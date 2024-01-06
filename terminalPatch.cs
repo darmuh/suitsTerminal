@@ -10,6 +10,8 @@ using static TerminalApi.TerminalApi;
 using GameNetcodeStuff;
 using Unity.Netcode;
 using Steamworks.Ugc;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace suitsTerminal
 {
@@ -19,15 +21,10 @@ namespace suitsTerminal
         public static List<UnlockableSuit> allSuits = new List<UnlockableSuit>();
         public static List<UnlockableItem> Unlockables = new List<UnlockableItem>();
         public static List<string> suitNames = new List<string>();
-        static bool keywordsCreated = false;
+        public static bool keywordsCreated = false;
 
         static void Postfix()
         {
-            if (keywordsCreated)
-            {
-                suitsTerminal.X("Keywords already created.");
-                return;
-            }
                 
             suitsTerminal.X("Suits patch");
             // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
@@ -39,10 +36,10 @@ namespace suitsTerminal
             Unlockables = StartOfRound.Instance.unlockablesList.unlockables;
 
             // Remove items with negative syncedSuitID
-            //allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
+            allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
 
             // Remove items with negative syncedSuitID and assign new random numbers
-            allSuits.RemoveAll(suit =>
+     /*       allSuits.RemoveAll(suit =>
             {
                 if (suit.syncedSuitID.Value < 0)
                 {
@@ -54,15 +51,17 @@ namespace suitsTerminal
                     } while (allSuits.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
 
                     // Assign the new random number
+                    suitsTerminal.X($"suit ID was {suit.syncedSuitID.Value}");
                     suit.syncedSuitID.Value = newRandomNumber;
+                    suitsTerminal.X($"suit ID changed to {suit.syncedSuitID.Value}");
 
                     return true; // Remove the item
                 }
 
                 return false; // Keep the item
-            });
+            }); */
 
-
+            //suitsTerminal.X(allSuits.ToString());
 
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
             suitsTerminal.X($"Unlockables Count: {Unlockables.Count}");
@@ -74,7 +73,7 @@ namespace suitsTerminal
                 component.disableObject = true;
                 TerminalNode itemNode = CreateTerminalNode("this shouldn't show", true, "switchSuit");
                 string SuitName = "";
-                if (item.syncedSuitID.Value >= 0)
+                if (item.syncedSuitID.Value >= 0 && !keywordsCreated)
                 {
                     SuitName = Unlockables[item.syncedSuitID.Value].unlockableName;
                     SuitName = terminalFriendlyString(SuitName);
@@ -88,10 +87,23 @@ namespace suitsTerminal
                     AddTerminalKeyword(itemKeyword);
                     suitsTerminal.X($"Keyword for {SuitName} added");
                 }
-                else
+                else if(item.syncedSuitID.Value >= 0 && keywordsCreated && suitsTerminal.instance.CompatibilityAC)
+                {
+                    SuitName = Unlockables[item.syncedSuitID.Value].unlockableName;
+                    SuitName = terminalFriendlyString(SuitName);
+                    TerminalKeyword itemKeyword = CreateTerminalKeyword("wear " + SuitName, true, itemNode);
+                    AddTerminalKeyword(itemKeyword);
+                    suitsTerminal.X($"Keyword for {SuitName} updated");
+                }
+                else if (item.syncedSuitID.Value < 0)
                 {
                     weirdSuitNum++;
                     suitsTerminal.X($"Skipping suit with invalid ID number: {item.syncedSuitID.Value}");
+                }
+                else
+                {
+                    suitsTerminal.X($"Keywords already created");
+                    suitsTerminal.X($"Item: {Unlockables[item.syncedSuitID.Value].unlockableName}");
                 }
 
 
@@ -121,7 +133,7 @@ namespace suitsTerminal
 
             Terminal getTerm = Object.FindObjectOfType<Terminal>();
 
-            if (getTerm != null)
+            if (getTerm != null && !keywordsCreated)
             {
                 
                 StringBuilder suitsList = new StringBuilder($"");
@@ -165,8 +177,74 @@ namespace suitsTerminal
                         suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
                     }
                 }
+
+                keywordsCreated = true;
             }
+            else if(suitsTerminal.instance.CompatibilityAC)
+            {
+                //verify keywords have been created
+
+                StringBuilder suitsList = new StringBuilder($"");
+
+                int weirdSuitNum = 0;
+                foreach (UnlockableSuit item in allSuits)
+                {
+
+                    string SuitName = "";
+                    if (item.syncedSuitID.Value >= 0)
+                    {
+                        SuitName = Unlockables[item.syncedSuitID.Value].unlockableName;
+                        SuitName = terminalFriendlyString(SuitName);
+                        suitsList.AppendLine($"> wear {SuitName}\n");
+                    }
+                    else
+                    {
+                        weirdSuitNum++;
+                        suitsTerminal.X($"Skipping suit.");
+                    }
+
+                }
+                suitsTerminal.X($"Suits with invalid ID Numbers: {weirdSuitNum}");
+
+
+                int maxLinesPerPage = 6;
+                List<Page> pages = PageSplitter.SplitTextIntoPages(suitsList.ToString(), maxLinesPerPage);
+                foreach (var page in pages)
+                {
+                    if (page.PageNumber == 1)
+                    {
+                        TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                        TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                        AddTerminalKeyword(suitsKeyword);
+                        suitsTerminal.X($"Created main suits command'");
+                    }
+                    else
+                    {
+                        TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                        TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                        AddTerminalKeyword(suitsKeyword);
+                        suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
+                    }
+                }
+            }
+
+            // Delayed tips
+            Task.Run(() =>
+            {
+                Thread.Sleep(5000);
+                suitsTerminal.X("hint in chat.");
+                HUDManager.Instance.AddTextToChatOnServer($"Access more suits by typing 'suits' in the terminal.");
+            });
+
+            Task.Run(() =>
+            {
+                Thread.Sleep(20000);
+                suitsTerminal.X("hint on hud.");
+                HUDManager.Instance.DisplayTip("Suits Access", "All suits have been moved to the terminal for storage. Use command 'suits' in the terminal to access them and change your suit!", false, false, "suitsTerminal-Hint");
+                
+            });
         }
+
     }
 
     [HarmonyPatch(typeof(Terminal), "ParsePlayerSentence")]
@@ -199,25 +277,31 @@ namespace suitsTerminal
                 //ulong playerID = StartOfRound.Instance.localPlayerController.playerClientId;
                 int playerID = GetPlayerID();
                 string SuitName = string.Empty;
-                foreach (UnlockableSuit item in Suits_Patch.allSuits)
+                if(Suits_Patch.Unlockables != null)
                 {
-                    SuitName = Suits_Patch.Unlockables[item.syncedSuitID.Value].unlockableName.ToLower();
-                    SuitName = terminalFriendlyString(SuitName);
-                    if (cleanedText.Equals("wear " + SuitName))
+                    foreach (UnlockableSuit suit in Suits_Patch.allSuits)
                     {
-                        UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], item.syncedSuitID.Value, true);
-                        item.SwitchSuitServerRpc(playerID);
-                        item.SwitchSuitClientRpc(playerID);
-                        __result.displayText = $"Changing suit to {Suits_Patch.Unlockables[item.syncedSuitID.Value].unlockableName}\r\n";
+                        if (suit.syncedSuitID.Value >= 0)
+                        {
+                            SuitName = Suits_Patch.Unlockables[suit.syncedSuitID.Value].unlockableName.ToLower();
+                            SuitName = terminalFriendlyString(SuitName);
+                            if (cleanedText.Equals("wear " + SuitName))
+                            {
+                                UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], suit.syncedSuitID.Value, true);
+                                suit.SwitchSuitServerRpc(playerID);
+                                suit.SwitchSuitClientRpc(playerID);
+                                __result.displayText = $"Changing suit to {Suits_Patch.Unlockables[suit.syncedSuitID.Value].unlockableName}\r\n";
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            suitsTerminal.X($"suit ID was {suit.syncedSuitID.Value}");
+                        }
                     }
-                   /* else
-                    {
-                        __result.displayText = $"Cannot find matching suit for {targetSuit}";
-                        suitsTerminal.X($"targetSuit - {targetSuit} \n unlockableName - {Suits_Patch.Unlockables[item.syncedSuitID.Value].unlockableName}");
-                    } */
-                        
-
                 }
+
+                __result.displayText = $"Unable to set suit to match command: {cleanedText}";
                 
             }
         }

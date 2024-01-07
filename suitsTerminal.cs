@@ -2,15 +2,11 @@
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
 using System.Reflection;
-using TerminalApi;
-using Unity.Netcode;
-using UnityEngine;
 
 namespace suitsTerminal
 {
-    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.0.1")]
+    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.0.3")]
 
     public class suitsTerminal : BaseUnityPlugin
     {
@@ -19,7 +15,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.0.2";
+            public const string PLUGIN_VERSION = "1.0.3";
         }
 
         public bool CompatibilityAC = false;
@@ -33,6 +29,7 @@ namespace suitsTerminal
 
             suitsTerminal.X("Plugin suitsTerminal is loaded!");
             Suits_Patch.keywordsCreated = false;
+            SConfig.Settings();
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
 

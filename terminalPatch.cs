@@ -4,12 +4,9 @@ using System.Linq;
 using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Steamworks;
 using System.Text;
 using static TerminalApi.TerminalApi;
 using GameNetcodeStuff;
-using Unity.Netcode;
-using Steamworks.Ugc;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -36,41 +33,68 @@ namespace suitsTerminal
             Unlockables = StartOfRound.Instance.unlockablesList.unlockables;
 
             // Remove items with negative syncedSuitID
-            allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
 
-            // Remove items with negative syncedSuitID and assign new random numbers
-     /*       allSuits.RemoveAll(suit =>
+            if (!SConfig.keepSuitsWithNegativeIDs.Value)
             {
-                if (suit.syncedSuitID.Value < 0)
+                allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
+                suitsTerminal.X("Removing suits with negative suitID values.");
+            }
+            else
+            {
+                suitsTerminal.X("Attempting to keep suits with negative suitID values.");
+                // Remove items with negative syncedSuitID and assign new random numbers
+                allSuits.RemoveAll(suit =>
                 {
-                    // Generate a new random number
-                    int newRandomNumber;
-                    do
+                    if (suit.syncedSuitID.Value < 0)
                     {
-                        newRandomNumber = UnityEngine.Random.Range(1, int.MaxValue);
-                    } while (allSuits.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
+                        // Generate a new random number
+                        int newRandomNumber;
+                        do
+                        {
+                            newRandomNumber = UnityEngine.Random.Range(1, int.MaxValue);
+                        } while (allSuits.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
 
-                    // Assign the new random number
-                    suitsTerminal.X($"suit ID was {suit.syncedSuitID.Value}");
-                    suit.syncedSuitID.Value = newRandomNumber;
-                    suitsTerminal.X($"suit ID changed to {suit.syncedSuitID.Value}");
+                        // Assign the new random number
+                        suitsTerminal.X($"suit ID was {suit.syncedSuitID.Value}");
+                        suit.syncedSuitID.Value = newRandomNumber;
+                        suitsTerminal.X($"suit ID changed to {suit.syncedSuitID.Value}");
 
-                    return true; // Remove the item
-                }
+                        return true; // Remove the item
+                    }
 
-                return false; // Keep the item
-            }); */
+                    return false; // Keep the item
+                });
+            }
+            
+
+
 
             //suitsTerminal.X(allSuits.ToString());
 
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
             suitsTerminal.X($"Unlockables Count: {Unlockables.Count}");
             int weirdSuitNum = 0;
+            int normSuit = 0;
             foreach (UnlockableSuit item in allSuits)
             {
                 
                 AutoParentToShip component = ((Component)item).gameObject.GetComponent<AutoParentToShip>();
-                component.disableObject = true;
+                if(normSuit >= SConfig.suitsOnRack.Value)
+                {
+                    component.disableObject = true;
+                    //suitsTerminal.X($"Removing {Unlockables[item.syncedSuitID.Value].unlockableName} from rack. Leaving {SConfig.suitsOnRack.Value} suits.");
+                }
+                else
+                {
+                    component.overrideOffset = true;
+
+                    float offsetModifier = 0.18f;
+
+                    component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (float)normSuit;
+                    component.rotationOffset = new Vector3(0f, 90f, 0f);
+                }
+                normSuit++;
+
                 TerminalNode itemNode = CreateTerminalNode("this shouldn't show", true, "switchSuit");
                 string SuitName = "";
                 if (item.syncedSuitID.Value >= 0 && !keywordsCreated)
@@ -87,13 +111,23 @@ namespace suitsTerminal
                     AddTerminalKeyword(itemKeyword);
                     suitsTerminal.X($"Keyword for {SuitName} added");
                 }
-                else if(item.syncedSuitID.Value >= 0 && keywordsCreated && suitsTerminal.instance.CompatibilityAC)
+                else if(item.syncedSuitID.Value >= 0 && keywordsCreated)
                 {
                     SuitName = Unlockables[item.syncedSuitID.Value].unlockableName;
                     SuitName = terminalFriendlyString(SuitName);
-                    TerminalKeyword itemKeyword = CreateTerminalKeyword("wear " + SuitName, true, itemNode);
-                    AddTerminalKeyword(itemKeyword);
-                    suitsTerminal.X($"Keyword for {SuitName} updated");
+                    if(GetKeyword("wear " + SuitName) != null)
+                    {
+                        TerminalKeyword itemKeyword = CreateTerminalKeyword("wear " + SuitName, true, itemNode);
+                        UpdateKeyword(itemKeyword);
+                        suitsTerminal.X($"Keyword for {SuitName} updated");
+                    }
+                    else
+                    {
+                        TerminalKeyword itemKeyword = CreateTerminalKeyword("wear " + SuitName, true, itemNode);
+                        AddTerminalKeyword(itemKeyword);
+                        suitsTerminal.X($"Keyword for {SuitName} added, keyword appears to have been removed.");
+                    }
+                    
                 }
                 else if (item.syncedSuitID.Value < 0)
                 {
@@ -102,8 +136,7 @@ namespace suitsTerminal
                 }
                 else
                 {
-                    suitsTerminal.X($"Keywords already created");
-                    suitsTerminal.X($"Item: {Unlockables[item.syncedSuitID.Value].unlockableName}");
+                    suitsTerminal.X($"leaving this here but it should never happen");
                 }
 
 
@@ -180,7 +213,7 @@ namespace suitsTerminal
 
                 keywordsCreated = true;
             }
-            else if(suitsTerminal.instance.CompatibilityAC)
+            else if(keywordsCreated)
             {
                 //verify keywords have been created
 
@@ -213,20 +246,59 @@ namespace suitsTerminal
                 {
                     if (page.PageNumber == 1)
                     {
-                        TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                        TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
-                        AddTerminalKeyword(suitsKeyword);
-                        suitsTerminal.X($"Created main suits command'");
+                        if (GetKeyword("suits") != null)
+                        {
+                            TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                            TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                            UpdateKeyword(suitsKeyword);
+                            suitsTerminal.X($"Updating main suits command");
+                        }
+                        else
+                        {
+                            TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                            TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                            AddTerminalKeyword(suitsKeyword);
+                            suitsTerminal.X($"main suits command was deleted, creating again");
+                        }
+                        
                     }
                     else
                     {
-                        TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                        TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
-                        AddTerminalKeyword(suitsKeyword);
-                        suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
+                        if (GetKeyword($"suits {page.PageNumber}") != null)
+                        {
+                            suitsTerminal.X("pages have already been creating, updating keyword");
+                            TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                            TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                            UpdateKeyword(suitsKeyword);
+                            //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
+                        }
+                        else
+                        {
+                            suitsTerminal.X("pages appear to have been deleted, creating keyword again");
+                            TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
+                            TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                            AddTerminalKeyword(suitsKeyword);
+                            //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
+                        }
                     }
                 }
             }
+
+            if (GetKeyword($"randomsuit") == null)
+            {
+                suitsTerminal.X("Creating keyword for wearing a random suit");
+                TerminalNode randNode = CreateTerminalNode($"something broke", true, "randomSuit");
+                TerminalKeyword randKeyword = CreateTerminalKeyword($"randomsuit", true, randNode);
+                AddTerminalKeyword(randKeyword);
+            }
+            else
+            {
+                suitsTerminal.X("Creating keyword for wearing a random suit");
+                TerminalNode randNode = CreateTerminalNode($"something broke", true, "randomSuit");
+                TerminalKeyword randKeyword = CreateTerminalKeyword($"randomsuit", true, randNode);
+                UpdateKeyword(randKeyword);
+            }
+                
 
             // Delayed tips
             Task.Run(() =>
@@ -240,7 +312,15 @@ namespace suitsTerminal
             {
                 Thread.Sleep(20000);
                 suitsTerminal.X("hint on hud.");
-                HUDManager.Instance.DisplayTip("Suits Access", "All suits have been moved to the terminal for storage. Use command 'suits' in the terminal to access them and change your suit!", false, false, "suitsTerminal-Hint");
+                if(SConfig.suitsOnRack.Value > 0 )
+                {
+                    HUDManager.Instance.DisplayTip("Suits Access", "Excess suits have been moved to the terminal for storage. Use command 'suits' in the terminal to access them and change your suit!", false, false, "suitsTerminal-Hint");
+                }
+                else
+                {
+                    HUDManager.Instance.DisplayTip("Suits Access", "All suits have been moved to the terminal for storage. Use command 'suits' in the terminal to access them and change your suit!", false, false, "suitsTerminal-Hint");
+                }
+                
                 
             });
         }
@@ -269,12 +349,10 @@ namespace suitsTerminal
             
             if (__result.terminalEvent != null && __result.terminalEvent == "switchSuit")
             {
-
                 suitsTerminal.X($"Suit Count: {Suits_Patch.allSuits.Count}");
                 suitsTerminal.X($"Unlockables Count: {Suits_Patch.Unlockables.Count}");
 
                 string cleanedText = GetScreenCleanedText(__instance);
-                //ulong playerID = StartOfRound.Instance.localPlayerController.playerClientId;
                 int playerID = GetPlayerID();
                 string SuitName = string.Empty;
                 if(Suits_Patch.Unlockables != null)
@@ -303,6 +381,44 @@ namespace suitsTerminal
 
                 __result.displayText = $"Unable to set suit to match command: {cleanedText}";
                 
+            }
+
+            if (__result.terminalEvent != null && __result.terminalEvent == "randomSuit")
+            {
+                suitsTerminal.X($"Suit Count: {Suits_Patch.allSuits.Count}");
+                suitsTerminal.X($"Unlockables Count: {Suits_Patch.Unlockables.Count}");
+
+                int playerID = GetPlayerID();
+                
+
+                if (Suits_Patch.Unlockables != null)
+                {
+                    for (int i = 0; i < Suits_Patch.Unlockables.Count; i++)
+                    {
+                        // Get a random index
+                        int randomIndex = UnityEngine.Random.Range(0, Suits_Patch.allSuits.Count);
+                        string SuitName;
+
+                        // Get the UnlockableSuit at the random index
+                        UnlockableSuit randomSuit = Suits_Patch.allSuits[randomIndex];
+                        if (randomSuit != null && Suits_Patch.Unlockables[randomSuit.syncedSuitID.Value] != null)
+                        {
+                            SuitName = Suits_Patch.Unlockables[randomSuit.syncedSuitID.Value].unlockableName;
+                            UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], randomSuit.syncedSuitID.Value, true);
+                            randomSuit.SwitchSuitServerRpc(playerID);
+                            randomSuit.SwitchSuitClientRpc(playerID);
+                            __result.displayText = $"Changing suit to {SuitName}!\r\n";
+                            break;
+                        }
+                        else
+                        {
+                            suitsTerminal.X($"Random suit ID was invalid or null");
+                        }
+                    }
+                    return;
+                }
+
+                __result.displayText = $"Unable to set suit random suit.";
             }
         }
 

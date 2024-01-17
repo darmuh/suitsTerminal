@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace suitsTerminal
 {
-    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.0.3")]
+    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.0.6")]
 
     public class suitsTerminal : BaseUnityPlugin
     {
@@ -15,7 +15,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.0.3";
+            public const string PLUGIN_VERSION = "1.0.6";
         }
 
         public bool CompatibilityAC = false;
@@ -27,7 +27,7 @@ namespace suitsTerminal
             suitsTerminal.instance = this;
             suitsTerminal.Log = base.Logger;
 
-            suitsTerminal.X("Plugin suitsTerminal is loaded!");
+            suitsTerminal.X("Plugin suitsTerminal is loaded with version 1.0.6!");
             Suits_Patch.keywordsCreated = false;
             SConfig.Settings();
 

@@ -3,10 +3,11 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
 using System.Reflection;
+using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {
-    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.0.6")]
+    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.1.0")]
 
     public class suitsTerminal : BaseUnityPlugin
     {
@@ -15,10 +16,10 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.0.6";
+            public const string PLUGIN_VERSION = "1.1.0";
         }
 
-        public bool CompatibilityAC = false;
+        public static Terminal Terminal;
 
         internal static new ManualLogSource Log;
 
@@ -27,17 +28,11 @@ namespace suitsTerminal
             suitsTerminal.instance = this;
             suitsTerminal.Log = base.Logger;
 
-            suitsTerminal.X("Plugin suitsTerminal is loaded with version 1.0.6!");
-            Suits_Patch.keywordsCreated = false;
+            suitsTerminal.Log.LogInfo("Plugin suitsTerminal is loaded with version 1.1.0!");
+            keywordsCreated = false;
             SConfig.Settings();
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-
-            if (Chainloader.PluginInfos.ContainsKey("com.potatoepet.AdvancedCompany"))
-            {
-                suitsTerminal.X("Advanced Company detected, setting Advanced Company Compatibility options");
-                CompatibilityAC = true;
-            }
 
             //LeaveTerminal.AddTest(); //this command is only for devtesting
             //Addkeywords used to be here
@@ -63,6 +58,9 @@ namespace suitsTerminal
 
         public static void X(string message)
         {
+            if (!SConfig.extensiveLogging.Value)
+                return;
+
             suitsTerminal.Log.LogInfo(message);
         }
 

@@ -7,7 +7,7 @@ using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {
-    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.1.0")]
+    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.1.2")]
 
     public class suitsTerminal : BaseUnityPlugin
     {
@@ -16,7 +16,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.1.0";
+            public const string PLUGIN_VERSION = "1.1.2";
         }
 
         public static Terminal Terminal;
@@ -28,7 +28,7 @@ namespace suitsTerminal
             suitsTerminal.instance = this;
             suitsTerminal.Log = base.Logger;
 
-            suitsTerminal.Log.LogInfo("Plugin suitsTerminal is loaded with version 1.1.0!");
+            suitsTerminal.Log.LogInfo("suitsTerminal version 1.1.2 has been started!");
             keywordsCreated = false;
             SConfig.Settings();
 

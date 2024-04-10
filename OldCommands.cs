@@ -27,7 +27,7 @@ namespace suitsTerminal
                         suitsTerminal.X($"Duplicate found. Updated SuitName: {SuitName}");
                     }
                     suitNames.Add(SuitName.ToLower());
-                    CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, true, SuitName, "", "", CommandHandler.SuitPickCommand);
+                    CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
                     suitsTerminal.X($"Keyword for {SuitName} added");
                 }
                 else if (item.syncedSuitID.Value >= 0 && keywordsCreated)
@@ -36,12 +36,12 @@ namespace suitsTerminal
                     SuitName = TerminalFriendlyString(SuitName);
                     if (GetKeyword("wear " + SuitName) != null)
                     {
-                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, true, SuitName, "", "", CommandHandler.SuitPickCommand);
+                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
                         suitsTerminal.X($"Keyword for {SuitName} updated");
                     }
                     else
                     {
-                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, true, SuitName, "", "", CommandHandler.SuitPickCommand);
+                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
                         suitsTerminal.X($"Keyword for {SuitName} added, keyword appears to have been removed.");
                     }
 
@@ -149,14 +149,14 @@ namespace suitsTerminal
             if (GetKeyword("suits") != null)
             {
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
                 UpdateKeyword(suitsKeyword);
                 //suitsTerminal.X($"Updating main suits command");
             }
             else
             {
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
                 AddTerminalKeyword(suitsKeyword);
                 suitsTerminal.X($"main suits command was deleted, creating again");
             }
@@ -169,7 +169,7 @@ namespace suitsTerminal
             {
                 suitsTerminal.X("pages have already been creating, updating keyword");
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
                 UpdateKeyword(suitsKeyword);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
@@ -177,7 +177,7 @@ namespace suitsTerminal
             {
                 suitsTerminal.X("pages appear to have been deleted, creating keyword again");
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
                 AddTerminalKeyword(suitsKeyword);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
@@ -189,14 +189,14 @@ namespace suitsTerminal
             if (GetKeyword("suits") != null)
             {
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
                 UpdateKeyword(suitsKeyword);
                 //suitsTerminal.X($"Updating main suits command");
             }
             else
             {
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
                 AddTerminalKeyword(suitsKeyword);
                 suitsTerminal.X($"main suits command was deleted, creating again");
             }
@@ -209,7 +209,7 @@ namespace suitsTerminal
             {
                 suitsTerminal.X("pages have already been creating, updating keyword");
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
                 UpdateKeyword(suitsKeyword);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
@@ -217,7 +217,7 @@ namespace suitsTerminal
             {
                 suitsTerminal.X("pages appear to have been deleted, creating keyword again");
                 TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", true, suitsNode);
+                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
                 AddTerminalKeyword(suitsKeyword);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
@@ -229,7 +229,7 @@ namespace suitsTerminal
             if (!SConfig.randomSuitCommand.Value)
                 return;
             
-                CommandHandler.AddCommand("random suit command", true, otherNodes, "randomsuit", true, "random_suit", "Other", "suitsTerminal command to equip a random suit", CommandHandler.RandomSuitCommand);
+                CommandHandler.AddCommand("random suit command", true, otherNodes, "randomsuit", false, "random_suit", "Other", "suitsTerminal command to equip a random suit", CommandHandler.RandomSuitCommand);
         }
     }
 }

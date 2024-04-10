@@ -10,6 +10,7 @@ using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
 using static TerminalApi.TerminalApi;
 using GameNetcodeStuff;
+using System.Numerics;
 
 namespace suitsTerminal
 {
@@ -21,6 +22,10 @@ namespace suitsTerminal
         internal static Key leaveMenu;
         internal static Key selectMenu;
         internal static Key togglePiP;
+        internal static string upString;
+        internal static string downString;
+        internal static string leftString;
+        internal static string rightString;
         internal static string leaveString;
         internal static string selectString;
         internal static string togglePiPstring;
@@ -31,20 +36,27 @@ namespace suitsTerminal
         public static bool specialMenusActive = false;
         internal static TerminalNode menuDisplay = null;
 
+        internal static bool initKeySettings = false;
+
+        //old layer info
+        internal static int playerModelLayer;
+        internal static int playerModelArmsLayer;
+
         internal static void InitSettings()
         {
-            suitsTerminal.X("Loading keybinds from config");
+            if (initKeySettings)
+                return;
+
+            initKeySettings = true;
             keyActions.Clear();
-            keyActions.Add(Key.LeftArrow, "previous_page");
-            keyActions.Add(Key.RightArrow, "next_page");
-            keyActions.Add(Key.UpArrow, "previous_item");
-            keyActions.Add(Key.DownArrow, "next_item");
-            LeaveMenu();
-            SelectKey();
+            suitsTerminal.X("Loading keybinds from config");
+            CollectionOfKeys();
             TogglePiPKey();
             CreateMenuCommand();
             if(menuDisplay == null )
                 menuDisplay = CreateTerminalNode("", true);
+
+            initKeySettings = false;
         }
 
         private static void GetCurrentSuitNum()
@@ -61,23 +73,58 @@ namespace suitsTerminal
             if (!advancedTerminalMenu.Value)
                 return;
 
-            CommandHandler.AddCommand("Advanced Menus Corotuine", true, otherNodes, "suits", true, "advanced_suitsTerm", "Other", "Access suitsTerminal menu for selecting a new suit to wear.", CommandHandler.AdvancedSuitsTerm);
+            CommandHandler.AddCommand("Advanced Menus Corotuine", true, otherNodes, "suits", false, "advanced_suitsTerm", "Other", "Access suitsTerminal menu for selecting a new suit to wear.", CommandHandler.AdvancedSuitsTerm);
         }
 
-        private static void LeaveMenu()
+        private static void CollectionOfKeys()
         {
-            if(IsValidKey(SConfig.leaveMenu.Value, out Key validKey))
+            CheckKeys(SConfig.menuUp.Value, out Key upKey, out upString);
+            BindKeys("previous_item", upKey, upString, "UpArrow", Key.UpArrow);
+
+            CheckKeys(SConfig.menuDown.Value, out Key downKey, out downString);
+            BindKeys("next_item", downKey, downString, "DownArrow", Key.DownArrow);
+
+            CheckKeys(SConfig.menuLeft.Value, out Key leftKey, out leftString);
+            BindKeys("previous_page", leftKey, leftString, "LeftArrow", Key.LeftArrow);
+
+            CheckKeys(SConfig.menuRight.Value, out Key rightKey, out rightString);
+            BindKeys("next_page", rightKey, rightString, "RightArrow", Key.RightArrow);
+
+            CheckKeys(SConfig.leaveMenu.Value, out Key leaveKey, out leaveString);
+            BindKeys("leave_menu", leaveKey, leaveString, "Backspace", Key.Backspace);
+
+            CheckKeys(SConfig.selectMenu.Value, out Key selectKey, out selectString);
+            BindKeys("menu_select", selectKey, selectString, "Enter", Key.Enter);
+        }
+
+        private static void BindKeys(string menuAction, Key givenKey, string givenKeyString, string defaultKeyString, Key defaultKey)
+        {
+            suitsTerminal.X($"Binding {menuAction}");
+            if(givenKey != Key.None)
             {
-                leaveMenu = validKey;
-                keyActions.Add(leaveMenu, "leave_menu");
-                leaveString = SConfig.leaveMenu.Value;
-            }   
+                keyActions.Add(givenKey, menuAction);
+                suitsTerminal.X($"{givenKeyString} bound to {menuAction}");
+            }
             else
             {
-                keyActions.Add(Key.Backspace, "leave_menu");
-                leaveString = "Backspace";
+                keyActions.Add(defaultKey, menuAction);
+                givenKeyString = defaultKeyString;
+                suitsTerminal.X($"{givenKeyString} bound to {menuAction}");
             }
-                
+        }
+
+        private static void CheckKeys(string configString, out Key usingKey, out string keyString)
+        {
+            if (IsValidKey(configString, out Key validKey))
+            {
+                usingKey = validKey;
+                keyString = configString;
+            }
+            else
+            {
+                usingKey = Key.None;
+                keyString = "FAIL";
+            }
         }
 
         private static void TogglePiPKey()
@@ -99,39 +146,24 @@ namespace suitsTerminal
 
         }
 
-        private static void SelectKey()
-        {
-            if (IsValidKey(SConfig.selectMenu.Value, out Key validKey))
-            {
-                selectMenu = validKey;
-                keyActions.Add(selectMenu, "menu_select");
-                selectString = SConfig.selectMenu.Value;
-            }   
-            else
-            {
-                keyActions.Add(Key.Enter, "menu_select");
-                selectString = "Enter";
-            }
-        }
-
         private static bool IsValidKey(string key, out Key validKey)
         {
             List<Key> invalidKeys = new List<Key>() {
-            Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J,
-            Key.K, Key.L, Key.M, Key.N, Key.O, Key.P, Key.Q, Key.R, Key.S, Key.T,
-            Key.U, Key.V, Key.W, Key.X, Key.Y, Key.Z, Key.Space
+            Key.Tab
             };
             if (Enum.TryParse(key, ignoreCase: true, out Key keyFromString))
             {
                 if (invalidKeys.Contains(keyFromString))
                 {
-                    suitsTerminal.X("Alphabetical Key detected, rejecting bind.");
+                    suitsTerminal.X("Tab Key detected, rejecting bind.");
                     validKey = Key.None;
                     return false;
                 }
                 else if (keyActions.ContainsKey(keyFromString))
                 {
                     suitsTerminal.X("Key was already bound to something, returning false");
+                    string allKeys = string.Join(", ", keyActions.Keys);
+                    suitsTerminal.X($"Key list: {allKeys}");
                     validKey = Key.None;
                     return false;
                 }
@@ -196,6 +228,31 @@ namespace suitsTerminal
             suitsTerminal.Terminal.terminalImage.enabled = false;
             suitsTerminal.Terminal.displayingPersistentImage = null;
             suitsTerminal.Terminal.terminalImage.texture = null;
+        }
+
+        private static void SaveOriginalLayerInformation(PlayerControllerB player)
+        {
+            if (!SConfig.enablePiPCamera.Value)
+                return;
+
+            playerModelLayer = player.thisPlayerModel.gameObject.layer;
+            playerModelArmsLayer = player.thisPlayerModelArms.gameObject.layer;
+
+            suitsTerminal.X($"Saved layer information: {playerModelLayer} & {playerModelArmsLayer}");
+        }
+
+        private static void ModifyPlayerLayersForPiP(PlayerControllerB player, int playerModel, int playerModelArms)
+        {
+            if (!SConfig.enablePiPCamera.Value)
+                return;
+
+            //Credits to QuackAndCheese, using this portion of their player patch from MirrorDecor
+
+            player.thisPlayerModel.gameObject.layer = playerModel; //23
+            //player.thisPlayerModelLOD1.gameObject.layer = 5;
+            player.thisPlayerModelArms.gameObject.layer = playerModelArms; //5
+
+            suitsTerminal.X($"Set layer information: playerModel - {playerModel} & playerModelArms - {playerModelArms}");
         }
 
         private static void HandleKeyAction(string value)
@@ -289,7 +346,9 @@ namespace suitsTerminal
                 yield break;
 
             specialMenusActive = true;
+            SaveOriginalLayerInformation(StartOfRound.Instance.localPlayerController);
             GetCurrentSuitNum();
+            ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, 23, 5);
             PictureInPicture.TogglePiP(true);
             yield return new WaitForSeconds(0.2f);
             suitsTerminal.Terminal.screenText.interactable = false;
@@ -317,6 +376,7 @@ namespace suitsTerminal
             specialMenusActive = false;
 
             PictureInPicture.TogglePiP(false);
+            ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, playerModelLayer, playerModelArmsLayer);
             //RemovePicture();
             suitsTerminal.Terminal.screenText.interactable = true;
             yield return new WaitForSeconds(0.1f);

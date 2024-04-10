@@ -1,6 +1,6 @@
 {
     "name": "suitsTerminal",
-    "version_number": "1.1.0",
+    "version_number": "1.1.2",
     "website_url": "https://github.com/darmuh/suitsTerminal",
     "description": "More Suits Addon that removes excess suits from the rack and stores them in the terminal. See a listing and select any suit for wear from the terminal and clean up the rack!",
     "dependencies": [

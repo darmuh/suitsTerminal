@@ -69,7 +69,7 @@ namespace suitsTerminal
             int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
             StringBuilder message = new StringBuilder();
 
-            message.Append($" === suitsTerminal Advanced Suits Menu ===\r\n=== Use Arrow Keys to Navigate All Suits === \r\n");
+            message.Append($" === suitsTerminal Advanced Suits Menu ===\r\n=== Next Item [{downString}], Last Item [{upString}], Next Page [{rightString}], Last Page [{leftString}] === \r\n");
             message.Append($" === Select a Suit by pressing [{selectString}] === \r\n");
             message.Append("\r\n");
 

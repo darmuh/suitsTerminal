@@ -105,7 +105,7 @@ namespace suitsTerminal
             playerCam.transform.rotation = newRotation;
             playerCam.transform.position = playerTransform.position - oppositeDirection * distanceBehind + playerTransform.up * 2f;
 
-            playerCam.cullingMask = 9962313; //ship security camera culling mask, best for seeing yourself it seems
+            playerCam.cullingMask = SConfig.setPiPCullingMask.Value; //9962313 old, ship security cam mask
             playerCam.orthographic = true;
             playerCam.orthographicSize = 0.55f;
             playerCam.usePhysicalProperties = false;

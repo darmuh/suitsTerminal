@@ -21,9 +21,15 @@ namespace suitsTerminal
         public static ConfigEntry<bool> chatHints;
         public static ConfigEntry<bool> bannerHints;
 
+        public static ConfigEntry<string> menuUp;
+        public static ConfigEntry<string> menuDown;
+        public static ConfigEntry<string> menuLeft;
+        public static ConfigEntry<string> menuRight;
         public static ConfigEntry<string> leaveMenu;
         public static ConfigEntry<string> selectMenu;
         public static ConfigEntry<string> togglePiP;
+
+        public static ConfigEntry<int> setPiPCullingMask;
         
 
         public static void Settings()
@@ -44,11 +50,15 @@ namespace suitsTerminal
 
             //Menu Binds
             SConfig.advancedTerminalMenu = suitsTerminal.instance.Config.Bind<bool>("General", "advancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
+            SConfig.menuLeft = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "menuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
+            SConfig.menuRight = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "menuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
+            SConfig.menuUp = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "menuUp", "UpArrow", "Set key to press to go to previous item on page in advanced menu system");
+            SConfig.menuDown = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "menuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
             SConfig.leaveMenu = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "leaveMenu", "Backspace", "Set key to press to leave advanced menu system");
             SConfig.selectMenu = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "selectMenu", "Enter", "Set key to press to select an option in advanced menu system");
             SConfig.togglePiP = suitsTerminal.instance.Config.Bind<string>("advancedTerminalMenu", "togglePiP", "F12", "Set key to press to toggle PiP view in advanced menu system");
             SConfig.enablePiPCamera = suitsTerminal.instance.Config.Bind<bool>("advancedTerminalMenu", "enablePiPCamera", true, "Disable this to stop the PiP camera from being created");
-
+            SConfig.setPiPCullingMask = suitsTerminal.instance.Config.Bind<int>("advancedTerminalMenu", "setPiPCullingMask", 565909343, "Use this configuration option to change the camera's culling mask. (don't change unless you have an idea what you're doing)");
 
             //Hints
             SConfig.chatHints = suitsTerminal.instance.Config.Bind<bool>("Hints", "chatHints", true, "Disable this to remove the chat hints displayed at load in.");

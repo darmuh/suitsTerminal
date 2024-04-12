@@ -13,6 +13,10 @@ namespace suitsTerminal
         internal static RawImage pipRawImage = null;
         internal static Canvas terminalCanvas = null;
         internal static bool pipActive = false;
+        internal static float initCamHeight;
+        internal static int heightStep;
+        internal static int zoomStep;
+        internal static int rotateStep;
 
         internal static void InitPiP()
         {
@@ -40,7 +44,8 @@ namespace suitsTerminal
             pipRawImage = pipGameObject.GetComponent<RawImage>();
 
             // Set dimensions and position for radar image (rawImage1)
-            SetRawImageDimensionsAndPosition(pipRawImage.rectTransform, 0.30f, 0.30f, 120f, -40f);
+            SetRawImageDimensionsAndPosition(pipRawImage.rectTransform, 0.45f, 0.33f, 90f, -12f);
+            pipRawImage.color = new Color(1, 1, 1, 0.9f); //90% opacity
             pipGameObject.SetActive(false);
             PiPCreated = true;
         }
@@ -64,6 +69,68 @@ namespace suitsTerminal
                 termObject.gameObject.layer = 0;
                 suitsTerminal.X("terminal layer changed");
             }
+        }
+
+        internal static void RotateCameraAroundPlayer(Transform playerTransform, Camera camera)
+        {
+            // Define the rotation increment
+            Quaternion rotationIncrement = Quaternion.LookRotation(-playerTransform.right, playerTransform.up);
+
+            // Calculate the new rotation by applying the rotation increment to the camera's current rotation
+            Quaternion newRotation = rotationIncrement * camera.transform.rotation;
+
+            // Update the camera's rotation
+            camera.transform.rotation = newRotation;
+
+            // Calculate the new position by offsetting from the player's position
+            Vector3 offset = camera.transform.position - playerTransform.position;
+            Vector3 newPosition = playerTransform.position + rotationIncrement * offset;
+
+            // Update the camera's position
+            camera.transform.position = newPosition;
+        }
+
+
+        internal static void ChangeCamZoom(Camera camera, ref int currentStep)
+        {
+            float[] zoomVals = { 1.2f, 0.45f, 0.35f, 0.28f};
+
+            // Increment the current step
+            currentStep++;
+
+            // If the current step exceeds the number of steps, circle back to the first step
+            if (currentStep >= zoomVals.Length)
+            {
+                currentStep = 0;
+            }
+
+            camera.orthographicSize = zoomVals[currentStep];
+        }
+
+        internal static void MoveCamera(Camera camera, ref int currentStep)
+        {
+            // Define the heights for each step
+            float[] stepHeights = { 0f, 1.3f, -9.499f, -7.749f, -5.499f, -2.49f };
+
+            // Increment the current step
+            currentStep++;
+
+            // If the current step exceeds the number of steps, circle back to the first step
+            if (currentStep >= stepHeights.Length)
+            {
+                currentStep = 0;
+            }
+
+            // Get the target height for the current step
+            float targetHeight = initCamHeight + stepHeights[currentStep];
+
+            Vector3 newPosition = camera.transform.localPosition;
+
+            // Update the y-coordinate of the new position to the target height
+            newPosition.y = targetHeight;
+
+            // Update the camera's position
+            camera.transform.localPosition = newPosition;
         }
 
         internal static void TogglePiP(bool state)
@@ -104,6 +171,8 @@ namespace suitsTerminal
             // Set camera's rotation and position
             playerCam.transform.rotation = newRotation;
             playerCam.transform.position = playerTransform.position - oppositeDirection * distanceBehind + playerTransform.up * 2f;
+            initCamHeight = playerCam.transform.position.y;
+            suitsTerminal.X($"initCamHeight: {initCamHeight}");
 
             playerCam.cullingMask = SConfig.setPiPCullingMask.Value; //9962313 old, ship security cam mask
             playerCam.orthographic = true;

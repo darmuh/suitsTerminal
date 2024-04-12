@@ -125,6 +125,29 @@ namespace suitsTerminal
             OldCommands.MakeRandomSuitCommand();
         }
 
+        private static void HideBootsAndRack()
+        {
+            if(rackSituated) 
+                return;
+
+            if (SConfig.hideBoots.Value)
+            {
+                GameObject boots = GameObject.Find("Environment/HangarShip/ScavengerModelSuitParts/Circle.004");
+                GameObject.Destroy(boots);
+            }
+
+            if (SConfig.dontRemove.Value)
+                return;
+
+            if (SConfig.hideRack.Value)
+            {
+                GameObject clothingRack = GameObject.Find("Environment/HangarShip/NurbsPath.002");
+                GameObject.Destroy(clothingRack);
+            }
+
+            
+        }
+
         private static void FixRack()
         {
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
@@ -132,6 +155,8 @@ namespace suitsTerminal
             weirdSuitNum = 0;
             reorderSuits = 0;
             normSuit = 0;
+
+            HideBootsAndRack();
 
             foreach (UnlockableSuit item in allSuits)
             {
@@ -164,7 +189,7 @@ namespace suitsTerminal
                         }
                     }
 
-                    if (normSuit >= SConfig.suitsOnRack.Value && !rackSituated || (rackSituated && !isHanging))
+                    if (normSuit >= SConfig.suitsOnRack.Value && !rackSituated || (rackSituated && !isHanging) || SConfig.hideRack.Value)
                     {
                         ProcessHiddenSuit(component);
                         normSuit++;
@@ -188,7 +213,9 @@ namespace suitsTerminal
                         rackSituated = true;
                         suitsTerminal.X($"Max suits are on the rack now. rack is situated \n^ ^\n .");
                     }
-                }
+
+                    
+                }  
             }
 
             InitThisPlugin.initStarted = false;

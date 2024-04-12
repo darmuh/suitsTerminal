@@ -8,6 +8,7 @@ using System.Linq;
 using static suitsTerminal.SConfig;
 using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
+using static suitsTerminal.PictureInPicture;
 using static TerminalApi.TerminalApi;
 using GameNetcodeStuff;
 using System.Numerics;
@@ -29,6 +30,9 @@ namespace suitsTerminal
         internal static string leaveString;
         internal static string selectString;
         internal static string togglePiPstring;
+        internal static string pipHeightString;
+        internal static string pipRotateString;
+        internal static string pipZoomString;
         internal static int currentPage;
         internal static int activeSelection;
         internal static int currentlyWearing;
@@ -79,25 +83,25 @@ namespace suitsTerminal
         private static void CollectionOfKeys()
         {
             CheckKeys(SConfig.menuUp.Value, out Key upKey, out upString);
-            BindKeys("previous_item", upKey, upString, "UpArrow", Key.UpArrow);
+            BindKeys("previous_item", upKey, ref upString, "UpArrow", Key.UpArrow);
 
             CheckKeys(SConfig.menuDown.Value, out Key downKey, out downString);
-            BindKeys("next_item", downKey, downString, "DownArrow", Key.DownArrow);
+            BindKeys("next_item", downKey, ref downString, "DownArrow", Key.DownArrow);
 
             CheckKeys(SConfig.menuLeft.Value, out Key leftKey, out leftString);
-            BindKeys("previous_page", leftKey, leftString, "LeftArrow", Key.LeftArrow);
+            BindKeys("previous_page", leftKey, ref leftString, "LeftArrow", Key.LeftArrow);
 
             CheckKeys(SConfig.menuRight.Value, out Key rightKey, out rightString);
-            BindKeys("next_page", rightKey, rightString, "RightArrow", Key.RightArrow);
+            BindKeys("next_page", rightKey, ref rightString, "RightArrow", Key.RightArrow);
 
             CheckKeys(SConfig.leaveMenu.Value, out Key leaveKey, out leaveString);
-            BindKeys("leave_menu", leaveKey, leaveString, "Backspace", Key.Backspace);
+            BindKeys("leave_menu", leaveKey, ref leaveString, "Backspace", Key.Backspace);
 
             CheckKeys(SConfig.selectMenu.Value, out Key selectKey, out selectString);
-            BindKeys("menu_select", selectKey, selectString, "Enter", Key.Enter);
+            BindKeys("menu_select", selectKey, ref selectString, "Enter", Key.Enter);
         }
 
-        private static void BindKeys(string menuAction, Key givenKey, string givenKeyString, string defaultKeyString, Key defaultKey)
+        private static void BindKeys(string menuAction, Key givenKey, ref string givenKeyString, string defaultKeyString, Key defaultKey)
         {
             suitsTerminal.X($"Binding {menuAction}");
             if(givenKey != Key.None)
@@ -131,6 +135,15 @@ namespace suitsTerminal
         {
             if (!enablePiPCamera.Value)
                 return;
+
+            CheckKeys(togglePiPHeight.Value, out Key pipHeight, out pipHeightString);
+            BindKeys("pip_height", pipHeight, ref pipHeightString, "Backslash", Key.Backslash);
+
+            CheckKeys(togglePiPRotation.Value, out Key pipRotate, out pipRotateString);
+            BindKeys("pip_rotate", pipRotate, ref pipRotateString, "Equals", Key.Equals);
+
+            CheckKeys(togglePiPZoom.Value, out Key pipZoom, out pipZoomString);
+            BindKeys("pip_zoom", pipZoom, ref pipZoomString, "Minus", Key.Minus);
 
             if (IsValidKey(SConfig.togglePiP.Value, out Key validKey))
             {
@@ -182,9 +195,23 @@ namespace suitsTerminal
                 
         }
 
+        internal static void TerminalInputEnabled(bool state)
+        {
+            if(state == false)
+            {
+                suitsTerminal.Terminal.screenText.interactable = false;
+            }
+            else
+            {
+                suitsTerminal.Terminal.screenText.interactable = true;
+            }
+        }
+
         // Method to check if any key in the dictionary is pressed
         public static bool AnyKeyIsPressed()
         {
+            TerminalInputEnabled(false);
+
             foreach (var keyAction in keyActions)
             {
                 if (Keyboard.current[keyAction.Key].isPressed)
@@ -216,23 +243,9 @@ namespace suitsTerminal
                 suitsTerminal.Log.LogError("Shortcut KeyActions list not updating properly");
         }
 
-        internal static void UpdatePicture()
-        {
-            suitsTerminal.Terminal.terminalImage.enabled = true;
-            suitsTerminal.Terminal.displayingPersistentImage = GetSuitTexture(activeSelection);
-            suitsTerminal.Terminal.terminalImage.texture = GetSuitTexture(activeSelection); 
-        }
-
-        internal static void RemovePicture()
-        {
-            suitsTerminal.Terminal.terminalImage.enabled = false;
-            suitsTerminal.Terminal.displayingPersistentImage = null;
-            suitsTerminal.Terminal.terminalImage.texture = null;
-        }
-
         private static void SaveOriginalLayerInformation(PlayerControllerB player)
         {
-            if (!SConfig.enablePiPCamera.Value)
+            if (enablePiPCamera.Value)
                 return;
 
             playerModelLayer = player.thisPlayerModel.gameObject.layer;
@@ -243,7 +256,7 @@ namespace suitsTerminal
 
         private static void ModifyPlayerLayersForPiP(PlayerControllerB player, int playerModel, int playerModelArms)
         {
-            if (!SConfig.enablePiPCamera.Value)
+            if (enablePiPCamera.Value)
                 return;
 
             //Credits to QuackAndCheese, using this portion of their player patch from MirrorDecor
@@ -264,6 +277,7 @@ namespace suitsTerminal
 
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -272,6 +286,7 @@ namespace suitsTerminal
                 currentPage++;
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -282,6 +297,7 @@ namespace suitsTerminal
 
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -290,12 +306,14 @@ namespace suitsTerminal
                 activeSelection++;
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "leave_menu")
             {
                 exitSpecialMenu = true;
+                TerminalInputEnabled(true);
                 return;
             }
             else if (value == "menu_select")
@@ -306,23 +324,30 @@ namespace suitsTerminal
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
                 return;
             }
             else if (value == "toggle_pip")
             {
-                PictureInPicture.TogglePiP(!PictureInPicture.pipActive);
+                TogglePiP(!PictureInPicture.pipActive);
                 suitsTerminal.X($"Toggling PiP to state {!PictureInPicture.pipActive}");
                 return;
             }
-        }
-
-        internal static Texture GetSuitTexture(int activeSuit)
-        {
-            if (allSuits[activeSuit] == null)
-                return null;
-
-            return allSuits[activeSuit].suitMaterial.mainTexture;
-
+            else if (value == "pip_height")
+            {
+                MoveCamera(playerCam, ref heightStep);
+                suitsTerminal.X($"Changing PiP height to {heightStep}");
+            }
+            else if (value == "pip_rotate")
+            {
+                RotateCameraAroundPlayer(StartOfRound.Instance.localPlayerController.transform, playerCam);
+                suitsTerminal.X($"Rotating PiP around player");
+            }
+            else if (value == "pip_zoom")
+            {
+                ChangeCamZoom(playerCam, ref zoomStep);
+                suitsTerminal.X($"Changing PiP zoom to zoomStep: [{zoomStep}]");
+            }
         }
 
         internal static void GetCurrentSuitID()
@@ -338,7 +363,13 @@ namespace suitsTerminal
             }
         }
 
+        private static void PiPSetParent()
+        {
+            if (!enablePiPCamera.Value)
+                return;
 
+            pipRawImage.transform.SetParent(suitsTerminal.Terminal.screenText.image.transform);
+        }
 
         internal static IEnumerator ActiveMenu()
         {
@@ -346,15 +377,20 @@ namespace suitsTerminal
                 yield break;
 
             specialMenusActive = true;
+            rotateStep = 0;
+            heightStep = 0;
+            zoomStep = 1;
             SaveOriginalLayerInformation(StartOfRound.Instance.localPlayerController);
             GetCurrentSuitNum();
             ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, 23, 5);
-            PictureInPicture.TogglePiP(true);
-            yield return new WaitForSeconds(0.2f);
+            TogglePiP(true);
+            suitsTerminal.Terminal.screenText.DeactivateInputField();
             suitsTerminal.Terminal.screenText.interactable = false;
+            yield return new WaitForSeconds(0.2f);
             suitsTerminal.X("ActiveMenu Coroutine");
             currentPage = 1;
             activeSelection = 0;
+            PiPSetParent();
 
             while (suitsTerminal.Terminal.terminalInUse && advancedTerminalMenu.Value && !exitSpecialMenu)
             {
@@ -375,12 +411,11 @@ namespace suitsTerminal
 
             specialMenusActive = false;
 
-            PictureInPicture.TogglePiP(false);
+            TogglePiP(false);
             ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, playerModelLayer, playerModelArmsLayer);
-            //RemovePicture();
-            suitsTerminal.Terminal.screenText.interactable = true;
             yield return new WaitForSeconds(0.1f);
             suitsTerminal.Terminal.screenText.ActivateInputField();
+            suitsTerminal.Terminal.screenText.interactable = true;
             suitsTerminal.Terminal.LoadNewNode(suitsTerminal.Terminal.terminalNodes.specialNodes[13]);
             yield break;
         }

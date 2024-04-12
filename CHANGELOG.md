@@ -1,18 +1,33 @@
 # Change Log
 
-### [1.1.2] **CURRENT VERSION**
+### [1.1.3] **CURRENT VERSION**
+ - Added new configuration options for removing the suit rack and the boots below the suit rack
+	- Credits to Hamster (author of LethalPipeRemoval) for finding the specific objects.
+	- enable hideRack to remove suit rack (this will ignore the suitsOnRack configuration since the entire rack is being deleted).
+	- enable hideBoots to remove the boots below the suit rack.
+	- Thanks also to seol.jihu on discord for pointing me towards Hamster's mod for an idea on how to implement this.
+ - Added the ability to move/rotate/zoom the mirror camera to different fixed positions with related keybind config options.
+	- togglePiPZoom: This key will be used to cycle between 4 different zoom options.
+	- togglePiPHeight: This key will allow you to change the height of the mirror camera to see different parts of the suit you've equipped.
+	- togglePiPRotation: This key will allow you to cycle between 4 different angles around the player so you can see each side of yourself and the back.
+ - Cleaned up the menu a bit, moved all controls to the bottom of the menu below the suits list.
+	- Also added some more checks to make sure the terminal isn't accepting input while in this menu.
+	- Attached the mirror camera to a specific object on the terminal so that it scrolls with the text.
+	- Increased the size of the mirror camera and added a slight opacity so that text behind it can still be seen.
+
+### [1.1.2]
  - Actually added the logic for handling the new configuration items for the advancedMenuSystem navigation. (lined out in below changes)
 	- Also modified some of the keybinding logic to better handle errors & standardize keybinds to a few re-usable methods.
 
 ### [1.1.1]
 
- - <del> Added new key binding configuration items for menu system:
+ - Added new key binding configuration items for menu system:
 	- menuLeft: Change key used to navigate to previous page in advancedMenuSystem.
 	- menuRight: Change key used to navigate to next page in advancedMenuSystem.
 	- menuDown: Change key used to navigate to next item in advancedMenuSystem.
 	- menuUp: Change key used to navigate to previous item in advancedMenuSystem.
 	- Added the above bindings since lots of different mods like to use the arrow keys, and also maybe some of you would like to use WASD instead.
-    - Also removed key limitations in bindings as these binds are ONLY active when in the menu system. </del>
+    - Also removed key limitations in bindings as these binds are ONLY active when in the menu system. 
 
  - Added new configuration item for Mirror Camera:
 	- setPiPCullingMask: Only modify this if you know what you are doing. Changes what is rendered on the camera.

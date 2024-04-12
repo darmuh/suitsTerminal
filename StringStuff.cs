@@ -67,10 +67,11 @@ namespace suitsTerminal
             // Calculate the start and end indexes for the current page
             int startIndex = (currentPage - 1) * pageSize;
             int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
+            int totalItems = 0;
+            int emptySpace = 0;
             StringBuilder message = new StringBuilder();
 
-            message.Append($" === suitsTerminal Advanced Suits Menu ===\r\n=== Next Item [{downString}], Last Item [{upString}], Next Page [{rightString}], Last Page [{leftString}] === \r\n");
-            message.Append($" === Select a Suit by pressing [{selectString}] === \r\n");
+            message.Append($"============= AdvancedsuitsMenu  =============\r\n");
             message.Append("\r\n");
 
             // Recalculate activeIndex based on the current page
@@ -91,18 +92,26 @@ namespace suitsTerminal
 
                 // Display the menu item
                 message.Append(menuItem + "\r\n");
+                totalItems++;
+            }
+
+            emptySpace = pageSize - totalItems;
+
+            for (int i = 0; i < emptySpace; i++)
+            {
+                message.Append("\r\n");
             }
 
             // Display pagination information
             message.Append("\r\n");
             message.Append($"Page {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)}\r\n");
-
+            message.Append($"============= See controls below =============\r\n");
+            message.Append($"Next Item [{downString}]\tLast Item [{upString}]\t\r\nNext Page [{rightString}]\tLast Page [{leftString}]\t\r\n");
             if(SConfig.enablePiPCamera.Value)
-                message.Append($"\r\n === Toggle Mirror-Cam by pressing [{togglePiPstring}] === \r\n");
-
-            message.Append($" === Leave this menu by pressing [{leaveString}] === \r\n");
-
-            //AdvancedMenu.UpdatePicture();
+            {
+                message.Append($"Toggle Cam [{togglePiPstring}]\tRotate Cam [{pipRotateString}]\t\r\nCam Height [{pipHeightString}]\tCam Zoom [{pipZoomString}]\r\n");
+            }
+            message.Append($"Leave Menu [{leaveString}]\tSelect Suit [{selectString}]\r\n");
             return message.ToString();
         }
 

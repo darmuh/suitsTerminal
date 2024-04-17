@@ -1,13 +1,31 @@
-﻿using System;
+﻿using Steamworks.Ugc;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
+using static suitsTerminal.AllSuits;
 
 namespace suitsTerminal
 {
     internal class StringStuff
     {
+        internal static string GetNumbers(string selectedSuit)
+        {
+            int startOfNum = selectedSuit.IndexOf("^");
+            string numbersPortion = startOfNum != -1 ? selectedSuit.Substring(startOfNum + 1) : string.Empty;
+            numbersPortion = numbersPortion.Replace("^", "").Replace("(", "").Replace(")", "");
+            return numbersPortion;
+        }
+
+
+        internal static string RemoveNumbers(string selectedSuit)
+        {
+            int caretIndex = selectedSuit.IndexOf("^");
+            string stringWithoutNumbers = caretIndex != -1 ? selectedSuit.Substring(0, caretIndex) : selectedSuit;
+            return stringWithoutNumbers;
+        }
+
         internal static string TerminalFriendlyString(string s)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -68,7 +86,7 @@ namespace suitsTerminal
             int startIndex = (currentPage - 1) * pageSize;
             int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
             int totalItems = 0;
-            int emptySpace = 0;
+            int emptySpace;
             StringBuilder message = new StringBuilder();
 
             message.Append($"============= AdvancedsuitsMenu  =============\r\n");
@@ -84,11 +102,13 @@ namespace suitsTerminal
             // Iterate through each item in the current page
             for (int i = startIndex; i < endIndex; i++)
             {
+                // Check if the menuItem is in favSuits
+                bool isFavorite = favSuits.Contains(menuItems[i]);
+
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
                 string menuItem = (i == activeIndex)
-                    ? "> " + ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i])
-                    : ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]);
-
+                    ? "> " + ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "")
+                    : ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "");
 
                 // Display the menu item
                 message.Append(menuItem + "\r\n");
@@ -103,10 +123,11 @@ namespace suitsTerminal
             }
 
             // Display pagination information
-            message.Append("\r\n");
-            message.Append($"Page {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)}\r\n");
-            message.Append($"============= See controls below =============\r\n");
-            message.Append($"Next Item [{downString}]\tLast Item [{upString}]\t\r\nNext Page [{rightString}]\tLast Page [{leftString}]\t\r\n");
+            //Page [LeftArrow] < 6/10 > [RightArrow]
+            message.Append("\r\n\r\n");
+            message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)} > [{rightString}]\r\n");
+            //message.Append($"============= See controls below =============\r\n");
+            message.Append($"Next Item [{downString}]\tLast Item [{upString}]\r\nFavorite Item [{favItemKeyString}] \tFavorites Menu [{favMenuKeyString}]\r\n");
             if(SConfig.enablePiPCamera.Value)
             {
                 message.Append($"Toggle Cam [{togglePiPstring}]\tRotate Cam [{pipRotateString}]\t\r\nCam Height [{pipHeightString}]\tCam Zoom [{pipZoomString}]\r\n");

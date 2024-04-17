@@ -26,7 +26,10 @@ namespace suitsTerminal
                     InitThisPlugin.InitSuitsTerm();
                     PictureInPicture.InitPiP();
                     hasLaunched = true;
+                    return;
                 }
+                else
+                    return;
             }
         }
 
@@ -37,11 +40,17 @@ namespace suitsTerminal
             {
                 suitsTerminal.Terminal = __instance;
                 suitsTerminal.X($"Setting suitsTerminal.Terminal");
+                ResetVars();      
+            }
+
+            private static void ResetVars()
+            {
                 hasLaunched = false;
                 normSuit = 0;
                 showSuit = 0;
                 hintOnce = false;
                 rackSituated = false;
+                favSuitsSet = false;
                 PictureInPicture.PiPCreated = false;
                 suitsTerminal.X("set initial suits values");
             }

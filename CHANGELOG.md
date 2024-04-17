@@ -1,6 +1,34 @@
 # Change Log
 
-### [1.1.3] **CURRENT VERSION**
+### [1.2.0] **CURRENT VERSION**
+ - Fixed issue where equipping suits from the terminal would not save the suit with the suit saver mod enabled.
+	- This issue was resolved by using a different vanilla function to change a player's suit.
+		- This also simplified my code a bit more and I no longer need to grab a player's playerID when changing the suit.
+ - Fixed issue where buying the new bunny & bee suits would not add them to all player's suits terminal listing.
+	- This issue seems to be caused by the fact that the bunny/bee suits do not update to be unlocked properly in the terminal and sometimes will continue to show in the store after being purchased.
+ - Added better duplicate name handling for suits with the same display name.
+	- Suits with the same unlockable name will now be displayed with their unique suit id value in the menu.
+	- This will ensure you get all of the suits you've added to the game, even if they share the same name
+		- If a model is replacing a specific suit name however, like NEON from valorant, then the model will replace all instances of that suit name.
+		- This is something that has to do with the model replacement mod, I can retrieve the different suit IDs but the model replaces all of them lol.
+ - Added config option to choose sorting method, [suitsSortingStyle]
+	- Choose between alphabetical, numerical, and none.
+	- Alphabetical goes off of the UnlockableName of the suit.
+	- Numerical goes off of the syncedSuitID value for each suit.
+	- None will apply no specific sorting and can result in host/client racks not being synced.
+ - Added config options to display specific suits on the rack (up to 13), [suitsOnRackCustom] [suitsOnRackList]
+	- When [suitsOnRackCustom] is enabled, will only show suits that match the suit names listed in suitsOnRackList.
+	- Note that each suit name should be separated by a comma and that the suit names ARE case sensitive.
+	- Favorite some suits and look at favoritesMenuList for examples of suit names.
+	- These settings do not override any of the following config options: [suitsOnRack], [dontRemove], [hideRack]
+ - Added new favorites system and menu page.
+	- Added [favItemKey] to select suits to add to favorites menu.
+	- Added [favMenuKey] to show favorites menu.
+	- Updated menu handling for this new system.
+	- Added new config item to save favorited suits [favoritesMenuList]. These will be stored/loaded each play session.
+ - Adjusted menu slightly to make room for new key bindings, may find an alternative solution to make the page feel less cramped in the future.
+
+### [1.1.3] 
  - Added new configuration options for removing the suit rack and the boots below the suit rack
 	- Credits to Hamster (author of LethalPipeRemoval) for finding the specific objects.
 	- enable hideRack to remove suit rack (this will ignore the suitsOnRack configuration since the entire rack is being deleted).

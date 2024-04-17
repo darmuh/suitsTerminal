@@ -18,9 +18,7 @@ namespace suitsTerminal
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
             suitsTerminal.X($"Unlockables Count: {UnlockableItems.Count}");
 
-            int playerID = GetPlayerID();
-            string displayText = string.Empty;
-
+            string displayText;
 
             if (UnlockableItems != null)
             {
@@ -35,9 +33,7 @@ namespace suitsTerminal
                     if (randomSuit != null && UnlockableItems[randomSuit.syncedSuitID.Value] != null)
                     {
                         SuitName = UnlockableItems[randomSuit.syncedSuitID.Value].unlockableName;
-                        UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], randomSuit.syncedSuitID.Value, true);
-                        randomSuit.SwitchSuitServerRpc(playerID);
-                        randomSuit.SwitchSuitClientRpc(playerID);
+                        randomSuit.SwitchSuitToThis();
                         displayText = $"Changing suit to {SuitName}!\r\n";
                         return displayText;
                     }
@@ -71,11 +67,110 @@ namespace suitsTerminal
             return;
         }
 
+        private static void PickSuitBasedOnID(int suitID, out UnlockableSuit suitToUse)
+        {
+            foreach (UnlockableSuit suit in allSuits)
+            {
+                if (suit.syncedSuitID.Value == suitID)
+                {
+                    suitToUse = suit;
+                    return;
+                }
+            }
+            suitToUse = null;
+        }
+
+        private static void PickUnlockableBasedOnID(int suitID, out UnlockableItem itemToUse)
+        {
+            foreach (UnlockableSuit suit in allSuits)
+            {
+                if (suit.syncedSuitID.Value == suitID)
+                {
+                    itemToUse = UnlockableItems[suit.syncedSuitID.Value];
+                    return;
+                }
+            }
+            itemToUse = null;
+        }
+
+        private static void PickSuitBasedOnItem(UnlockableItem itemGiven, out UnlockableSuit suitToWear)
+        {
+            foreach(UnlockableSuit suit in allSuits)
+            {
+                if (UnlockableItems[suit.syncedSuitID.Value] == itemGiven)
+                {
+                    suitToWear = suit;
+                    suitsTerminal.X("Found suit to wear");
+                    return;
+                }
+            }
+            suitToWear = null;
+        }
+
+        private static void FindSuitWithoutID(string suitName, List<int> dontUse)
+        {
+            List<UnlockableItem> duplicateNamedSuits = new List<UnlockableItem>();
+
+            suitsTerminal.X("grabbing duplicate suits items to not use");
+            foreach(int id in dontUse)
+            {
+                PickUnlockableBasedOnID(id, out UnlockableItem dontUseItem);
+                if(dontUseItem != null)
+                    duplicateNamedSuits.Add(dontUseItem);
+            }
+
+            suitsTerminal.X("iterating through item to grab the remaining suitID");
+            foreach(UnlockableItem item in UnlockableItems)
+            {
+                if(item.unlockableName == suitName && !duplicateNamedSuits.Contains(item))
+                {
+                    suitsTerminal.X("Found unique suit, assigning.");
+                    PickSuitBasedOnItem(item, out UnlockableSuit wearThis);
+                    if(wearThis != null)
+                    {
+                        wearThis.SwitchSuitToThis();
+                        suitsTerminal.X($"Wearing: {UnlockableItems[wearThis.syncedSuitID.Value].unlockableName}");
+                    }
+                    else
+                        suitsTerminal.Log.LogError($"failed to get suit from item!");
+                }
+                        //{UnlockableItems[suit.syncedSuitID.Value].unlockableName}
+            }
+        }
+
+        private static void DuplicateSuitHandling(string selectedSuit)
+        {
+            string numbersPortion = GetNumbers(selectedSuit);
+            if (int.TryParse(numbersPortion, out int stringSuitID))
+            {
+                if(stringSuitID != -1)
+                {
+                    PickSuitBasedOnID(stringSuitID, out UnlockableSuit suit);
+                    if (suit != null)
+                    {
+                        suit.SwitchSuitToThis();
+                        suitsTerminal.X($"Wearing: {UnlockableItems[suit.syncedSuitID.Value].unlockableName}");
+                    }
+                    else
+                        suitsTerminal.Log.LogError($"failed to resolve suit name from {stringSuitID}");
+                }
+                else
+                    suitsTerminal.Log.LogError($"failed to resolve suit name from {selectedSuit}");
+            }
+            else
+                suitsTerminal.Log.LogError($"failed to resolve suit ID from {numbersPortion}");
+        }
+
         internal static void AdvancedSuitPick(string selectedSuit)
         {
-            int playerID = GetPlayerID();
             string displayText = string.Empty;
             //suitsTerminal.X("1.");
+
+            if (selectedSuit.Contains("^("))
+            {
+                DuplicateSuitHandling(selectedSuit);
+                return;
+            }
 
             if (UnlockableItems != null && selectedSuit != string.Empty)
             {
@@ -95,9 +190,7 @@ namespace suitsTerminal
                         if (SuitName.Equals(selectedSuit))
                         {
                             suitsTerminal.X("4.");
-                            UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], suit.syncedSuitID.Value, true);
-                            suit.SwitchSuitServerRpc(playerID);
-                            suit.SwitchSuitClientRpc(playerID);
+                            suit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
                             displayText = $"Changing suit to {UnlockableItems[suit.syncedSuitID.Value].unlockableName}\r\n";
                             suitsTerminal.X(displayText);
                             return;
@@ -117,7 +210,6 @@ namespace suitsTerminal
             suitsTerminal.X($"Unlockables Count: {UnlockableItems.Count}");
 
             string cleanedText = GetScreenCleanedText(suitsTerminal.Terminal);
-            int playerID = GetPlayerID();
             string displayText = string.Empty;
 
             if (UnlockableItems != null)
@@ -130,9 +222,7 @@ namespace suitsTerminal
                         SuitName = TerminalFriendlyString(SuitName);
                         if (cleanedText.Equals("wear " + SuitName))
                         {
-                            UnlockableSuit.SwitchSuitForPlayer(StartOfRound.Instance.allPlayerScripts[playerID], suit.syncedSuitID.Value, true);
-                            suit.SwitchSuitServerRpc(playerID);
-                            suit.SwitchSuitClientRpc(playerID);
+                            suit.SwitchSuitToThis();
                             displayText = $"Changing suit to {UnlockableItems[suit.syncedSuitID.Value].unlockableName}\r\n";
                             return displayText;
                         }
@@ -148,27 +238,6 @@ namespace suitsTerminal
 
             displayText = $"Unable to set suit to match command: {cleanedText}";
             return displayText;
-        }
-
-        internal static int GetPlayerID()
-        {
-            List<PlayerControllerB> allPlayers = new List<PlayerControllerB>();
-            string myName = GameNetworkManager.Instance.localPlayerController.playerUsername;
-            int returnID = -1;
-            allPlayers = StartOfRound.Instance.allPlayerScripts.ToList();
-            allPlayers = allPlayers.OrderBy((PlayerControllerB player) => player.playerClientId).ToList();
-            for (int i = 0; i < allPlayers.Count; i++)
-            {
-                if (StartOfRound.Instance.allPlayerScripts[i].playerUsername == myName)
-                {
-                    suitsTerminal.X("Found my playerID");
-                    returnID = i;
-                    break;
-                }
-            }
-            if (returnID == -1)
-                suitsTerminal.X("Failed to find ID");
-            return returnID;
         }
 
         private static string GetScreenCleanedText(Terminal __instance)
@@ -193,6 +262,9 @@ namespace suitsTerminal
 
         internal static void AddCommand(string textFail, bool clearText, List<TerminalNode> nodeGroup, string keyWord, bool isVerb, string nodeName, string category, string description, CommandDelegate methodName)
         {
+            if (GetKeyword(keyWord) != null)
+                return;
+
             TerminalNode node = CreateTerminalNode(textFail, clearText);
             TerminalKeyword termWord = CreateTerminalKeyword(keyWord, isVerb, node);
 

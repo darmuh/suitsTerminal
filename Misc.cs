@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerminalApi;
+using static suitsTerminal.AdvancedMenu;
+using static suitsTerminal.AllSuits;
 
 namespace suitsTerminal
 {
@@ -15,5 +18,26 @@ namespace suitsTerminal
         internal static bool hasLaunched = false;
         internal static bool hintOnce = false;
         internal static bool isHanging = false;
+
+        internal static List<string> GetString()
+        {
+            if(favSuits.Count == 0)
+            {
+                suitsTerminal.Log.LogWarning("Favorite suits empty, displaying regular menu");
+                inFavsMenu = false;
+                return suitNames;
+            }
+
+            if (inFavsMenu)
+                return favSuits;
+            else
+                return suitNames;
+        }
+
+        internal static void SaveToConfig(List<string> stringList, out string configItem)
+        {
+            configItem = string.Join(", ", stringList);
+            suitsTerminal.X($"Saving to config\n{configItem}");
+        }
     }
 }

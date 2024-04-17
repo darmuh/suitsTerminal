@@ -5,17 +5,28 @@
 Created as an alternative solution to having too many suits, this mod will remove all suits from the rack and store them in the terminal.
 You can also leave up to 13 suits to remain on the rack via this mod's configuration options, or remove none if you have another mod taking care of the excess suits.
 
-
 ### advancedTerminalMenu:
 
  - A singular 'suits' command will be generated.
 	- This command will also be shown in the 'Other' command listing.
+	- [NEW IN 1.2.0] duplicate suit names will be listed with their unique suitID.
 
  - The 'suits' command will bring up an interactive menu that can be navigated by arrow keys.
 	- Please note that any other mod that uses the arrow keys for functionality may interfere with this menu.
-	- I plan to add compatibility with my mod (darmuhsTerminalStuff) in a later update, however there aren't any major issues between the two.
 	- The specialMenusActive bool in this mod is public and accessible.
 	- The public bool can be used by other mods to indicate not to listen for shortcut during this specialmenu, which is likely what I'll do for TerminalStuff.
+
+ - [NEW IN 1.2.0] Favoriting system and separate favorites menu is now available.
+	- Simply press the [favItemKey] to add the currently selected suit to your favorite suits.
+	- To see only your favorited suits, press the [favMenuKey] to toggle the menu to the favorites list.
+	- Favorites will be saved to the [favoritesMenuList] configuration item.
+	- Default keybinds are [favItemKey = F] and [favMenuKey = F1].
+
+ - [NEW IN 1.2.0] Add only specific suits to the rack's 13 available spots.
+	- When [suitsOnRackCustom] is enabled, will only show suits that match the suit names listed in [suitsOnRackList].
+	- Note that each suit name should be separated by a comma and that the suit names ARE case sensitive.
+	- Favorite some suits and look at favoritesMenuList for examples of suit names.
+	- These settings do not override any of the following config options: [suitsOnRack], [dontRemove], [hideRack]
 
  - Controls for the advancedTerminalMenu are completely configurable, any key except for tab is acceptable.
 	- See valid key names here - https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.Key.html
@@ -35,6 +46,7 @@ You can also leave up to 13 suits to remain on the rack via this mod's configura
 	- [v1.0.0 video demo (youtube)](https://www.youtube.com/watch?v=4qNo0Qn6zJk)
 	- [v1.1.0 video demo (youtube)](https://www.youtube.com/watch?v=bOm86ieLVfM)
 	- [v1.1.3 video demo (youtube)](https://www.youtube.com/watch?v=6fJ2Vm1iekQ)
+	- [v1.2.0 video demo (youtube)](https://www.youtube.com/watch?v=lCWSDqoQolU)
 
 	
 ### Chat Commands:

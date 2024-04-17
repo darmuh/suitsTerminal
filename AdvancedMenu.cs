@@ -9,9 +9,11 @@ using static suitsTerminal.SConfig;
 using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.PictureInPicture;
+using static suitsTerminal.Misc;
 using static TerminalApi.TerminalApi;
 using GameNetcodeStuff;
 using System.Numerics;
+using System.Text;
 
 namespace suitsTerminal
 {
@@ -29,15 +31,21 @@ namespace suitsTerminal
         internal static string rightString;
         internal static string leaveString;
         internal static string selectString;
+        internal static string favItemKeyString;
+        internal static string favMenuKeyString;
         internal static string togglePiPstring;
         internal static string pipHeightString;
         internal static string pipRotateString;
         internal static string pipZoomString;
+
+        internal static bool inFavsMenu = false;
         internal static int currentPage;
         internal static int activeSelection;
         internal static int currentlyWearing;
         internal static bool exitSpecialMenu = false;
+
         public static bool specialMenusActive = false;
+        
         internal static TerminalNode menuDisplay = null;
 
         internal static bool initKeySettings = false;
@@ -99,6 +107,12 @@ namespace suitsTerminal
 
             CheckKeys(SConfig.selectMenu.Value, out Key selectKey, out selectString);
             BindKeys("menu_select", selectKey, ref selectString, "Enter", Key.Enter);
+
+            CheckKeys(SConfig.favItemKey.Value, out Key favItemKey, out favItemKeyString);
+            BindKeys("favorite_item", favItemKey, ref favItemKeyString, "F", Key.F);
+
+            CheckKeys(SConfig.favMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
+            BindKeys("favorites_menu", favMenuKey, ref favMenuKeyString, "F1", Key.F1);
         }
 
         private static void BindKeys(string menuAction, Key givenKey, ref string givenKeyString, string defaultKeyString, Key defaultKey)
@@ -245,7 +259,7 @@ namespace suitsTerminal
 
         private static void SaveOriginalLayerInformation(PlayerControllerB player)
         {
-            if (enablePiPCamera.Value)
+            if (!enablePiPCamera.Value)
                 return;
 
             playerModelLayer = player.thisPlayerModel.gameObject.layer;
@@ -256,7 +270,7 @@ namespace suitsTerminal
 
         private static void ModifyPlayerLayersForPiP(PlayerControllerB player, int playerModel, int playerModelArms)
         {
-            if (enablePiPCamera.Value)
+            if (!enablePiPCamera.Value)
                 return;
 
             //Credits to QuackAndCheese, using this portion of their player patch from MirrorDecor
@@ -270,12 +284,14 @@ namespace suitsTerminal
 
         private static void HandleKeyAction(string value)
         {
+            List<string> currentMenu = GetString();
+
             if (value == "previous_page")
             {
-                if(currentPage > 0)
+                if (currentPage > 0)
                     currentPage--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -284,7 +300,7 @@ namespace suitsTerminal
             else if (value == "next_page")
             {
                 currentPage++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -292,10 +308,10 @@ namespace suitsTerminal
             }
             else if (value == "previous_item")
             {
-                if(activeSelection > 0)
+                if (activeSelection > 0)
                     activeSelection--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -304,7 +320,7 @@ namespace suitsTerminal
             else if (value == "next_item")
             {
                 activeSelection++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -318,19 +334,19 @@ namespace suitsTerminal
             }
             else if (value == "menu_select")
             {
-                string selectedSuit = GetActiveMenuItem(suitNames, activeSelection, 10, currentPage);
-                currentlyWearing = activeSelection;
+                string selectedSuit = GetActiveMenuItem(currentMenu, activeSelection, 10, currentPage);
                 CommandHandler.AdvancedSuitPick(selectedSuit);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                GetCurrentSuitNum();
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 return;
             }
             else if (value == "toggle_pip")
             {
-                TogglePiP(!PictureInPicture.pipActive);
-                suitsTerminal.X($"Toggling PiP to state {!PictureInPicture.pipActive}");
+                TogglePiP(!pipActive);
+                suitsTerminal.X($"Toggling PiP to state {!pipActive}");
                 return;
             }
             else if (value == "pip_height")
@@ -348,6 +364,43 @@ namespace suitsTerminal
                 ChangeCamZoom(playerCam, ref zoomStep);
                 suitsTerminal.X($"Changing PiP zoom to zoomStep: [{zoomStep}]");
             }
+            else if (value == "favorite_item")
+            {
+                string selectedSuit = GetActiveMenuItem(suitNames, activeSelection, 10, currentPage);
+                if(favSuits.Contains(selectedSuit))
+                    favSuits.Remove(selectedSuit);
+                else
+                    favSuits.Add(selectedSuit);
+
+                SaveToConfig(favSuits, out string saveToConfig);
+                favoritesMenuList.Value = saveToConfig;
+                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
+                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
+            }
+            else if (value == "favorites_menu")
+            {
+                inFavsMenu = !inFavsMenu;
+                List<string> newMenu = GetString();
+                currentPage = 1;
+                activeSelection = 0;
+                GetCurrentSuitNum();
+                menuDisplay.displayText = AdvancedMenuDisplay(newMenu, activeSelection, 10, currentPage);
+                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
+                DisplayAllMenuItemsLog(newMenu);
+            }
+        }
+
+        private static void DisplayAllMenuItemsLog(List<string> menuListing)
+        {
+            StringBuilder fullList = new StringBuilder();
+            foreach(string item in menuListing)
+            {
+                fullList.Append(item + "\n");
+            }
+                suitsTerminal.X($"{fullList}");
         }
 
         internal static void GetCurrentSuitID()
@@ -357,7 +410,18 @@ namespace suitsTerminal
                 if (suit.suitID == StartOfRound.Instance.localPlayerController.currentSuitID ||
                     suit.syncedSuitID.Value == StartOfRound.Instance.localPlayerController.currentSuitID)
                 {
-                    currentlyWearing = allSuits.IndexOf(suit);  // Assign directly to currentlyWearing
+                    if (!inFavsMenu)
+                        currentlyWearing = allSuits.IndexOf(suit);  // Assign directly to currentlyWearing
+                    else
+                    {
+                        string unlockableName = UnlockableItems[suit.syncedSuitID.Value].unlockableName;
+                        int indexOf = favSuits.IndexOf(unlockableName);
+                        if (indexOf == -1)
+                            currentlyWearing = favSuits.IndexOf(unlockableName + $"^({suit.syncedSuitID.Value})");
+                        else
+                            currentlyWearing = indexOf;
+                    }
+                        
                     break;  // Exit the loop once a match is found
                 }
             }
@@ -377,6 +441,7 @@ namespace suitsTerminal
                 yield break;
 
             specialMenusActive = true;
+            inFavsMenu = false;
             rotateStep = 0;
             heightStep = 0;
             zoomStep = 1;

@@ -17,7 +17,8 @@ namespace suitsTerminal
             //suitsTerminal.X("processhiddensuit method");
             component.GetComponent<SuitInfo>().suitTag = "hidden";
             component.disableObject = true;
-            component.gameObject.SetActive(false);
+            component.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+            component.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
         }
 
         internal static void ProcessHangingSuit(AutoParentToShip component)

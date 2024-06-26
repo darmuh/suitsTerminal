@@ -6,8 +6,10 @@ using UnityEngine;
 using System.Text;
 using GameNetcodeStuff;
 using static suitsTerminal.Misc;
+using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
-using TerminalApi;
+using BepInEx.Bootstrap;
+using OpenBodyCams;
 
 namespace suitsTerminal
 {
@@ -59,7 +61,7 @@ namespace suitsTerminal
         [HarmonyPatch(typeof(Terminal), "LoadNewNodeIfAffordable")]
         public class AffordableNode : Terminal
         {
-            static void Postfix(Terminal __instance)
+            static void Postfix()
             {
                 suitsTerminal.X("purchase detected");
                 InitThisPlugin.InitSuitsTerm();
@@ -108,6 +110,52 @@ namespace suitsTerminal
         public static void Postfix()
         {
             //hasLaunched = false;
+            CompatibilityCheck();
+        }
+
+        private static void CompatibilityCheck()
+        {
+            if (Chainloader.PluginInfos.ContainsKey("Zaggy1024.OpenBodyCams"))
+            {
+                suitsTerminal.X("OpenBodyCams by Zaggy1024 detected!");
+                suitsTerminal.OpenBodyCams = true;
+                GetResolutionForOBC();
+            }
+            if (Chainloader.PluginInfos.ContainsKey("darmuh.TerminalStuff"))
+            {
+                suitsTerminal.X("darmuhsTerminalStuff detected!");
+                suitsTerminal.TerminalStuff = true;
+            }
+        }
+
+        private static void GetResolutionForOBC()
+        {
+            List<string> resolutionStrings = GetListFromConfigItem(SConfig.obcResolution.Value);
+            List<int> resolutionList = GetNumberListFromStringList(resolutionStrings);
+            if (resolutionList.Count == 2)
+            {
+                OpenBodyCams.defaultRes = new Vector2Int(resolutionList[0], resolutionList[1]);
+                suitsTerminal.Log.LogInfo($"Resolution set to {resolutionList[0]}x{resolutionList[1]}");
+            }
+            else
+            {
+                OpenBodyCams.defaultRes = new Vector2Int(1000, 700);
+                suitsTerminal.Log.LogInfo($"Unable to set resolution to values provided in config: {SConfig.obcResolution.Value}\nUsing default of 1000x700");
+            }
+                
+                
+        }
+    }
+
+
+    [HarmonyPatch(typeof(Terminal), "ParsePlayerSentence")]
+    public class Terminal_ParsePlayerSentence_Patch
+    {
+        static void Postfix(ref TerminalNode __result)
+        {
+            if (CommandStuff.GetNewDisplayText(ref __result))
+                suitsTerminal.X("command found in base funcstring listing...");
+            return;
         }
     }
 
@@ -123,13 +171,13 @@ namespace suitsTerminal
         {
             string[] lines = inputText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-            List<Page> pages = new List<Page>();
+            List<Page> pages = [];
             int lineNumber = 0;
             int pageNumber = 1;
 
             while (lineNumber < lines.Length)
             {
-                Page page = new Page { Content = new StringBuilder(), PageNumber = pageNumber };
+                Page page = new() { Content = new StringBuilder(), PageNumber = pageNumber };
 
                 // Add header for each page
                 page.Content.AppendLine($"=== Choose your Suit! Page {pageNumber} ===\r\n\r\n");

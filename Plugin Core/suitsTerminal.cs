@@ -7,16 +7,19 @@ using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {
-    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.2.0")]
+    [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", "1.3.0")]
 
     public class suitsTerminal : BaseUnityPlugin
     {
         public static suitsTerminal instance;
+        internal static bool TerminalStuff = false;
+        internal static bool OpenBodyCams = false;
+
         public static class PluginInfo
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.2.0";
+            public const string PLUGIN_VERSION = "1.3.0";
         }
 
         public static Terminal Terminal;

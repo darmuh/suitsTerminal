@@ -1,3 +1,1 @@
-﻿Known issues:
-- advancedTerminalMenu bindings can/will conflict with other mods that add shortcuts to the menu such as fastswitchplayerview and darmuhsTerminalStuff
-- advancedTerminalMenu mirror cam preview will not automatically enable with darmuhsTerminalStuff (can still toggle after pressing the binding a few times)
+﻿

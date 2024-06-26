@@ -1,17 +1,16 @@
 ﻿using GameNetcodeStuff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TerminalApi.Classes;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.StringStuff;
-using static TerminalApi.TerminalApi;
+using static suitsTerminal.TerminalHook;
 
 namespace suitsTerminal
 {
     internal class CommandHandler
     {
-        public static List<CommandInfo> suitsTerminalCommands = new List<CommandInfo>();
         public delegate void CommandDelegate(out string displayText);
         internal static string RandomSuit()
         {
@@ -33,7 +32,7 @@ namespace suitsTerminal
                     if (randomSuit != null && UnlockableItems[randomSuit.syncedSuitID.Value] != null)
                     {
                         SuitName = UnlockableItems[randomSuit.syncedSuitID.Value].unlockableName;
-                        randomSuit.SwitchSuitToThis();
+                        randomSuit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
                         displayText = $"Changing suit to {SuitName}!\r\n";
                         return displayText;
                     }
@@ -48,23 +47,23 @@ namespace suitsTerminal
             return displayText;
         }
 
-        internal static void SuitPickCommand(out string displayText)
+        internal static string SuitPickCommand()
         {
-            displayText = PickSuit();
-            return;
+            string displayText = PickSuit();
+            return displayText;
         }
 
-        internal static void RandomSuitCommand(out string displayText)
+        internal static string RandomSuitCommand()
         {
-            displayText = RandomSuit();
-            return;
+            string displayText = RandomSuit();
+            return displayText;
         }
 
-        internal static void AdvancedSuitsTerm(out string displayText)
+        internal static string AdvancedSuitsTerm()
         {
             suitsTerminal.Terminal.StartCoroutine(AdvancedMenu.ActiveMenu());
-            displayText = AdvancedMenuDisplay(suitNames, 0, 10, 1);
-            return;
+            string displayText = AdvancedMenuDisplay(suitNames, 0, 10, 1);
+            return displayText;
         }
 
         private static void PickSuitBasedOnID(int suitID, out UnlockableSuit suitToUse)
@@ -109,7 +108,7 @@ namespace suitsTerminal
 
         private static void FindSuitWithoutID(string suitName, List<int> dontUse)
         {
-            List<UnlockableItem> duplicateNamedSuits = new List<UnlockableItem>();
+            List<UnlockableItem> duplicateNamedSuits = [];
 
             suitsTerminal.X("grabbing duplicate suits items to not use");
             foreach(int id in dontUse)
@@ -128,7 +127,7 @@ namespace suitsTerminal
                     PickSuitBasedOnItem(item, out UnlockableSuit wearThis);
                     if(wearThis != null)
                     {
-                        wearThis.SwitchSuitToThis();
+                        wearThis.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
                         suitsTerminal.X($"Wearing: {UnlockableItems[wearThis.syncedSuitID.Value].unlockableName}");
                     }
                     else
@@ -148,7 +147,7 @@ namespace suitsTerminal
                     PickSuitBasedOnID(stringSuitID, out UnlockableSuit suit);
                     if (suit != null)
                     {
-                        suit.SwitchSuitToThis();
+                        suit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
                         suitsTerminal.X($"Wearing: {UnlockableItems[suit.syncedSuitID.Value].unlockableName}");
                     }
                     else
@@ -163,7 +162,7 @@ namespace suitsTerminal
 
         internal static void AdvancedSuitPick(string selectedSuit)
         {
-            string displayText = string.Empty;
+            string displayText;
             //suitsTerminal.X("1.");
 
             if (selectedSuit.Contains("^("))
@@ -210,7 +209,7 @@ namespace suitsTerminal
             suitsTerminal.X($"Unlockables Count: {UnlockableItems.Count}");
 
             string cleanedText = GetScreenCleanedText(suitsTerminal.Terminal);
-            string displayText = string.Empty;
+            string displayText;
 
             if (UnlockableItems != null)
             {
@@ -222,7 +221,7 @@ namespace suitsTerminal
                         SuitName = TerminalFriendlyString(SuitName);
                         if (cleanedText.Equals("wear " + SuitName))
                         {
-                            suit.SwitchSuitToThis();
+                            suit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
                             displayText = $"Changing suit to {UnlockableItems[suit.syncedSuitID.Value].unlockableName}\r\n";
                             return displayText;
                         }
@@ -248,7 +247,7 @@ namespace suitsTerminal
 
         private static string RemovePunctuation(string s) //copied from game files
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
             foreach (char c in s)
             {
                 if (!char.IsPunctuation(c))
@@ -260,31 +259,9 @@ namespace suitsTerminal
             return stringBuilder.ToString().ToLower();
         }
 
-        internal static void AddCommand(string textFail, bool clearText, List<TerminalNode> nodeGroup, string keyWord, bool isVerb, string nodeName, string category, string description, CommandDelegate methodName)
+        internal static void AddCommand(string textFail, bool clearText, string keyWord, bool isVerb, string nodeName, Func<string> methodName, Dictionary<TerminalNode,Func<string>> nodeListing)
         {
-            if (GetKeyword(keyWord) != null)
-                return;
-
-            TerminalNode node = CreateTerminalNode(textFail, clearText);
-            TerminalKeyword termWord = CreateTerminalKeyword(keyWord, isVerb, node);
-
-            CommandInfo commandInfo = new CommandInfo()
-            {
-                TriggerNode = node,
-                DisplayTextSupplier = () =>
-                {
-                    methodName(out string displayText);
-                    return displayText;
-                },
-                Category = category,
-                Description = description
-            };
-            suitsTerminalCommands.Add(commandInfo);
-
-            AddTerminalKeyword(termWord, commandInfo);
-
-            node.name = nodeName;
-            nodeGroup.Add(node);
+            MakeCommand(nodeName, keyWord, textFail, isVerb, clearText, methodName, nodeListing);
         }
 
     }

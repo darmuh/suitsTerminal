@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using static suitsTerminal.StringStuff;
 using static suitsTerminal.Misc;
 using static suitsTerminal.ProcessRack;
@@ -8,22 +7,17 @@ using static suitsTerminal.Bools;
 using System.Linq;
 using UnityEngine;
 using Component = UnityEngine.Component;
-using Steamworks.Ugc;
-using System.Collections;
-using TerminalApi;
 
 namespace suitsTerminal
 {
     internal class AllSuits
     {
-        internal static List<UnlockableSuit> allSuits = new List<UnlockableSuit>();
-        internal static List<UnlockableItem> UnlockableItems = new List<UnlockableItem>();
-        internal static List<TerminalNode> suitPages = new List<TerminalNode>();
-        internal static List<TerminalNode> otherNodes = new List<TerminalNode>();
-        internal static Dictionary<int,string> suitNameToID = new Dictionary<int,string>();
-        internal static List<string> suitNames = new List<string>();
-        internal static List<string> favSuits = new List<string>();
-        internal static List<Page> suitsPages = new List<Page>();
+        internal static List<UnlockableSuit> allSuits = [];
+        internal static List<UnlockableItem> UnlockableItems = [];
+        internal static Dictionary<int,string> suitNameToID = [];
+        internal static List<string> suitNames = [];
+        internal static List<string> favSuits = [];
+        internal static List<Page> suitsPages = [];
         internal static bool favSuitsSet = false;
 
         internal static void GetList()
@@ -58,8 +52,8 @@ namespace suitsTerminal
 
         private static void CheckForDuplicateSuitNames()
         {
-            List<string> fullList = new List<string>();
-            List<string> duplicatesFound = new List<string>();
+            List<string> fullList = [];
+            List<string> duplicatesFound = [];
             // Populate suitNames based on suitNameToID
             foreach (var kvp in suitNameToID)
             {
@@ -172,10 +166,10 @@ namespace suitsTerminal
         {
             // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
             allSuits.Clear();
-            allSuits = Resources.FindObjectsOfTypeAll<UnlockableSuit>().ToList();
+            allSuits = [.. Resources.FindObjectsOfTypeAll<UnlockableSuit>()];
 
             // Order the list by syncedSuitID.Value
-            allSuits = allSuits.OrderBy((UnlockableSuit suit) => suit.suitID).ToList();
+            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => suit.suitID)];
 
             UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
             RemoveBadSuitIDs();
@@ -184,12 +178,12 @@ namespace suitsTerminal
         private static void OrderSuitsByName()
         {
             // Order the list by name
-            allSuits = allSuits.OrderBy((UnlockableSuit suit) => UnlockableItems[suit.syncedSuitID.Value].unlockableName).ToList();
+            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => UnlockableItems[suit.syncedSuitID.Value].unlockableName)];
         }
 
         private static void OrderSuitsByID()
         {
-            allSuits = allSuits.OrderBy((UnlockableSuit suit) => suit.syncedSuitID.Value).ToList();
+            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => suit.syncedSuitID.Value)];
         }
 
         internal static void InitSuitsListing()

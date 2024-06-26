@@ -1,6 +1,39 @@
 # Change Log
 
-### [1.2.0] **CURRENT VERSION**
+### [1.3.0] **CURRENT VERSION**
+ - Legonzaur on Github fixed an issue where all suits were still getting loaded by the game despite being hidden, causing a large amount of RAM usage.
+	- Huge thankyou to all who put effort into this fix!
+	- While it was a relatively small change in the code, a lot of troubleshooting/effort was put into discovering this issue.
+	- I welcome anyone who would like to contribute to this project. I did originally make this just as a backup to TooManySuits if/when it failed.
+ - Removed TerminalAPI dependency utilizing same command creation method as the latest version of darmuhsTerminalStuff.
+	- This mod is now hard-dependency free!
+	- Please report any issues with the new terminal command creation system if you find any :)
+ - Updated mirror camera culling mask calculation
+	- Mask should now be up to standards with most other mods that use cameras. Just like darmuhsTerminalStuff
+	- removed the config item that lets you set your own culling mask integer in favor of this new system.
+ - Added compatibility with OpenBodyCams, including using OBC for the mirrorcam
+	- Thanks again to Zaggy for working with me to get this working.
+	- Please note you need to be on OpenBodyCams version 2.2.1 or later to utilize this feature.
+	- Configuration items [useOpenBodyCams] and [obcResolution] have been added.
+		- [useOpenBodyCams] can be set to false to continue to use the built-in camera in suitsTerminal.
+		- [obcResolution] will determine the camera resolution.
+ - Moved the majority of the controls hints to a separate help menu page.
+	- This page can be accessed by the new [helpMenu] configuration key.
+	- While in the help menu, all controls except for [leaveMenu] and [helpMenu] are paused.
+ - While using the built-in camera, your first person hand models will be hidden temporarily when the camera is being displayed.
+ - Configuration items have been added to modify the time advancedTerminalMenu will wait between checking for key presses as well as after a key has been pressed.
+	- [menuKeyPressDelay] is the Regular delay when checking for key presses in the advancedTerminalMenu. (This delay will be added ontop of menuPostSelectDelay)
+	- [menuPostSelectDelay] is the delay used after a key press is registered in the advancedTerminalMenu.
+	- I have modified the default values for these two. They were originally both set to 0.1 in previous versions of suitsTerminal.
+ - The commands added by this mod no longer display in the "Other" command menu.
+	- I may add support for this later, it was a TerminalAPI feature.
+ - Updated chat command handling to not try to run the last chat message sent every single time enter is pressed.
+ - Verified compatibility with latest version of TooManySuits when [dontRemove] is set to TRUE.
+	- This allows for TooManySuits to be the only mod touching the suits on the rack, while still adding commands to the terminal.
+	- One odd interaction I did find is that some suits could not be equipped from the terminal until you've at least cycled through all pages of TooManySuits' rack.
+		- Not sure if this is something I can fix on my end alone.
+
+### [1.2.0]
  - Fixed issue where equipping suits from the terminal would not save the suit with the suit saver mod enabled.
 	- This issue was resolved by using a different vanilla function to change a player's suit.
 		- This also simplified my code a bit more and I no longer need to grab a player's playerID when changing the suit.

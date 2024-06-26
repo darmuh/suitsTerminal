@@ -3,7 +3,7 @@ using System;
 using static suitsTerminal.StringStuff;
 using static suitsTerminal.Misc;
 using static suitsTerminal.AllSuits;
-using static TerminalApi.TerminalApi;
+using static suitsTerminal.TerminalHook;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,25 +23,25 @@ namespace suitsTerminal
                     SuitName = TerminalFriendlyString(SuitName);
                     if (suitNames.Contains(SuitName.ToLower()))
                     {
-                        SuitName = SuitName + "z";
+                        SuitName += "z";
                         suitsTerminal.X($"Duplicate found. Updated SuitName: {SuitName}");
                     }
                     suitNames.Add(SuitName.ToLower());
-                    CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
+                    CommandHandler.AddCommand(SuitName, true, "wear " + SuitName, false, SuitName, CommandHandler.SuitPickCommand, CommandStuff.sT);
                     suitsTerminal.X($"Keyword for {SuitName} added");
                 }
                 else if (item.syncedSuitID.Value >= 0 && keywordsCreated)
                 {
                     SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
                     SuitName = TerminalFriendlyString(SuitName);
-                    if (GetKeyword("wear " + SuitName) != null)
+                    if (TryGetKeyword("wear " + SuitName))
                     {
-                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
+                        CommandHandler.AddCommand(SuitName, true, "wear " + SuitName, false, SuitName, CommandHandler.SuitPickCommand, CommandStuff.sT);
                         suitsTerminal.X($"Keyword for {SuitName} updated");
                     }
                     else
                     {
-                        CommandHandler.AddCommand(SuitName, true, suitPages, "wear " + SuitName, false, SuitName, "", "", CommandHandler.SuitPickCommand);
+                        CommandHandler.AddCommand(SuitName, true, "wear " + SuitName, false, SuitName, CommandHandler.SuitPickCommand, CommandStuff.sT);
                         suitsTerminal.X($"Keyword for {SuitName} added, keyword appears to have been removed.");
                     }
 
@@ -80,12 +80,12 @@ namespace suitsTerminal
 
         private static StringBuilder BuildSuitsList()
         {
-            StringBuilder suitsList = new StringBuilder();
+            StringBuilder suitsList = new();
             weirdSuitNum = 0;
 
             foreach (UnlockableSuit item in allSuits)
             {
-                string SuitName = "";
+                string SuitName;
                 if (item.syncedSuitID.Value >= 0)
                 {
                     SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
@@ -131,11 +131,11 @@ namespace suitsTerminal
                 {
                     if (page.PageNumber == 1)
                     {
-                        UpdateOrRecreateMainSuitCommand(page);
+                        CreateOrUpdateMainSuitCommand(page);
                     }
                     else
                     {
-                        UpdateOrRecreateSuitPage(page);
+                        CreateOrUpdateSuitPage(page);
                     }
                 }
             }
@@ -146,18 +146,15 @@ namespace suitsTerminal
         // Helper method to create or update the main suit command
         private static void CreateOrUpdateMainSuitCommand(Page page)
         {
-            if (GetKeyword("suits") != null)
+            if (TryGetKeyword("suits"))
             {
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
-                UpdateKeyword(suitsKeyword);
-                //suitsTerminal.X($"Updating main suits command");
+                //MakeCommand("Quit Terminal", keyword, "", false, true, QuitTerminalCommand, darmuhsTerminalStuff);
+                MakeCommand("suits (main)", "suits", $"{page.Content}", false, true);
+                suitsTerminal.X($"Updating main suits command");
             }
             else
             {
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
-                AddTerminalKeyword(suitsKeyword);
+                MakeCommand("suits (main)", "suits", $"{page.Content}", false, true);
                 suitsTerminal.X($"main suits command was deleted, creating again");
             }
         }
@@ -165,71 +162,26 @@ namespace suitsTerminal
         // Helper method to create or update suit pages
         private static void CreateOrUpdateSuitPage(Page page)
         {
-            if (GetKeyword($"suits {page.PageNumber}") != null)
+            if (TryGetKeyword($"suits {page.PageNumber}"))
             {
-                suitsTerminal.X("pages have already been creating, updating keyword");
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
-                UpdateKeyword(suitsKeyword);
+                suitsTerminal.X($"page {page.PageNumber} has already been creating, updating keyword");
+                MakeCommand($"suits (pg.{page.PageNumber})", $"suits {page.PageNumber}", $"{page.Content}", false, true);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
             else
             {
-                suitsTerminal.X("pages appear to have been deleted, creating keyword again");
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
-                AddTerminalKeyword(suitsKeyword);
+                suitsTerminal.X($"page {page.PageNumber} has been deleted, creating keyword again");
+                MakeCommand($"suits (pg.{page.PageNumber})", $"suits {page.PageNumber}", $"{page.Content}", false, true);
                 //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
             }
         }
-
-        // Helper method to update or recreate the main suit command
-        private static void UpdateOrRecreateMainSuitCommand(Page page)
-        {
-            if (GetKeyword("suits") != null)
-            {
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
-                UpdateKeyword(suitsKeyword);
-                //suitsTerminal.X($"Updating main suits command");
-            }
-            else
-            {
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits", false, suitsNode);
-                AddTerminalKeyword(suitsKeyword);
-                suitsTerminal.X($"main suits command was deleted, creating again");
-            }
-        }
-
-        // Helper method to update or recreate suit pages
-        private static void UpdateOrRecreateSuitPage(Page page)
-        {
-            if (GetKeyword($"suits {page.PageNumber}") != null)
-            {
-                suitsTerminal.X("pages have already been creating, updating keyword");
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
-                UpdateKeyword(suitsKeyword);
-                //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
-            }
-            else
-            {
-                suitsTerminal.X("pages appear to have been deleted, creating keyword again");
-                TerminalNode suitsNode = CreateTerminalNode($"{page.Content.ToString()}", true);
-                TerminalKeyword suitsKeyword = CreateTerminalKeyword($"suits {page.PageNumber}", false, suitsNode);
-                AddTerminalKeyword(suitsKeyword);
-                //suitsTerminal.X($"Created keyword 'suits {page.PageNumber}'");
-            }
-        }
-
 
         internal static void MakeRandomSuitCommand()
         {
             if (!SConfig.randomSuitCommand.Value)
                 return;
             
-                CommandHandler.AddCommand("random suit command", true, otherNodes, "randomsuit", false, "random_suit", "Other", "suitsTerminal command to equip a random suit", CommandHandler.RandomSuitCommand);
+                CommandHandler.AddCommand("random suit command", true, "randomsuit", false, "sT_random_suit", CommandHandler.RandomSuitCommand, CommandStuff.sT);
         }
     }
 }

@@ -4,15 +4,13 @@ using UnityEngine.InputSystem;
 using Key = UnityEngine.InputSystem.Key;
 using System.Collections;
 using UnityEngine;
-using System.Linq;
 using static suitsTerminal.SConfig;
 using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.PictureInPicture;
 using static suitsTerminal.Misc;
-using static TerminalApi.TerminalApi;
+using static suitsTerminal.TerminalHook;
 using GameNetcodeStuff;
-using System.Numerics;
 using System.Text;
 
 namespace suitsTerminal
@@ -20,7 +18,7 @@ namespace suitsTerminal
     public class AdvancedMenu
     {
         // Define a dictionary to map keys to actions
-        internal static Dictionary<Key, string> keyActions = new Dictionary<Key, string>();
+        internal static Dictionary<Key, string> keyActions = [];
         internal static Key keyBeingPressed;
         internal static Key leaveMenu;
         internal static Key selectMenu;
@@ -33,12 +31,14 @@ namespace suitsTerminal
         internal static string selectString;
         internal static string favItemKeyString;
         internal static string favMenuKeyString;
+        internal static string helpMenuKeyString;
         internal static string togglePiPstring;
         internal static string pipHeightString;
         internal static string pipRotateString;
         internal static string pipZoomString;
 
         internal static bool inFavsMenu = false;
+        internal static bool inHelpMenu = false;
         internal static int currentPage;
         internal static int activeSelection;
         internal static int currentlyWearing;
@@ -49,10 +49,6 @@ namespace suitsTerminal
         internal static TerminalNode menuDisplay = null;
 
         internal static bool initKeySettings = false;
-
-        //old layer info
-        internal static int playerModelLayer;
-        internal static int playerModelArmsLayer;
 
         internal static void InitSettings()
         {
@@ -66,7 +62,7 @@ namespace suitsTerminal
             TogglePiPKey();
             CreateMenuCommand();
             if(menuDisplay == null )
-                menuDisplay = CreateTerminalNode("", true);
+                menuDisplay = CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
 
             initKeySettings = false;
         }
@@ -85,7 +81,7 @@ namespace suitsTerminal
             if (!advancedTerminalMenu.Value)
                 return;
 
-            CommandHandler.AddCommand("Advanced Menus Corotuine", true, otherNodes, "suits", false, "advanced_suitsTerm", "Other", "Access suitsTerminal menu for selecting a new suit to wear.", CommandHandler.AdvancedSuitsTerm);
+            CommandHandler.AddCommand("Advanced Menus Corotuine", true, "suits", false, "advanced_suitsTerm", CommandHandler.AdvancedSuitsTerm, CommandStuff.sT);
         }
 
         private static void CollectionOfKeys()
@@ -113,6 +109,9 @@ namespace suitsTerminal
 
             CheckKeys(SConfig.favMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
             BindKeys("favorites_menu", favMenuKey, ref favMenuKeyString, "F1", Key.F1);
+
+            CheckKeys(helpMenu.Value, out Key helpMenuKey, out helpMenuKeyString);
+            BindKeys("help_menu", helpMenuKey, ref helpMenuKeyString, "H", Key.H);
         }
 
         private static void BindKeys(string menuAction, Key givenKey, ref string givenKeyString, string defaultKeyString, Key defaultKey)
@@ -175,9 +174,9 @@ namespace suitsTerminal
 
         private static bool IsValidKey(string key, out Key validKey)
         {
-            List<Key> invalidKeys = new List<Key>() {
+            List<Key> invalidKeys = [
             Key.Tab
-            };
+            ];
             if (Enum.TryParse(key, ignoreCase: true, out Key keyFromString))
             {
                 if (invalidKeys.Contains(keyFromString))
@@ -257,36 +256,22 @@ namespace suitsTerminal
                 suitsTerminal.Log.LogError("Shortcut KeyActions list not updating properly");
         }
 
-        private static void SaveOriginalLayerInformation(PlayerControllerB player)
+        private static Camera GetCam()
         {
-            if (!enablePiPCamera.Value)
-                return;
-
-            playerModelLayer = player.thisPlayerModel.gameObject.layer;
-            playerModelArmsLayer = player.thisPlayerModelArms.gameObject.layer;
-
-            suitsTerminal.X($"Saved layer information: {playerModelLayer} & {playerModelArmsLayer}");
-        }
-
-        private static void ModifyPlayerLayersForPiP(PlayerControllerB player, int playerModel, int playerModelArms)
-        {
-            if (!enablePiPCamera.Value)
-                return;
-
-            //Credits to QuackAndCheese, using this portion of their player patch from MirrorDecor
-
-            player.thisPlayerModel.gameObject.layer = playerModel; //23
-            //player.thisPlayerModelLOD1.gameObject.layer = 5;
-            player.thisPlayerModelArms.gameObject.layer = playerModelArms; //5
-
-            suitsTerminal.X($"Set layer information: playerModel - {playerModel} & playerModelArms - {playerModelArms}");
+            if(suitsTerminal.OpenBodyCams && useOpenBodyCams.Value)
+            {
+                return OpenBodyCams.GetMirrorCam();
+            }
+            else
+                return playerCam;
         }
 
         private static void HandleKeyAction(string value)
         {
             List<string> currentMenu = GetString();
+            Camera currentCam = GetCam();
 
-            if (value == "previous_page")
+            if (value == "previous_page" && !inHelpMenu)
             {
                 if (currentPage > 0)
                     currentPage--;
@@ -297,7 +282,7 @@ namespace suitsTerminal
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
-            else if (value == "next_page")
+            else if (value == "next_page" && !inHelpMenu)
             {
                 currentPage++;
                 menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
@@ -306,7 +291,7 @@ namespace suitsTerminal
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
-            else if (value == "previous_item")
+            else if (value == "previous_item" && !inHelpMenu)
             {
                 if (activeSelection > 0)
                     activeSelection--;
@@ -317,7 +302,7 @@ namespace suitsTerminal
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
-            else if (value == "next_item")
+            else if (value == "next_item" && !inHelpMenu)
             {
                 activeSelection++;
                 menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
@@ -332,7 +317,7 @@ namespace suitsTerminal
                 TerminalInputEnabled(true);
                 return;
             }
-            else if (value == "menu_select")
+            else if (value == "menu_select" && !inHelpMenu)
             {
                 string selectedSuit = GetActiveMenuItem(currentMenu, activeSelection, 10, currentPage);
                 CommandHandler.AdvancedSuitPick(selectedSuit);
@@ -340,31 +325,32 @@ namespace suitsTerminal
                 GetCurrentSuitNum();
                 menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                suitsTerminal.Terminal.StartCoroutine(TransformHotfix(currentCam));
                 TerminalInputEnabled(false);
                 return;
             }
-            else if (value == "toggle_pip")
+            else if (value == "toggle_pip" && !inHelpMenu)
             {
                 TogglePiP(!pipActive);
                 suitsTerminal.X($"Toggling PiP to state {!pipActive}");
                 return;
             }
-            else if (value == "pip_height")
+            else if (value == "pip_height" && !inHelpMenu)
             {
-                MoveCamera(playerCam, ref heightStep);
+                MoveCamera(currentCam.transform, ref heightStep);
                 suitsTerminal.X($"Changing PiP height to {heightStep}");
             }
-            else if (value == "pip_rotate")
+            else if (value == "pip_rotate" && !inHelpMenu)
             {
-                RotateCameraAroundPlayer(StartOfRound.Instance.localPlayerController.transform, playerCam);
+                RotateCameraAroundPlayer(StartOfRound.Instance.localPlayerController.transform, currentCam.transform);
                 suitsTerminal.X($"Rotating PiP around player");
             }
-            else if (value == "pip_zoom")
+            else if (value == "pip_zoom" && !inHelpMenu)
             {
-                ChangeCamZoom(playerCam, ref zoomStep);
+                ChangeCamZoom(currentCam, ref zoomStep);
                 suitsTerminal.X($"Changing PiP zoom to zoomStep: [{zoomStep}]");
             }
-            else if (value == "favorite_item")
+            else if (value == "favorite_item" && !inHelpMenu)
             {
                 string selectedSuit = GetActiveMenuItem(suitNames, activeSelection, 10, currentPage);
                 if(favSuits.Contains(selectedSuit))
@@ -379,7 +365,7 @@ namespace suitsTerminal
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
             }
-            else if (value == "favorites_menu")
+            else if (value == "favorites_menu" && !inHelpMenu)
             {
                 inFavsMenu = !inFavsMenu;
                 List<string> newMenu = GetString();
@@ -391,11 +377,34 @@ namespace suitsTerminal
                 TerminalInputEnabled(false);
                 DisplayAllMenuItemsLog(newMenu);
             }
+            else if (value == "help_menu")
+            {
+                inHelpMenu = !inHelpMenu;
+                currentPage = 1;
+                activeSelection = 0;
+                GetCurrentSuitNum();
+                menuDisplay.displayText = HelpMenuDisplay(inHelpMenu, currentMenu);
+
+                TogglePiP(!inHelpMenu);
+                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                TerminalInputEnabled(false);
+            }
+        }
+
+        internal static IEnumerator TransformHotfix(Camera currentCam)
+        {
+            if (!suitsTerminal.OpenBodyCams)
+                yield break;
+            if (!useOpenBodyCams.Value)
+                yield break;
+
+            yield return new WaitForEndOfFrame();
+            CamInit(currentCam);
         }
 
         private static void DisplayAllMenuItemsLog(List<string> menuListing)
         {
-            StringBuilder fullList = new StringBuilder();
+            StringBuilder fullList = new();
             foreach(string item in menuListing)
             {
                 fullList.Append(item + "\n");
@@ -445,9 +454,7 @@ namespace suitsTerminal
             rotateStep = 0;
             heightStep = 0;
             zoomStep = 1;
-            SaveOriginalLayerInformation(StartOfRound.Instance.localPlayerController);
             GetCurrentSuitNum();
-            ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, 23, 5);
             TogglePiP(true);
             suitsTerminal.Terminal.screenText.DeactivateInputField();
             suitsTerminal.Terminal.screenText.interactable = false;
@@ -462,10 +469,10 @@ namespace suitsTerminal
                 if (AnyKeyIsPressed())
                 {
                     HandleKeyPress(keyBeingPressed);
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(menuKeyPressDelay.Value);
                 }
                 else
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(menuPostSelectDelay.Value);
             }
 
             if (!suitsTerminal.Terminal.terminalInUse)
@@ -477,7 +484,6 @@ namespace suitsTerminal
             specialMenusActive = false;
 
             TogglePiP(false);
-            ModifyPlayerLayersForPiP(StartOfRound.Instance.localPlayerController, playerModelLayer, playerModelArmsLayer);
             yield return new WaitForSeconds(0.1f);
             suitsTerminal.Terminal.screenText.ActivateInputField();
             suitsTerminal.Terminal.screenText.interactable = true;

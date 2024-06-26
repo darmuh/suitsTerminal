@@ -1,5 +1,4 @@
-﻿using TerminalApi;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Object;
 
@@ -9,6 +8,8 @@ namespace suitsTerminal
     {
         internal static bool PiPCreated = false;
         internal static GameObject pipGameObject = null;
+        internal static GameObject camGameObject = null;
+        internal static int cullingMaskInt;
         internal static Camera playerCam = null;
         internal static RawImage pipRawImage = null;
         internal static Canvas terminalCanvas = null;
@@ -20,7 +21,7 @@ namespace suitsTerminal
 
         internal static void InitPiP()
         {
-            if (PiPCreated || !SConfig.enablePiPCamera.Value)
+            if (PiPCreated || !SConfig.enablePiPCamera.Value )
                 return;
 
             terminalCanvas = GameObject.Find("Environment/HangarShip/Terminal/Canvas")?.GetComponent<Canvas>();
@@ -37,6 +38,8 @@ namespace suitsTerminal
                 suitsTerminal.Log.LogError("Unable to find originalRawImage, null.");
                 return;
             }
+            if (pipGameObject != null && pipGameObject.gameObject != null)
+                Object.Destroy(pipGameObject.gameObject);
 
             pipGameObject = Instantiate(originalRawImage.gameObject, originalRawImage.transform.parent);
             pipGameObject.name = "suitsTerminal PiP (Clone)";
@@ -61,39 +64,65 @@ namespace suitsTerminal
 
         internal static void PlayerCamSetup()
         {
-            playerCam = Instantiate(StartOfRound.Instance.spectateCamera);
-            playerCam.gameObject.SetActive(true);
-            Transform termObject = GameObject.Find("Environment/HangarShip/Terminal").GetComponent<Transform>();
-            if (termObject != null && termObject.gameObject.layer != 0)
-            {
-                termObject.gameObject.layer = 0;
-                suitsTerminal.X("terminal layer changed");
-            }
+            camGameObject = new("darmuh's PlayerCam (Clone)");
+            RenderTexture renderTexture = new(StartOfRound.Instance.localPlayerController.gameplayCamera.targetTexture);
+            playerCam = camGameObject.AddComponent<Camera>();
+            playerCam.targetTexture = renderTexture;
+            cullingMaskInt = StartOfRound.Instance.localPlayerController.gameplayCamera.cullingMask & ~LayerMask.GetMask(layerNames: ["Ignore Raycast", "UI", "HelmetVisor"]);
+            cullingMaskInt |= (1 << 23);
+            
+            playerCam.cullingMask = cullingMaskInt;
+            
+            playerCam.orthographic = true;
+            playerCam.orthographicSize = 0.55f;
+            playerCam.usePhysicalProperties = false;
+            playerCam.farClipPlane = 30f;
+            playerCam.nearClipPlane = 0.25f;
+            playerCam.fieldOfView = 130f;
+            camGameObject.SetActive(false);
+            suitsTerminal.X("playerCam instantiated");
         }
 
-        internal static void RotateCameraAroundPlayer(Transform playerTransform, Camera camera)
+        internal static void SetCameraState(bool active)
+        {
+            if (camGameObject == null)
+                return;
+
+            if (active == true)
+                camGameObject.SetActive(active);
+            else
+                GameObject.Destroy(camGameObject);
+        }
+
+        internal static void SetArmsState(bool shouldHide)
+        {
+  StartOfRound.Instance.localPlayerController.thisPlayerModelArms.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = !shouldHide;
+                suitsTerminal.X($"shouldHide: {shouldHide} arms set to {!shouldHide}");
+        }
+
+        internal static void RotateCameraAroundPlayer(Transform playerTransform, Transform cameraTransform)
         {
             // Define the rotation increment
             Quaternion rotationIncrement = Quaternion.LookRotation(-playerTransform.right, playerTransform.up);
 
             // Calculate the new rotation by applying the rotation increment to the camera's current rotation
-            Quaternion newRotation = rotationIncrement * camera.transform.rotation;
+            Quaternion newRotation = rotationIncrement * cameraTransform.rotation;
 
             // Update the camera's rotation
-            camera.transform.rotation = newRotation;
+            cameraTransform.rotation = newRotation;
 
             // Calculate the new position by offsetting from the player's position
-            Vector3 offset = camera.transform.position - playerTransform.position;
+            Vector3 offset = cameraTransform.position - playerTransform.position;
             Vector3 newPosition = playerTransform.position + rotationIncrement * offset;
 
             // Update the camera's position
-            camera.transform.position = newPosition;
+            cameraTransform.position = newPosition;
         }
 
 
         internal static void ChangeCamZoom(Camera camera, ref int currentStep)
         {
-            float[] zoomVals = { 1.2f, 0.45f, 0.35f, 0.28f};
+            float[] zoomVals = [1.2f, 0.45f, 0.35f, 0.28f];
 
             // Increment the current step
             currentStep++;
@@ -107,10 +136,10 @@ namespace suitsTerminal
             camera.orthographicSize = zoomVals[currentStep];
         }
 
-        internal static void MoveCamera(Camera camera, ref int currentStep)
+        internal static void MoveCamera(Transform cameraTransform, ref int currentStep)
         {
             // Define the heights for each step
-            float[] stepHeights = { 0f, 1.3f, -9.499f, -7.749f, -5.499f, -2.49f };
+            float[] stepHeights = [0f, 1.3f, -9.499f, -7.749f, -5.499f, -2.49f];
 
             // Increment the current step
             currentStep++;
@@ -124,13 +153,13 @@ namespace suitsTerminal
             // Get the target height for the current step
             float targetHeight = initCamHeight + stepHeights[currentStep];
 
-            Vector3 newPosition = camera.transform.localPosition;
+            Vector3 newPosition = cameraTransform.localPosition;
 
             // Update the y-coordinate of the new position to the target height
             newPosition.y = targetHeight;
 
             // Update the camera's position
-            camera.transform.localPosition = newPosition;
+            cameraTransform.localPosition = newPosition;
         }
 
         internal static void TogglePiP(bool state)
@@ -139,21 +168,21 @@ namespace suitsTerminal
                 return;
 
             pipActive = state;
-            pipRawImage.texture = MirrorTexture(state);
+            if(suitsTerminal.OpenBodyCams && SConfig.useOpenBodyCams.Value)
+            {
+                suitsTerminal.X("OpenBodyCams detected, using OBC for Mirror");
+                OpenBodyCams.OpenBodyCamsMirror(state);
+            }
+            else
+                pipRawImage.texture = MirrorTexture(state);
+            
             pipRawImage.enabled = state;
             pipGameObject.SetActive(state);
-
         }
 
-        private static Texture MirrorTexture(bool state)
+        internal static void CamInit(Camera playerCam)
         {
-            if (playerCam == null)
-            {
-                PlayerCamSetup();
-            }
-
-            playerCam.enabled = state;
-            playerCam.cameraType = CameraType.SceneView;
+            playerCam.cameraType = CameraType.Game;
 
             Transform termTransform = suitsTerminal.Terminal.transform;
             Transform playerTransform = StartOfRound.Instance.localPlayerController.transform;
@@ -174,14 +203,21 @@ namespace suitsTerminal
             initCamHeight = playerCam.transform.position.y;
             suitsTerminal.X($"initCamHeight: {initCamHeight}");
 
-            playerCam.cullingMask = SConfig.setPiPCullingMask.Value; //9962313 old, ship security cam mask
-            playerCam.orthographic = true;
-            playerCam.orthographicSize = 0.55f;
-            playerCam.usePhysicalProperties = false;
-            playerCam.farClipPlane = 30f;
-            playerCam.nearClipPlane = 0.25f;
-            playerCam.fieldOfView = 130f;
             playerCam.transform.SetParent(termTransform);
+        }
+
+        private static Texture MirrorTexture(bool state)
+        {
+            if (playerCam == null)
+            {
+                PlayerCamSetup();
+            }
+
+            SetCameraState(state);
+            SetArmsState(state);
+
+            CamInit(playerCam);
+            pipGameObject.SetActive(state);
 
             Texture spectateTexture = playerCam.targetTexture;
             return spectateTexture;

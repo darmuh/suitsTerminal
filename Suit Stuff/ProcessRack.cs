@@ -7,16 +7,13 @@ namespace suitsTerminal
     {
         internal static void ProcessHiddenSuit(AutoParentToShip component)
         {
-            SuitInfo suitInfoComponent = component.gameObject.GetComponent<SuitInfo>();
-
-            if (suitInfoComponent == null)
-            {
-                suitInfoComponent = component.gameObject.AddComponent<SuitInfo>();
-            }
+            _ = component.gameObject.GetComponent<SuitInfo>() ?? component.gameObject.AddComponent<SuitInfo>();
 
             //suitsTerminal.X("processhiddensuit method");
             component.GetComponent<SuitInfo>().suitTag = "hidden";
             component.disableObject = true;
+            component.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+            component.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
         }
 
         internal static void ProcessHangingSuit(AutoParentToShip component)
@@ -35,13 +32,7 @@ namespace suitsTerminal
         internal static void ProcessVisibleSuit(AutoParentToShip component, int normSuit)
         {
             //suitsTerminal.X("processvisiblesuit");
-            SuitInfo suitInfoComponent = component.gameObject.GetComponent<SuitInfo>();
-
-            if (suitInfoComponent == null)
-            {
-                suitInfoComponent = component.gameObject.AddComponent<SuitInfo>();
-            }
-
+            _ = component.gameObject.GetComponent<SuitInfo>() ?? component.gameObject.AddComponent<SuitInfo>();
             component.GetComponent<SuitInfo>().suitTag = "hanging";
             component.overrideOffset = true;
 

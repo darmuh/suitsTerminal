@@ -1,6 +1,7 @@
 ﻿using Steamworks.Ugc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
@@ -13,7 +14,7 @@ namespace suitsTerminal
         internal static string GetNumbers(string selectedSuit)
         {
             int startOfNum = selectedSuit.IndexOf("^");
-            string numbersPortion = startOfNum != -1 ? selectedSuit.Substring(startOfNum + 1) : string.Empty;
+            string numbersPortion = startOfNum != -1 ? selectedSuit[(startOfNum + 1)..] : string.Empty;
             numbersPortion = numbersPortion.Replace("^", "").Replace("(", "").Replace(")", "");
             return numbersPortion;
         }
@@ -22,13 +23,13 @@ namespace suitsTerminal
         internal static string RemoveNumbers(string selectedSuit)
         {
             int caretIndex = selectedSuit.IndexOf("^");
-            string stringWithoutNumbers = caretIndex != -1 ? selectedSuit.Substring(0, caretIndex) : selectedSuit;
+            string stringWithoutNumbers = caretIndex != -1 ? selectedSuit[..caretIndex] : selectedSuit;
             return stringWithoutNumbers;
         }
 
         internal static string TerminalFriendlyString(string s)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
             foreach (char c in s)
             {
                 if (!char.IsPunctuation(c))
@@ -56,7 +57,7 @@ namespace suitsTerminal
             // Calculate the start and end indexes for the current page
             int startIndex = (currentPage - 1) * pageSize;
             int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
-            StringBuilder message = new StringBuilder();
+            StringBuilder message = new();
 
             message.Append("\r\n");
 
@@ -87,7 +88,7 @@ namespace suitsTerminal
             int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
             int totalItems = 0;
             int emptySpace;
-            StringBuilder message = new StringBuilder();
+            StringBuilder message = new();
 
             message.Append($"============= AdvancedsuitsMenu  =============\r\n");
             message.Append("\r\n");
@@ -126,13 +127,8 @@ namespace suitsTerminal
             //Page [LeftArrow] < 6/10 > [RightArrow]
             message.Append("\r\n\r\n");
             message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)} > [{rightString}]\r\n");
-            //message.Append($"============= See controls below =============\r\n");
-            message.Append($"Next Item [{downString}]\tLast Item [{upString}]\r\nFavorite Item [{favItemKeyString}] \tFavorites Menu [{favMenuKeyString}]\r\n");
-            if(SConfig.enablePiPCamera.Value)
-            {
-                message.Append($"Toggle Cam [{togglePiPstring}]\tRotate Cam [{pipRotateString}]\t\r\nCam Height [{pipHeightString}]\tCam Zoom [{pipZoomString}]\r\n");
-            }
-            message.Append($"Leave Menu [{leaveString}]\tSelect Suit [{selectString}]\r\n");
+            message.Append($"Leave Menu: [{leaveString}]\tSelect Suit: [{selectString}]\r\n");
+            message.Append($"\r\n\r\n>>>\tDisplay Help Page: [{helpMenuKeyString}]\t<<\r\n");
             return message.ToString();
         }
 
@@ -159,6 +155,29 @@ namespace suitsTerminal
             return menuItem;
         }
 
+        internal static List<string> GetListFromConfigItem(string configItem)
+        {
+            List<string> keywordsInConfig = configItem.Split(';')
+                                      .Select(item => item.TrimStart())
+                                      .ToList();
+            return keywordsInConfig;
+        }
+
+        internal static List<int> GetNumberListFromStringList(List<string> stringList)
+        {
+            List<int> numbersList = [];
+            foreach(string item in stringList)
+            {
+                if (int.TryParse(item, out int number))
+                {
+                    numbersList.Add(number);
+                }
+                else
+                    suitsTerminal.Log.LogError($"Could not parse {item} to integer");
+            }
+
+            return numbersList;
+        }
 
     }
 }

@@ -3,6 +3,7 @@ using OpenBodyCams;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.PictureInPicture;
@@ -34,6 +35,11 @@ namespace suitsTerminal
                 return favSuits;
             else
                 return suitNames;
+        }
+
+        internal static GameObject GetGameObject(string location)
+        {
+            return GameObject.Find(location);
         }
 
         internal static string HelpMenuDisplay(bool inHelpMenu, List<string> currentMenu)

@@ -15,7 +15,7 @@ namespace suitsTerminal
         {
             if(SConfig.chatCommands.Value)
             {
-                if (lastMessage == __instance.lastChatMessage)
+                if (lastMessage == __instance.lastChatMessage) //avoid patching for every single chat message
                     return;
 
                 suitsTerminal.X($"Testing message [{__instance.lastChatMessage}] for command.");

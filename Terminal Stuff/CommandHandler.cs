@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.StringStuff;
-using static suitsTerminal.TerminalHook;
+using OpenLib.CoreMethods;
+using OpenBodyCams;
 
 namespace suitsTerminal
 {
@@ -50,12 +51,6 @@ namespace suitsTerminal
         internal static string SuitPickCommand()
         {
             string displayText = PickSuit();
-            return displayText;
-        }
-
-        internal static string RandomSuitCommand()
-        {
-            string displayText = RandomSuit();
             return displayText;
         }
 
@@ -259,9 +254,21 @@ namespace suitsTerminal
             return stringBuilder.ToString().ToLower();
         }
 
-        internal static void AddCommand(string textFail, bool clearText, string keyWord, bool isVerb, string nodeName, Func<string> methodName, Dictionary<TerminalNode,Func<string>> nodeListing)
+        internal static void AddCommand(bool clearText, string keyWord, string nodeName, Func<string> methodName, MainListing nodeListing, string category = "", string description = "")
         {
-            MakeCommand(nodeName, keyWord, textFail, isVerb, clearText, methodName, nodeListing);
+            TerminalNode newNode = AddingThings.AddNodeManual(nodeName, keyWord, methodName, clearText, 0, nodeListing);
+            suitsTerminal.X($"{newNode.name} created!");
+            if(category.ToLower() == "other")
+            {
+                TerminalNode otherNode = LogicHandling.GetFromAllNodes("OtherCommands");
+                AddingThings.AddToExistingNodeText($"\n>{keyWord.ToUpper()}\n{description}", ref otherNode);
+            }
+
+        }
+
+        internal static void AddBasicCommand(string nodeName, string keyWord, string displayText, string category = "", string description = "")
+        {
+            AddingThings.AddBasicCommand(nodeName, keyWord, displayText, false, true, category, description);
         }
 
     }

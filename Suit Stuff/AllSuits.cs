@@ -208,8 +208,7 @@ namespace suitsTerminal
                     suitsTerminal.X($"Added [{suitName}] to favorites list.");
                 }
                 else
-                    suitsTerminal.Log.LogWarning($"[{suitName}] not loaded to favorites. Suit is locked, already added, or not found.");
-                    
+                    suitsTerminal.Log.LogWarning($"[{suitName}] not loaded to favorites. Suit is locked, already added, or not found.");  
             }
         }
 
@@ -220,7 +219,7 @@ namespace suitsTerminal
 
             if (SConfig.hideBoots.Value)
             {
-                GameObject boots = GameObject.Find("Environment/HangarShip/ScavengerModelSuitParts/Circle.004");
+                GameObject boots = GetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004");
                 GameObject.Destroy(boots);
             }
 
@@ -229,7 +228,7 @@ namespace suitsTerminal
 
             if (SConfig.hideRack.Value)
             {
-                GameObject clothingRack = GameObject.Find("Environment/HangarShip/NurbsPath.002");
+                GameObject clothingRack = GetGameObject("Environment/HangarShip/NurbsPath.002");
                 GameObject.Destroy(clothingRack);
             }
    

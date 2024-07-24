@@ -4,6 +4,18 @@
     <TargetFramework>netstandard2.1</TargetFramework>
 	  <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
+    <RepositoryUrl>https://github.com/darmuh/suitsTerminal</RepositoryUrl>
+    <AssemblyVersion>PluginInfo.PLUGIN_VERSION</AssemblyVersion>
+    <FileVersion>PluginInfo.PLUGIN_VERSION</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
 <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
@@ -23,6 +35,9 @@
     </Reference>
     <Reference Include="OpenBodyCams">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\dontloadpls\Zaggy1024-OpenBodyCams\OpenBodyCams.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenLib">
+      <HintPath>..\..\publicDevLibrary\OpenLib\bin\Debug\OpenLib.dll</HintPath>
     </Reference>
     <Reference Include="TerminalApi">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\dontloadpls\NotAtomicBomb-TerminalApi\TerminalApi.dll</HintPath>
@@ -71,6 +86,9 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+<ItemGroup>
+  <Folder Include="Properties\" />
+</ItemGroup>
 
 
 </Project>

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using GameNetcodeStuff;
+using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using static UnityEngine.Object;
 
@@ -18,6 +20,7 @@ namespace suitsTerminal
         internal static int heightStep;
         internal static int zoomStep;
         internal static int rotateStep;
+        internal static ShadowCastingMode originalShadows;
 
         internal static void InitPiP()
         {
@@ -70,14 +73,16 @@ namespace suitsTerminal
             playerCam.targetTexture = renderTexture;
             cullingMaskInt = StartOfRound.Instance.localPlayerController.gameplayCamera.cullingMask & ~LayerMask.GetMask(layerNames: ["Ignore Raycast", "UI", "HelmetVisor"]);
             cullingMaskInt |= (1 << 23);
-            
+
+            originalShadows = StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode;
+
             playerCam.cullingMask = cullingMaskInt;
             
             playerCam.orthographic = true;
             playerCam.orthographicSize = 0.55f;
             playerCam.usePhysicalProperties = false;
             playerCam.farClipPlane = 30f;
-            playerCam.nearClipPlane = 0.25f;
+            playerCam.nearClipPlane = 0.05f;
             playerCam.fieldOfView = 130f;
             camGameObject.SetActive(false);
             suitsTerminal.X("playerCam instantiated");
@@ -96,8 +101,13 @@ namespace suitsTerminal
 
         internal static void SetArmsState(bool shouldHide)
         {
-  StartOfRound.Instance.localPlayerController.thisPlayerModelArms.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = !shouldHide;
-                suitsTerminal.X($"shouldHide: {shouldHide} arms set to {!shouldHide}");
+            StartOfRound.Instance.localPlayerController.thisPlayerModelArms.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = !shouldHide;
+            suitsTerminal.X($"shouldHide: {shouldHide} arms set to {!shouldHide}");
+
+            if (shouldHide)
+                StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = ShadowCastingMode.Off;
+            else
+                StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = originalShadows;
         }
 
         internal static void RotateCameraAroundPlayer(Transform playerTransform, Transform cameraTransform)
@@ -171,7 +181,7 @@ namespace suitsTerminal
             if(suitsTerminal.OpenBodyCams && SConfig.useOpenBodyCams.Value)
             {
                 suitsTerminal.X("OpenBodyCams detected, using OBC for Mirror");
-                OpenBodyCams.OpenBodyCamsMirror(state);
+                OpenBodyCams.TerminalMirrorStatus(state);
             }
             else
                 pipRawImage.texture = MirrorTexture(state);

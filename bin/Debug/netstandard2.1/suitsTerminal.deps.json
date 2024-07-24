@@ -13,6 +13,7 @@
           "0Harmony": "2.9.0.0",
           "Facepunch.Steamworks.Win64": "1.0.0.0",
           "OpenBodyCams": "2.2.1.0",
+          "OpenLib": "0.1.3.0",
           "Unity.Collections": "0.0.0.0",
           "Unity.InputSystem": "1.7.0.0",
           "Unity.Netcode.Runtime": "0.0.0.0",
@@ -80,6 +81,14 @@
           "OpenBodyCams.dll": {
             "assemblyVersion": "2.2.1.0",
             "fileVersion": "2.2.1.0"
+          }
+        }
+      },
+      "OpenLib/0.1.3.0": {
+        "runtime": {
+          "OpenLib.dll": {
+            "assemblyVersion": "0.1.3.0",
+            "fileVersion": "0.1.3.0"
           }
         }
       },
@@ -186,6 +195,14 @@
             "fileVersion": "0.0.0.0"
           }
         }
+      },
+      "BMX.LobbyCompatibility/1.0.0.0": {
+        "runtime": {
+          "BMX.LobbyCompatibility.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
       }
     }
   },
@@ -213,6 +230,11 @@
       "sha512": ""
     },
     "OpenBodyCams/2.2.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OpenLib/0.1.3.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -278,6 +300,11 @@
       "sha512": ""
     },
     "Assembly-CSharp/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BMX.LobbyCompatibility/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

@@ -9,9 +9,10 @@ using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.PictureInPicture;
 using static suitsTerminal.Misc;
-using static suitsTerminal.TerminalHook;
+using OpenLib.CoreMethods;
 using GameNetcodeStuff;
 using System.Text;
+using OpenLib.ConfigManager;
 
 namespace suitsTerminal
 {
@@ -62,7 +63,7 @@ namespace suitsTerminal
             TogglePiPKey();
             CreateMenuCommand();
             if(menuDisplay == null )
-                menuDisplay = CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
+                menuDisplay = AddingThings.CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
 
             initKeySettings = false;
         }
@@ -81,7 +82,7 @@ namespace suitsTerminal
             if (!advancedTerminalMenu.Value)
                 return;
 
-            CommandHandler.AddCommand("Advanced Menus Corotuine", true, "suits", false, "advanced_suitsTerm", CommandHandler.AdvancedSuitsTerm, CommandStuff.sT);
+            CommandHandler.AddCommand(true, "suits", "advanced_suitsTerm", CommandHandler.AdvancedSuitsTerm, ConfigSetup.defaultListing, "other", "suitsTerminal advanced menu for changing suits");
         }
 
         private static void CollectionOfKeys()

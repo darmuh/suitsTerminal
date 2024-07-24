@@ -24,6 +24,13 @@ namespace suitsTerminal
             if (hintOnce)
                 return;
 
+            if (suitsTerminal.Terminal == null)
+            {
+                suitsTerminal.Log.LogError("~~ FATAL ERROR ~~");
+                suitsTerminal.Log.LogError("Terminal instance is NULL");
+                suitsTerminal.Log.LogError("~~ FATAL ERROR ~~");
+                return;
+            }
             suitsTerminal.Terminal.StartCoroutine(ChatHints());
             suitsTerminal.Terminal.StartCoroutine(HudHints());
             hintOnce = true;

@@ -1,6 +1,14 @@
 # Change Log
 
-### [1.3.0] **CURRENT VERSION**
+### [1.4.0]
+ - This mod is now utilizing OpenLib for it's interactions with the terminal
+ - Fixed issue where homebrew mirror camera would not show the player.
+	- Thanks Zaggy for the pointer
+ - Updated OpenBodyCams handling to be in-line with how it is done with darmuhsTerminalStuff.
+ - Some terminal commands added with this mod will be added to the "other" command listing
+ - Version information will now autopopulate to the file properties
+
+### [1.3.0]
  - Legonzaur on Github fixed an issue where all suits were still getting loaded by the game despite being hidden, causing a large amount of RAM usage.
 	- Huge thankyou to all who put effort into this fix!
 	- While it was a relatively small change in the code, a lot of troubleshooting/effort was put into discovering this issue.

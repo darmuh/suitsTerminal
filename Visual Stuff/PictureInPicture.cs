@@ -1,7 +1,8 @@
-﻿using GameNetcodeStuff;
+﻿using OpenBodyCams;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using static UnityEngine.Object;
 
 namespace suitsTerminal
@@ -14,7 +15,6 @@ namespace suitsTerminal
         internal static int cullingMaskInt;
         internal static Camera playerCam = null;
         internal static RawImage pipRawImage = null;
-        internal static Canvas terminalCanvas = null;
         internal static bool pipActive = false;
         internal static float initCamHeight;
         internal static int heightStep;
@@ -27,25 +27,24 @@ namespace suitsTerminal
             if (PiPCreated || !SConfig.enablePiPCamera.Value )
                 return;
 
-            terminalCanvas = GameObject.Find("Environment/HangarShip/Terminal/Canvas")?.GetComponent<Canvas>();
-
-            if(terminalCanvas == null)
+            if (suitsTerminal.Terminal.terminalImage == null)
             {
-                suitsTerminal.Log.LogError("Unable to find terminalCanvas, null.");
+                suitsTerminal.X("Original terminalImage not found or split view already created");
                 return;
             }
 
-            RawImage originalRawImage = GameObject.Find("Environment/HangarShip/Terminal/Canvas/MainContainer/ImageContainer/Image (1)")?.GetComponent<RawImage>();
-            if (originalRawImage == null)
-            {
-                suitsTerminal.Log.LogError("Unable to find originalRawImage, null.");
-                return;
-            }
             if (pipGameObject != null && pipGameObject.gameObject != null)
                 Object.Destroy(pipGameObject.gameObject);
 
-            pipGameObject = Instantiate(originalRawImage.gameObject, originalRawImage.transform.parent);
+            pipGameObject = Instantiate(suitsTerminal.Terminal.terminalImage.gameObject, suitsTerminal.Terminal.terminalImage.transform.parent);
             pipGameObject.name = "suitsTerminal PiP (Clone)";
+
+            if (pipGameObject.GetComponent<VideoPlayer>() != null)
+            {
+                VideoPlayer extraPlayer = pipGameObject.GetComponent<VideoPlayer>();
+                Destroy(extraPlayer);
+                suitsTerminal.X("extra videoPlayer deleted");
+            }
 
             pipRawImage = pipGameObject.GetComponent<RawImage>();
 
@@ -58,7 +57,7 @@ namespace suitsTerminal
 
         private static void SetRawImageDimensionsAndPosition(RectTransform rectTransform, float heightPercentage, float widthPercentage, float anchoredPosX, float anchoredPosY)
         {
-            RectTransform canvasRect = terminalCanvas.GetComponent<RectTransform>();
+            RectTransform canvasRect = suitsTerminal.Terminal.terminalUIScreen.GetComponent<RectTransform>();
             float height = canvasRect.rect.height * heightPercentage;
             float width = canvasRect.rect.width * widthPercentage;
             rectTransform.sizeDelta = new Vector2(width, height);

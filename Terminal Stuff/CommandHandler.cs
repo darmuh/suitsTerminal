@@ -12,7 +12,6 @@ namespace suitsTerminal
 {
     internal class CommandHandler
     {
-        public delegate void CommandDelegate(out string displayText);
         internal static string RandomSuit()
         {
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
@@ -257,11 +256,11 @@ namespace suitsTerminal
         internal static void AddCommand(bool clearText, string keyWord, string nodeName, Func<string> methodName, MainListing nodeListing, string category = "", string description = "")
         {
             TerminalNode newNode = AddingThings.AddNodeManual(nodeName, keyWord, methodName, clearText, 0, nodeListing);
-            suitsTerminal.X($"{newNode.name} created!");
             if(category.ToLower() == "other")
             {
                 TerminalNode otherNode = LogicHandling.GetFromAllNodes("OtherCommands");
-                AddingThings.AddToExistingNodeText($"\n>{keyWord.ToUpper()}\n{description}", ref otherNode);
+                if(otherNode != null)
+                    AddingThings.AddToExistingNodeText($"\n>{keyWord.ToUpper()}\n{description}", ref otherNode);
             }
 
         }

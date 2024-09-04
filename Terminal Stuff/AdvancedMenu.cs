@@ -214,10 +214,12 @@ namespace suitsTerminal
             if(state == false)
             {
                 suitsTerminal.Terminal.screenText.interactable = false;
+                suitsTerminal.Terminal.currentNode.maxCharactersToType = 0;
             }
             else
             {
                 suitsTerminal.Terminal.screenText.interactable = true;
+                suitsTerminal.Terminal.currentNode.maxCharactersToType = 25;
             }
         }
 

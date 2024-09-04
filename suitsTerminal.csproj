@@ -8,14 +8,14 @@
     <AssemblyVersion>PluginInfo.PLUGIN_VERSION</AssemblyVersion>
     <FileVersion>PluginInfo.PLUGIN_VERSION</FileVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>False</Optimize>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />

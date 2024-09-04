@@ -57,7 +57,7 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 	- [v1.1.0 video demo (youtube)](https://www.youtube.com/watch?v=bOm86ieLVfM)
 	- [v1.1.3 video demo (youtube)](https://www.youtube.com/watch?v=6fJ2Vm1iekQ)
 	- [v1.2.0 video demo (youtube)](https://www.youtube.com/watch?v=lCWSDqoQolU)
-	- [**LATEST VERSION**][v1.3.0 video demo (youtube)](https://www.youtube.com/watch?v=7QvVdqLiAsg)
+	- [v1.3.0 video demo (youtube)](https://www.youtube.com/watch?v=7QvVdqLiAsg)
 	- [TooManySuits v1.1.0 Compatibility demo (youtube)](https://www.youtube.com/watch?v=CzcAo6pFM4k)
 	
 ### Chat Commands:

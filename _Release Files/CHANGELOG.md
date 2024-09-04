@@ -1,5 +1,14 @@
 # Change Log
 
+### [1.4.2]
+ - Added fix for compatibility with upcoming terminalstuff update
+ - Hopefully fixed NRE error with addcommand method (unable to replicate on my end)
+ - Updated to OpenLib 0.1.8
+ - Update advancedSuitsMenu to accept 0 input to hopefully fix some issues where other mods would place words into the node anyway
+
+### [1.4.1]
+ - Fix manifest to include "darmuh-OpenLib-0.1.3"
+
 ### [1.4.0]
  - This mod is now utilizing OpenLib for it's interactions with the terminal
  - Fixed issue where homebrew mirror camera would not show the player.

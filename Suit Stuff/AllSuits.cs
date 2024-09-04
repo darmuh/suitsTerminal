@@ -158,7 +158,7 @@ namespace suitsTerminal
                 suitsTerminal.Log.LogInfo("No sorting requested, host/client may be desynced.");
             }
             else
-                suitsTerminal.Log.LogError("Config failure, no sorting");
+                suitsTerminal.Log.LogWarning("Config failure, no sorting");
 
         }
 

@@ -40,7 +40,7 @@ namespace suitsTerminal
         public static ConfigEntry<string> togglePiPHeight{ get; internal set; }
 
         public static ConfigEntry<string> suitsOnRackList{ get; internal set; }
-        public static ConfigEntry<bool> suitsOnRackCustom{ get; internal set; }
+        public static ConfigEntry<string> DontAddToRack { get; internal set; }
         public static ConfigEntry<string> favoritesMenuList{ get; internal set; }
         public static ConfigEntry<string> suitsSortingStyle{ get; internal set; }
 

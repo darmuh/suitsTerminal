@@ -10,9 +10,10 @@ using static suitsTerminal.AllSuits;
 using static suitsTerminal.PictureInPicture;
 using static suitsTerminal.Misc;
 using OpenLib.CoreMethods;
-using GameNetcodeStuff;
 using System.Text;
 using OpenLib.ConfigManager;
+using static OpenLib.Common.CommonStringStuff;
+using System.Linq;
 
 namespace suitsTerminal
 {
@@ -47,7 +48,7 @@ namespace suitsTerminal
 
         public static bool specialMenusActive = false;
         
-        internal static TerminalNode menuDisplay = null;
+        internal static TerminalNode menuDisplay = null!;
 
         internal static bool initKeySettings = false;
 
@@ -79,7 +80,7 @@ namespace suitsTerminal
 
         internal static void CreateMenuCommand()
         {
-            if (!advancedTerminalMenu.Value)
+            if (!AdvancedTerminalMenu.Value)
                 return;
 
             CommandHandler.AddCommand(true, "suits", "advanced_suitsTerm", CommandHandler.AdvancedSuitsTerm, ConfigSetup.defaultListing, "other", "suitsTerminal advanced menu for changing suits");
@@ -87,31 +88,31 @@ namespace suitsTerminal
 
         private static void CollectionOfKeys()
         {
-            CheckKeys(SConfig.menuUp.Value, out Key upKey, out upString);
+            CheckKeys(SConfig.MenuUp.Value, out Key upKey, out upString);
             BindKeys("previous_item", upKey, ref upString, "UpArrow", Key.UpArrow);
 
-            CheckKeys(SConfig.menuDown.Value, out Key downKey, out downString);
+            CheckKeys(SConfig.MenuDown.Value, out Key downKey, out downString);
             BindKeys("next_item", downKey, ref downString, "DownArrow", Key.DownArrow);
 
-            CheckKeys(SConfig.menuLeft.Value, out Key leftKey, out leftString);
+            CheckKeys(SConfig.MenuLeft.Value, out Key leftKey, out leftString);
             BindKeys("previous_page", leftKey, ref leftString, "LeftArrow", Key.LeftArrow);
 
-            CheckKeys(SConfig.menuRight.Value, out Key rightKey, out rightString);
+            CheckKeys(SConfig.MenuRight.Value, out Key rightKey, out rightString);
             BindKeys("next_page", rightKey, ref rightString, "RightArrow", Key.RightArrow);
 
-            CheckKeys(SConfig.leaveMenu.Value, out Key leaveKey, out leaveString);
+            CheckKeys(SConfig.LeaveMenu.Value, out Key leaveKey, out leaveString);
             BindKeys("leave_menu", leaveKey, ref leaveString, "Backspace", Key.Backspace);
 
-            CheckKeys(SConfig.selectMenu.Value, out Key selectKey, out selectString);
+            CheckKeys(SConfig.SelectMenu.Value, out Key selectKey, out selectString);
             BindKeys("menu_select", selectKey, ref selectString, "Enter", Key.Enter);
 
-            CheckKeys(SConfig.favItemKey.Value, out Key favItemKey, out favItemKeyString);
+            CheckKeys(SConfig.FavItemKey.Value, out Key favItemKey, out favItemKeyString);
             BindKeys("favorite_item", favItemKey, ref favItemKeyString, "F", Key.F);
 
-            CheckKeys(SConfig.favMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
+            CheckKeys(SConfig.FavMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
             BindKeys("favorites_menu", favMenuKey, ref favMenuKeyString, "F1", Key.F1);
 
-            CheckKeys(helpMenu.Value, out Key helpMenuKey, out helpMenuKeyString);
+            CheckKeys(HelpMenu.Value, out Key helpMenuKey, out helpMenuKeyString);
             BindKeys("help_menu", helpMenuKey, ref helpMenuKeyString, "H", Key.H);
         }
 
@@ -147,23 +148,23 @@ namespace suitsTerminal
 
         private static void TogglePiPKey()
         {
-            if (!enablePiPCamera.Value)
+            if (!EnablePiPCamera.Value)
                 return;
 
-            CheckKeys(togglePiPHeight.Value, out Key pipHeight, out pipHeightString);
+            CheckKeys(TogglePiPHeight.Value, out Key pipHeight, out pipHeightString);
             BindKeys("pip_height", pipHeight, ref pipHeightString, "Backslash", Key.Backslash);
 
-            CheckKeys(togglePiPRotation.Value, out Key pipRotate, out pipRotateString);
+            CheckKeys(TogglePiPRotation.Value, out Key pipRotate, out pipRotateString);
             BindKeys("pip_rotate", pipRotate, ref pipRotateString, "Equals", Key.Equals);
 
-            CheckKeys(togglePiPZoom.Value, out Key pipZoom, out pipZoomString);
+            CheckKeys(TogglePiPZoom.Value, out Key pipZoom, out pipZoomString);
             BindKeys("pip_zoom", pipZoom, ref pipZoomString, "Minus", Key.Minus);
 
-            if (IsValidKey(SConfig.togglePiP.Value, out Key validKey))
+            if (IsValidKey(SConfig.TogglePiP.Value, out Key validKey))
             {
                 togglePiP = validKey;
                 keyActions.Add(togglePiP, "toggle_pip");
-                togglePiPstring = SConfig.togglePiP.Value;
+                togglePiPstring = SConfig.TogglePiP.Value;
             }
             else
             {
@@ -182,15 +183,15 @@ namespace suitsTerminal
             {
                 if (invalidKeys.Contains(keyFromString))
                 {
-                    suitsTerminal.X("Tab Key detected, rejecting bind.");
+                    suitsTerminal.WARNING("Tab Key detected, rejecting bind.");
                     validKey = Key.None;
                     return false;
                 }
                 else if (keyActions.ContainsKey(keyFromString))
                 {
-                    suitsTerminal.X("Key was already bound to something, returning false");
+                    suitsTerminal.WARNING("Key was already bound to something, returning false");
                     string allKeys = string.Join(", ", keyActions.Keys);
-                    suitsTerminal.X($"Key list: {allKeys}");
+                    suitsTerminal.WARNING($"Key list: {allKeys}");
                     validKey = Key.None;
                     return false;
                 }
@@ -261,7 +262,7 @@ namespace suitsTerminal
 
         private static Camera GetCam()
         {
-            if(suitsTerminal.OpenBodyCams && useOpenBodyCams.Value)
+            if(suitsTerminal.OpenBodyCams && UseOpenBodyCams.Value)
             {
                 return OpenBodyCams.GetMirrorCam();
             }
@@ -269,9 +270,24 @@ namespace suitsTerminal
                 return playerCam;
         }
 
+        private static int GetFirstValidMenuItem(List<string> currentMenu, List<string> dontAddTerminal)
+        {
+            int firstValid = 0;
+            foreach(string item in currentMenu)
+            {
+                if (dontAddTerminal.Contains(item.ToLower()))
+                    firstValid++;
+                else
+                    return firstValid;
+            }
+
+            return firstValid;
+        }
+
         private static void HandleKeyAction(string value)
         {
             List<string> currentMenu = GetString();
+            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(DontAddToTerminal.Value, ','));
             Camera currentCam = GetCam();
 
             if (value == "previous_page" && !inHelpMenu)
@@ -299,7 +315,7 @@ namespace suitsTerminal
                 if (activeSelection > 0)
                     activeSelection--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage, false);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -323,6 +339,9 @@ namespace suitsTerminal
             else if (value == "menu_select" && !inHelpMenu)
             {
                 string selectedSuit = GetActiveMenuItem(currentMenu, activeSelection, 10, currentPage);
+                if (dontAddTerminal.Contains(selectedSuit))
+                    return;
+
                 CommandHandler.AdvancedSuitPick(selectedSuit);
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 GetCurrentSuitNum();
@@ -362,7 +381,7 @@ namespace suitsTerminal
                     favSuits.Add(selectedSuit);
 
                 SaveToConfig(favSuits, out string saveToConfig);
-                favoritesMenuList.Value = saveToConfig;
+                FavoritesMenuList.Value = saveToConfig;
                 suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
@@ -373,7 +392,7 @@ namespace suitsTerminal
                 inFavsMenu = !inFavsMenu;
                 List<string> newMenu = GetString();
                 currentPage = 1;
-                activeSelection = 0;
+                activeSelection = GetFirstValidMenuItem(currentMenu, dontAddTerminal);
                 GetCurrentSuitNum();
                 menuDisplay.displayText = AdvancedMenuDisplay(newMenu, activeSelection, 10, currentPage);
                 suitsTerminal.Terminal.LoadNewNode(menuDisplay);
@@ -384,7 +403,7 @@ namespace suitsTerminal
             {
                 inHelpMenu = !inHelpMenu;
                 currentPage = 1;
-                activeSelection = 0;
+                activeSelection = GetFirstValidMenuItem(currentMenu, dontAddTerminal);
                 GetCurrentSuitNum();
                 menuDisplay.displayText = HelpMenuDisplay(inHelpMenu, currentMenu);
 
@@ -398,7 +417,7 @@ namespace suitsTerminal
         {
             if (!suitsTerminal.OpenBodyCams)
                 yield break;
-            if (!useOpenBodyCams.Value)
+            if (!UseOpenBodyCams.Value)
                 yield break;
 
             yield return new WaitForEndOfFrame();
@@ -441,7 +460,7 @@ namespace suitsTerminal
 
         private static void PiPSetParent()
         {
-            if (!enablePiPCamera.Value)
+            if (!EnablePiPCamera.Value)
                 return;
 
             pipRawImage.transform.SetParent(suitsTerminal.Terminal.screenText.image.transform);
@@ -452,6 +471,8 @@ namespace suitsTerminal
             if (specialMenusActive)
                 yield break;
 
+            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(DontAddToTerminal.Value, ','));
+            Camera currentCam = GetCam();
             specialMenusActive = true;
             inFavsMenu = false;
             rotateStep = 0;
@@ -464,18 +485,19 @@ namespace suitsTerminal
             yield return new WaitForSeconds(0.2f);
             suitsTerminal.X("ActiveMenu Coroutine");
             currentPage = 1;
-            activeSelection = 0;
+            activeSelection = GetFirstValidMenuItem(suitNames, dontAddTerminal);
             PiPSetParent();
+            suitsTerminal.Terminal.StartCoroutine(TransformHotfix(currentCam));
 
-            while (suitsTerminal.Terminal.terminalInUse && advancedTerminalMenu.Value && !exitSpecialMenu)
+            while (suitsTerminal.Terminal.terminalInUse && AdvancedTerminalMenu.Value && !exitSpecialMenu)
             {
                 if (AnyKeyIsPressed())
                 {
                     HandleKeyPress(keyBeingPressed);
-                    yield return new WaitForSeconds(menuKeyPressDelay.Value);
+                    yield return new WaitForSeconds(MenuKeyPressDelay.Value);
                 }
                 else
-                    yield return new WaitForSeconds(menuPostSelectDelay.Value);
+                    yield return new WaitForSeconds(MenuPostSelectDelay.Value);
             }
 
             if (!suitsTerminal.Terminal.terminalInUse)

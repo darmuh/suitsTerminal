@@ -12,7 +12,7 @@
           "BepInEx.AssemblyPublicizer.MSBuild": "0.4.1",
           "0Harmony": "2.9.0.0",
           "Facepunch.Steamworks.Win64": "1.0.0.0",
-          "OpenBodyCams": "2.2.1.0",
+          "OpenBodyCams": "2.3.0.0",
           "OpenLib": "0.1.7.0",
           "Unity.Collections": "0.0.0.0",
           "Unity.InputSystem": "1.7.0.0",
@@ -76,11 +76,11 @@
           }
         }
       },
-      "OpenBodyCams/2.2.1.0": {
+      "OpenBodyCams/2.3.0.0": {
         "runtime": {
           "OpenBodyCams.dll": {
-            "assemblyVersion": "2.2.1.0",
-            "fileVersion": "2.2.1.0"
+            "assemblyVersion": "2.3.0.0",
+            "fileVersion": "2.3.0.0"
           }
         }
       },
@@ -229,7 +229,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "OpenBodyCams/2.2.1.0": {
+    "OpenBodyCams/2.3.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

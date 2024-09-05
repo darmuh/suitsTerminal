@@ -29,7 +29,7 @@ namespace suitsTerminal
             reorderSuits++;
         }
 
-        internal static void ProcessVisibleSuit(AutoParentToShip component, int normSuit)
+        internal static void ProcessVisibleSuit(AutoParentToShip component, int suitNumber)
         {
             //suitsTerminal.X("processvisiblesuit");
             _ = component.gameObject.GetComponent<SuitInfo>() ?? component.gameObject.AddComponent<SuitInfo>();
@@ -38,7 +38,7 @@ namespace suitsTerminal
 
             float offsetModifier = 0.18f;
 
-            component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (float)normSuit;
+            component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (float)suitNumber;
             component.rotationOffset = new Vector3(0f, 90f, 0f);
 
             showSuit++;

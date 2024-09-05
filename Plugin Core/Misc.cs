@@ -1,12 +1,8 @@
-﻿using GameNetcodeStuff;
-using OpenBodyCams;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
 using static suitsTerminal.AllSuits;
-using static suitsTerminal.PictureInPicture;
 
 namespace suitsTerminal
 {
@@ -26,7 +22,7 @@ namespace suitsTerminal
         {
             if(favSuits.Count == 0)
             {
-                suitsTerminal.Log.LogWarning("Favorite suits empty, displaying regular menu");
+                suitsTerminal.X("Favorite suits empty, displaying regular menu");
                 inFavsMenu = false;
                 return suitNames;
             }
@@ -53,7 +49,7 @@ namespace suitsTerminal
                 message.Append("\r\n\r\n");
 
                 message.Append($"Highlight Next Item: [{downString}]\r\nHighlight Last Item: [{upString}]\r\nFavorite Item: [{favItemKeyString}]\r\nShow Favorites Menu: [{favMenuKeyString}]\r\n");
-                if (SConfig.enablePiPCamera.Value)
+                if (SConfig.EnablePiPCamera.Value)
                 {
                     message.Append($"Toggle Camera Preview: [{togglePiPstring}]\r\nRotate Camera: [{pipRotateString}]\r\nChange Camera Height: [{pipHeightString}]\r\nChange Camera Zoom: [{pipZoomString}]\r\n");
                 }
@@ -73,20 +69,6 @@ namespace suitsTerminal
             configItem = string.Join(", ", stringList);
             suitsTerminal.X($"Saving to config\n{configItem}");
         }
-
-        internal static PlayerControllerB GetPlayerUsingTerminal()
-        {
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (!player.isPlayerDead && player.currentTriggerInAnimationWith == suitsTerminal.Terminal.terminalTrigger)
-                {
-                    suitsTerminal.X($"Player: {player.playerUsername} detected using terminal.");
-                    return player;
-                }
-            }
-            return null;
-        }
-
 
     }
 }

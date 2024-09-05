@@ -1,5 +1,25 @@
 # Change Log
 
+### [1.4.4]
+ - Added [DefaultSuit] configuration item which will allow for setting a new default suit to wear when loading in to the game.
+	- If SuitSaver is present, this will be completely disabled to avoid conflicts.
+
+### [1.4.3]
+ - Updated configuration item names, descriptions, and default values for clarity.
+ - Added TransformHotfix to mirror camera for reproducible issue that I cant seem to solve.
+	- The issue is if you switch suits from the rack and then go to the terminal and enter the suits menu it will almost always break the mirror camera position/rotation.
+	- The TransformHotfix will basically reset the camera position/angles the frame after you enter the suits menu.
+ - Added [DontAddToTerminal] config item to specify suit names that should NOT be added to the terminal.
+	- You will only be able to wear this suit if it's in the rack.
+ - Added [DontAddToRack] config item to specify suits that should NOT be added to the rack.
+	- These suits will only be able to be worn if they are listed in the terminal.
+ - Changed [suitsOnRackList] to [SuitsOnRackOnly] & removed [suitsOnRackCustom] config item.
+	- If [SuitsOnRackOnly] has a value, only suits in this list will be added to the rack.
+	- Handling has been updated so that this does not need to be case sensitive and leaving it empty will leave it disabled.
+ - Moved some more redundant methods over to OpenLib and performed some general code cleanup.
+ - Updated advancedSuitsMenu formatting, will now show currently equipped suit name at the bottom of the listing above page numbers
+ - Added nullable to project and better error handling messages
+
 ### [1.4.2]
  - Added fix for compatibility with upcoming terminalstuff update
  - Hopefully fixed NRE error with addcommand method (unable to replicate on my end)

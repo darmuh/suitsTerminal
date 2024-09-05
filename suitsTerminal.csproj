@@ -17,6 +17,14 @@
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <DebugType>portable</DebugType>
   </PropertyGroup>
+  <PropertyGroup>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
+    <Nullable>enable</Nullable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <BaseOutputPath>Z:\games\modding\LC\suitsTerminal\suitsTerminal\_Release Files</BaseOutputPath>
+  </PropertyGroup>
 <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
     <Reference Include="0Harmony">
@@ -88,6 +96,20 @@
   </ItemGroup>
 <ItemGroup>
   <Folder Include="Properties\" />
+  <Folder Include="_Release Files\Release\netstandard2.1\" />
+</ItemGroup>
+<ItemGroup>
+  <None Include="_Release Files\CHANGELOG.md" />
+  <None Include="_Release Files\icon.png" />
+  <None Include="_Release Files\LICENSE.MD" />
+  <None Include="_Release Files\manifest.json" />
+  <None Include="_Release Files\README.md" />
+</ItemGroup>
+<ItemGroup>
+  <None Update="_Release Files\README.md">
+    <Pack>True</Pack>
+    <PackagePath>\</PackagePath>
+  </None>
 </ItemGroup>
 
 

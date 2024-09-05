@@ -1,15 +1,11 @@
-﻿using GameNetcodeStuff;
-using OpenBodyCams;
+﻿using OpenBodyCams;
 using OpenBodyCams.API;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static suitsTerminal.Misc;
 using static suitsTerminal.PictureInPicture;
 using OpenLib.Common;
-using OpenLib.CoreMethods;
 
 namespace suitsTerminal
 {
@@ -66,7 +62,7 @@ namespace suitsTerminal
             if (TerminalMirrorCam != null || ((BodyCamComponent)TerminalMirrorCam) != null)
             {
                 Object.Destroy(((BodyCamComponent)TerminalMirrorCam));
-                TerminalMirrorCam = null;
+                TerminalMirrorCam = null!;
                 suitsTerminal.X("Attempting to destroy residual TerminalMirrorCam");
             }
         }
@@ -78,7 +74,8 @@ namespace suitsTerminal
         {
             if (TerminalMirrorCam != null || ((BodyCamComponent)TerminalMirrorCam) != null)
             {
-                ToggleCamState(((BodyCamComponent)TerminalMirrorCam).GetCamera(), enabled);
+                Camera getCam = ((BodyCamComponent)TerminalMirrorCam).GetCamera();
+                ToggleCamState(getCam, enabled);
                 suitsTerminal.X($"OBC - Setting Mirror Status: [{enabled}]");
             }
             else if(enabled)
@@ -121,7 +118,7 @@ namespace suitsTerminal
             terminalMirrorCam.OnCameraCreated += ResetTransform;
             terminalMirrorCam.OnBlankedSet += CamIsBlanked;
 
-            terminalMirrorCam.Resolution = GetResolutionForOBC(SConfig.obcResolution.Value);
+            terminalMirrorCam.Resolution = GetResolutionForOBC(SConfig.ObcResolution.Value);
             terminalMirrorCam.SetTargetToTransform(suitsTerminal.Terminal.transform);
             Camera cam = terminalMirrorCam.GetCamera();
             cam.gameObject.name = "TerminalStuff obc mirrorcam";
@@ -151,7 +148,7 @@ namespace suitsTerminal
             else
             {
                 resolution = new Vector2Int(1000, 700);
-                suitsTerminal.Log.LogWarning($"OBC - Unable to set resolution to values provided in config: {configItem}\nUsing default of 1000x700");
+                suitsTerminal.WARNING($"OBC - Unable to set resolution to values provided in config: {configItem}\nUsing default of 1000x700");
                 return resolution;
             }
         }

@@ -1,7 +1,4 @@
-﻿using OpenLib.Menus;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace suitsTerminal.EventSub
 {
@@ -11,8 +8,6 @@ namespace suitsTerminal.EventSub
         {
             if (suitsTerminal.OpenBodyCams)
                 OpenBodyCams.ResidualCamsCheck();
-
-
         }
     }
 }

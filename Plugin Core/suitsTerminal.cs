@@ -1,8 +1,6 @@
 ﻿using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
-using OpenLib.CoreMethods;
 using suitsTerminal.EventSub;
 using System.Reflection;
 using static suitsTerminal.Misc;
@@ -17,13 +15,14 @@ namespace suitsTerminal
         public static suitsTerminal instance;
         internal static bool TerminalStuff = false;
         internal static bool OpenBodyCams = false;
+        internal static bool SuitSaver = false;
         //internal static MainListing sT = new();
 
         public static class PluginInfo
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.4.2";
+            public const string PLUGIN_VERSION = "1.4.4";
         }
 
         public static Terminal Terminal;
@@ -63,10 +62,20 @@ namespace suitsTerminal
 
         public static void X(string message)
         {
-            if (!SConfig.extensiveLogging.Value)
+            if (!SConfig.ExtensiveLogging.Value)
                 return;
 
             Log.LogInfo(message);
+        }
+
+        public static void WARNING(string message)
+        {
+            Log.LogWarning(message);
+        }
+
+        public static void ERROR(string message) 
+        {
+            Log.LogError(message); 
         }
 
     }

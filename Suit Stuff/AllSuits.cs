@@ -7,6 +7,7 @@ using static suitsTerminal.Bools;
 using System.Linq;
 using UnityEngine;
 using Component = UnityEngine.Component;
+using static OpenLib.Common.CommonStringStuff;
 
 namespace suitsTerminal
 {
@@ -32,15 +33,17 @@ namespace suitsTerminal
                 {
                     SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
 
-                    if(!SConfig.advancedTerminalMenu.Value)
+                    if(!SConfig.AdvancedTerminalMenu.Value)
                         SuitName = TerminalFriendlyString(SuitName);
-
-                    suitNameToID.Add(item.syncedSuitID.Value, SuitName);
+                    if (!suitNameToID.ContainsKey(item.syncedSuitID.Value))
+                        suitNameToID.Add(item.syncedSuitID.Value, SuitName);
+                    else
+                        suitsTerminal.WARNING($"WARNING: duplicate suitID detected: {item.syncedSuitID.Value}\n{SuitName} will not be added to listing");
                 }
                 else
                 {
                     weirdSuitNum++;
-                    suitsTerminal.X($"Skipping suit, either weird or locked.");
+                    suitsTerminal.WARNING($"Skipping suit, either weird or locked.");
                 }
             }
 
@@ -96,7 +99,8 @@ namespace suitsTerminal
 
         private static bool AddSuitToList(UnlockableSuit suit)
         {
-            if (!SConfig.enforcePaidSuits.Value)
+
+            if (!SConfig.EnforcePaidSuits.Value)
                 return true;
 
             if (UnlockableItems[suit.syncedSuitID.Value].shopSelectionNode == null)
@@ -104,7 +108,7 @@ namespace suitsTerminal
 
             if (!UnlockableItems[suit.syncedSuitID.Value].spawnPrefab)
             {
-                suitsTerminal.X($"Locked suit [{UnlockableItems[suit.syncedSuitID.Value].unlockableName}] detected, not adding to list.");
+                suitsTerminal.WARNING($"Locked suit [{UnlockableItems[suit.syncedSuitID.Value].unlockableName}] detected, not adding to list.");
                 suitsTerminal.X($"hasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
                 return false;
             }
@@ -116,7 +120,7 @@ namespace suitsTerminal
         {
             // Remove items with negative syncedSuitID
 
-            if (!SConfig.keepSuitsWithNegativeIDs.Value)
+            if (!SConfig.KeepSuitsWithNegativeIDs.Value)
             {
                 allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
                 suitsTerminal.X("Removing suits with negative suitID values.");
@@ -147,18 +151,18 @@ namespace suitsTerminal
                     return false; // Keep the item
                 });
             }
-            if (SConfig.suitsSortingStyle.Value == "alphabetical")
+            if (SConfig.SuitsSortingStyle.Value == "alphabetical")
                 OrderSuitsByName();
-            else if (SConfig.suitsSortingStyle.Value == "numerical")
+            else if (SConfig.SuitsSortingStyle.Value == "numerical")
             {
                 OrderSuitsByID();
             }
-            else if (SConfig.suitsSortingStyle.Value == "none")
+            else if (SConfig.SuitsSortingStyle.Value == "none")
             {
                 suitsTerminal.Log.LogInfo("No sorting requested, host/client may be desynced.");
             }
             else
-                suitsTerminal.Log.LogWarning("Config failure, no sorting");
+                suitsTerminal.WARNING("Config failure, no sorting");
 
         }
 
@@ -194,13 +198,13 @@ namespace suitsTerminal
 
         private static void InitFavorites()
         {
-            List<string>favConfigList = SConfig.favoritesMenuList.Value.Split(',')
-                                      .Select(item => item.TrimStart())
-                                      .ToList();
+            List<string> favConfigList = GetKeywordsPerConfigItem(SConfig.FavoritesMenuList.Value, ',');
 
             favSuits.Clear();
+            if (favConfigList.Count == 0)
+                return;
 
-            foreach(string suitName in favConfigList)
+            foreach (string suitName in favConfigList)
             {
                 if (suitNames.Contains(suitName) && !favSuits.Contains(suitName))
                 {
@@ -208,7 +212,7 @@ namespace suitsTerminal
                     suitsTerminal.X($"Added [{suitName}] to favorites list.");
                 }
                 else
-                    suitsTerminal.Log.LogWarning($"[{suitName}] not loaded to favorites. Suit is locked, already added, or not found.");  
+                    suitsTerminal.WARNING($"[{suitName}] not loaded to favorites. Suit is locked, already added, or not found.");  
             }
         }
 
@@ -217,16 +221,16 @@ namespace suitsTerminal
             if(rackSituated) 
                 return;
 
-            if (SConfig.hideBoots.Value)
+            if (SConfig.HideBoots.Value)
             {
                 GameObject boots = GetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004");
                 GameObject.Destroy(boots);
             }
 
-            if (SConfig.dontRemove.Value)
+            if (SConfig.DontRemove.Value)
                 return;
 
-            if (SConfig.hideRack.Value)
+            if (SConfig.HideRack.Value)
             {
                 GameObject clothingRack = GetGameObject("Environment/HangarShip/NurbsPath.002");
                 GameObject.Destroy(clothingRack);
@@ -242,9 +246,7 @@ namespace suitsTerminal
             reorderSuits = 0;
             normSuit = 0;
 
-            List<string> customSuitNames = SConfig.suitsOnRackList.Value.Split(',')
-                                      .Select(item => item.TrimStart())
-                                      .ToList();
+            List<string> customSuitNames = GetKeywordsPerConfigItem(SConfig.SuitsOnRackOnly.Value, ',');
 
             HideBootsAndRack();
 
@@ -253,9 +255,10 @@ namespace suitsTerminal
                 AutoParentToShip component = ((Component)item).gameObject.GetComponent<AutoParentToShip>();
                 SuitInfo suitInfoComponent = component.gameObject.GetComponent<SuitInfo>();
 
-                OldCommands.CreateOldWearCommands(item);
+                List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(SConfig.DontAddToTerminal.Value, ','));
+                OldCommands.CreateOldWearCommands(item, dontAddTerminal);
 
-                if (!SConfig.dontRemove.Value)
+                if (!SConfig.DontRemove.Value)
                 {
                     isHanging = false;
 
@@ -298,7 +301,7 @@ namespace suitsTerminal
                         ProcessHiddenSuit(component);
                     }
 
-                    if (showSuit == SConfig.suitsOnRack.Value && !rackSituated)
+                    if (showSuit == SConfig.SuitsOnRack.Value && !rackSituated)
                     {
                         rackSituated = true;
                         suitsTerminal.X($"Max suits are on the rack now. rack is situated, yippeee!!!");
@@ -308,5 +311,7 @@ namespace suitsTerminal
 
             InitThisPlugin.initStarted = false;
         }
+
+        
     }
 }

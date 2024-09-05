@@ -7,45 +7,47 @@ namespace suitsTerminal
     public static class SConfig
     {
         //establish commands that can be turned on or off here
-        public static ConfigEntry<bool> extensiveLogging { get; internal set; }
-        public static ConfigEntry<int> suitsOnRack { get; internal set; }
-        public static ConfigEntry<bool> hideRack{ get; internal set; }
-        public static ConfigEntry<bool> hideBoots{ get; internal set; }
-        public static ConfigEntry<bool> keepSuitsWithNegativeIDs{ get; internal set; }
-        public static ConfigEntry<bool> randomSuitCommand{ get; internal set; }
-        public static ConfigEntry<bool> chatCommands{ get; internal set; }
-        public static ConfigEntry<bool> dontRemove{ get; internal set; }
-        public static ConfigEntry<bool> enforcePaidSuits{ get; internal set; }
-        public static ConfigEntry<bool> terminalCommands{ get; internal set; }
-        public static ConfigEntry<bool> advancedTerminalMenu{ get; internal set; }
-        public static ConfigEntry<bool> enablePiPCamera{ get; internal set; }
-        public static ConfigEntry<bool> chatHints{ get; internal set; }
-        public static ConfigEntry<bool> bannerHints{ get; internal set; }
-        public static ConfigEntry<bool> useOpenBodyCams { get; internal set; }
-        public static ConfigEntry<string> obcResolution { get; internal set; }
+        public static ConfigEntry<bool> ExtensiveLogging { get; internal set; }
+        public static ConfigEntry<int> SuitsOnRack { get; internal set; }
+        public static ConfigEntry<bool> HideRack{ get; internal set; }
+        public static ConfigEntry<bool> HideBoots{ get; internal set; }
+        public static ConfigEntry<bool> KeepSuitsWithNegativeIDs{ get; internal set; }
+        public static ConfigEntry<bool> RandomSuitCommand{ get; internal set; }
+        public static ConfigEntry<bool> ChatCommands{ get; internal set; }
+        public static ConfigEntry<bool> DontRemove{ get; internal set; }
+        public static ConfigEntry<bool> EnforcePaidSuits{ get; internal set; }
+        public static ConfigEntry<bool> TerminalCommands{ get; internal set; }
+        public static ConfigEntry<bool> AdvancedTerminalMenu{ get; internal set; }
+        public static ConfigEntry<bool> EnablePiPCamera{ get; internal set; }
+        public static ConfigEntry<bool> ChatHints{ get; internal set; }
+        public static ConfigEntry<bool> BannerHints{ get; internal set; }
+        public static ConfigEntry<bool> UseOpenBodyCams { get; internal set; }
+        public static ConfigEntry<string> ObcResolution { get; internal set; }
+        public static ConfigEntry<string> DefaultSuit {  get; internal set; }
 
 
-        public static ConfigEntry<string> menuUp{ get; internal set; }
-        public static ConfigEntry<string> menuDown{ get; internal set; }
-        public static ConfigEntry<string> menuLeft{ get; internal set; }
-        public static ConfigEntry<string> menuRight{ get; internal set; }
-        public static ConfigEntry<string> leaveMenu{ get; internal set; }
-        public static ConfigEntry<string> selectMenu{ get; internal set; }
-        public static ConfigEntry<string> helpMenu{ get; internal set; }
-        public static ConfigEntry<string> favItemKey{ get; internal set; }
-        public static ConfigEntry<string> favMenuKey{ get; internal set; }
-        public static ConfigEntry<string> togglePiP{ get; internal set; }
-        public static ConfigEntry<string> togglePiPZoom{ get; internal set; }
-        public static ConfigEntry<string> togglePiPRotation{ get; internal set; }
-        public static ConfigEntry<string> togglePiPHeight{ get; internal set; }
+        public static ConfigEntry<string> MenuUp{ get; internal set; }
+        public static ConfigEntry<string> MenuDown{ get; internal set; }
+        public static ConfigEntry<string> MenuLeft{ get; internal set; }
+        public static ConfigEntry<string> MenuRight{ get; internal set; }
+        public static ConfigEntry<string> LeaveMenu{ get; internal set; }
+        public static ConfigEntry<string> SelectMenu{ get; internal set; }
+        public static ConfigEntry<string> HelpMenu{ get; internal set; }
+        public static ConfigEntry<string> FavItemKey{ get; internal set; }
+        public static ConfigEntry<string> FavMenuKey{ get; internal set; }
+        public static ConfigEntry<string> TogglePiP{ get; internal set; }
+        public static ConfigEntry<string> TogglePiPZoom{ get; internal set; }
+        public static ConfigEntry<string> TogglePiPRotation{ get; internal set; }
+        public static ConfigEntry<string> TogglePiPHeight{ get; internal set; }
 
-        public static ConfigEntry<string> suitsOnRackList{ get; internal set; }
+        public static ConfigEntry<string> SuitsOnRackOnly{ get; internal set; }
         public static ConfigEntry<string> DontAddToRack { get; internal set; }
-        public static ConfigEntry<string> favoritesMenuList{ get; internal set; }
-        public static ConfigEntry<string> suitsSortingStyle{ get; internal set; }
+        public static ConfigEntry<string> DontAddToTerminal { get; internal set; }
+        public static ConfigEntry<string> FavoritesMenuList{ get; internal set; }
+        public static ConfigEntry<string> SuitsSortingStyle{ get; internal set; }
 
-        public static ConfigEntry<float> menuKeyPressDelay { get; internal set; }
-        public static ConfigEntry<float> menuPostSelectDelay { get; internal set; }
+        public static ConfigEntry<float> MenuKeyPressDelay { get; internal set; }
+        public static ConfigEntry<float> MenuPostSelectDelay { get; internal set; }
 
 
         public static void Settings()
@@ -54,51 +56,54 @@ namespace suitsTerminal
             suitsTerminal.Log.LogInfo("Reading configuration settings");
 
             //General Configs
-            advancedTerminalMenu = MakeBool("General", "advancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
-            extensiveLogging = MakeBool("General", "extensiveLogging", false, "Enable or Disable extensive logging for this mod.");
-            enforcePaidSuits = MakeBool("General", "enforcePaidSuits", true, "Enable or Disable enforcing paid suits being locked until they are paid for & unlocked.");
-            keepSuitsWithNegativeIDs = MakeBool("General", "keepSuitsWithNegativeIDs", false, "Enable this to attempt to keep suits with negative suitIDs, this option could break the mod or others");
-            randomSuitCommand = MakeBool("General", "randomSuitCommand", false, "Enable/Disable the randomsuit terminal command.");
-            chatCommands = MakeBool("General", "chatCommands", false, "Enable/Disable suits commands via chat (!suits/!wear).");
-            terminalCommands = MakeBool("General", "terminalCommands", true, "Enable/Disable the base suits commands via terminal (suits, wear).");
-            dontRemove = MakeBool("General", "dontRemove", false, "Enable this to stop this mod from removing suits from the rack and make it compatible with other mods like TooManySuits.");
+            AdvancedTerminalMenu = MakeBool("General", "AdvancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
+            ExtensiveLogging = MakeBool("General", "ExtensiveLogging", false, "Enable or Disable extensive logging for this mod.");
+            EnforcePaidSuits = MakeBool("General", "EnforcePaidSuits", true, "Enable or Disable enforcing paid suits being locked until they are paid for & unlocked.");
+            KeepSuitsWithNegativeIDs = MakeBool("General", "KeepSuitsWithNegativeIDs", false, "Enable this to attempt to keep suits with negative suitIDs, this option could break the mod or others");
+            RandomSuitCommand = MakeBool("General", "RandomSuitCommand", false, "Enable/Disable the randomsuit terminal command.");
+            ChatCommands = MakeBool("General", "ChatCommands", false, "Enable/Disable suits commands via chat (!suits/!wear).");
+            TerminalCommands = MakeBool("General", "TerminalCommands", true, "Enable/Disable the base suits commands via terminal (suits, wear).");
+            DontRemove = MakeBool("General", "DontRemove", false, "Enable this to stop this mod from removing suits from the rack and make it compatible with other mods like TooManySuits.");
+            DefaultSuit = MakeString("General", "DefaultSuit", "", "Automatically equip this suit when first loading in (in-place of the default orange\nThis configuration option is disabled if SuitSaver is present.");
+            DontAddToTerminal = MakeString("General", "DontAddToTerminal", "", "Comma-separated list of suits you do NOT want added to the terminal in any situation. Leave blank to disable this list.");
+
 
             //rack config
-            suitsOnRack = MakeClampedInt("Rack Settings", "suitsOnRack", 13, "Number of suits to keep on the rack. (Up to 13)", 0, 13);
-            suitsOnRackCustom = MakeBool("Rack Settings", "suitsOnRackCustom", false, "Enable this to set specific suits on the rack from the [suitsOnRackList] when [suitsOnRack] is above 0");
-            suitsOnRackList = MakeString("Rack Settings", "suitsOnRackList", "YORU, Blue Sapphire, Arctic, OMEN, Elite, GlowRed, GreenImposter, HEVSuit, Medic, RedImposter, Shadow, Santa, Speedster", "when suitsOnRackCustom is enabled, list suits to display on the rack by name (separated by commas & case sensitive). NOTE: If no suits match these names, none will be displayed on the rack.");
-            hideBoots = MakeBool("Rack Settings", "hideBoots", false, "Enable this to hide the boots by the rack.");
-            hideRack = MakeBool("Rack Settings", "hideRack", false, "Enable this to hide the rack, (rack will not be hidden if dontRemove is enabled, suitsOnRack integer will be ignored if rack hidden).");
-            suitsSortingStyle = MakeClampedString("Rack Settings", "suitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
+            SuitsOnRack = MakeClampedInt("Rack Settings", "SuitsOnRack", 13, "Number of suits to keep on the rack. (Up to 13)", 0, 13);
+            SuitsOnRackOnly = MakeString("Rack Settings", "SuitsOnRackOnly", "", "Comma-separated list of suits to display on the rack by name. Leave blank to disable this list.\nNOTE: This will make it so ONLY suits listed here will be added to the rack.\nIf no suits match this configuration item, no suits will be added to the rack.");
+            DontAddToRack = MakeString("Rack Settings", "DontAddToRack", "", "Comma-separated list of suits you do NOT want added to the rack in any situation. Leave blank to disable this list.");
+            HideBoots = MakeBool("Rack Settings", "HideBoots", false, "Enable this to hide the boots by the rack.");
+            HideRack = MakeBool("Rack Settings", "HideRack", false, "Enable this to hide the rack, (rack will not be hidden if DontRemove is enabled, SuitsOnRack integer will be ignored if rack hidden).");
+            SuitsSortingStyle = MakeClampedString("Rack Settings", "SuitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
 
             //Menu Binds
-            favoritesMenuList = MakeString("advancedTerminalMenu", "favoritesMenuList", "", "Favorited suit names will be stored here and displayed in the advancedTerminalMenu.");
-            enablePiPCamera = MakeBool("advancedTerminalMenu", "enablePiPCamera", true, "Disable this to stop the PiP camera from being created");
-            menuLeft = MakeString("advancedTerminalMenu", "menuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
-            menuRight = MakeString("advancedTerminalMenu", "menuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
-            menuUp = MakeString("advancedTerminalMenu", "menuUp", "UpArrow", "Set key to press to go to previous item on page in advanced menu system");
-            menuDown = MakeString("advancedTerminalMenu", "menuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
-            leaveMenu = MakeString("advancedTerminalMenu", "leaveMenu", "Backspace", "Set key to press to leave advanced menu system");
-            selectMenu = MakeString("advancedTerminalMenu", "selectMenu", "Enter", "Set key to press to select an item in advanced menu system");
-            helpMenu = MakeString("advancedTerminalMenu", "helpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
-            favItemKey = MakeString("advancedTerminalMenu", "favItemKey", "F", "Set key to press to set an item as a favorite in advanced menu system");
-            favMenuKey = MakeString("advancedTerminalMenu", "favMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
-            togglePiP = MakeString("advancedTerminalMenu", "togglePiP", "F12", "Set key to press to toggle PiP (mirror cam) on/off in advanced menu system");
-            togglePiPZoom = MakeString("advancedTerminalMenu", "togglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
-            togglePiPRotation = MakeString("advancedTerminalMenu", "togglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
-            togglePiPHeight = MakeString("advancedTerminalMenu", "togglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
+            FavoritesMenuList = MakeString("AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
+            EnablePiPCamera = MakeBool("AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");
+            MenuLeft = MakeString("AdvancedTerminalMenu", "MenuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
+            MenuRight = MakeString("AdvancedTerminalMenu", "MenuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
+            MenuUp = MakeString("AdvancedTerminalMenu", "MenuUp", "UpArrow", "Set key to press to go to previous item on page in advanced menu system");
+            MenuDown = MakeString("AdvancedTerminalMenu", "MenuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
+            LeaveMenu = MakeString("AdvancedTerminalMenu", "LeaveMenu", "Backspace", "Set key to press to leave advanced menu system");
+            SelectMenu = MakeString("AdvancedTerminalMenu", "SelectMenu", "Enter", "Set key to press to select an item in advanced menu system");
+            HelpMenu = MakeString("AdvancedTerminalMenu", "HelpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
+            FavItemKey = MakeString("AdvancedTerminalMenu", "FavItemKey", "F", "Set key to press to set an item as a favorite in advanced menu system");
+            FavMenuKey = MakeString("AdvancedTerminalMenu", "FavMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
+            TogglePiP = MakeString("AdvancedTerminalMenu", "TogglePiP", "F12", "Set key to press to toggle PiP (mirror cam) on/off in advanced menu system");
+            TogglePiPZoom = MakeString("AdvancedTerminalMenu", "TogglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
+            TogglePiPRotation = MakeString("AdvancedTerminalMenu", "TogglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
+            TogglePiPHeight = MakeString("AdvancedTerminalMenu", "TogglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
             
             //Hints
-            chatHints = MakeBool("Hints", "chatHints", true, "Disable this to remove the chat hints displayed at load in.");
-            bannerHints = MakeBool("Hints", "bannerHints", true, "Disable this to remove the banner hints displayed at load in.");
+            ChatHints = MakeBool("Hints", "ChatHints", false, "Determines whether chat hints are displayed at load in.");
+            BannerHints = MakeBool("Hints", "BannerHints", true, "Determines whether banner hints are displayed at load in.");
 
             //OpenBodyCams
-            useOpenBodyCams = MakeBool("OpenBodyCams", "useOpenBodyCams", true, "Disable this to remove the banner hints displayed at load in.");
-            obcResolution = MakeString("OpenBodyCams", "obcResolution", "1000; 700", "Set the resolution of the Mirror Camera created with OpenBodyCams");
+            UseOpenBodyCams = MakeBool("OpenBodyCams", "UseOpenBodyCams", true, "Disable this to remove the banner hints displayed at load in.");
+            ObcResolution = MakeString("OpenBodyCams", "ObcResolution", "1000; 700", "Set the resolution of the Mirror Camera created with OpenBodyCams");
 
             //Clamped Floats
-            menuKeyPressDelay = MakeClampedFloat("advancedTerminalMenu", "menuKeyPressDelay", 0.15f, "Regular delay when checking for key presses in the advancedTerminalMenu. (This delay will be added ontop of menuPostSelectDelay)", 0.05f, 1f);
-            menuPostSelectDelay = MakeClampedFloat("advancedTerminalMenu", "menuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the advancedTerminalMenu.", 0.05f, 1f);
+            MenuKeyPressDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuKeyPressDelay", 0.15f, "Regular delay when checking for key presses in the AdvancedTerminalMenu. (This delay will be added ontop of MenuPostSelectDelay)", 0.05f, 1f);
+            MenuPostSelectDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the AdvancedTerminalMenu.", 0.05f, 1f);
 
             //creds to Kittenji
             PropertyInfo orphanedEntriesProp = suitsTerminal.instance.Config.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);

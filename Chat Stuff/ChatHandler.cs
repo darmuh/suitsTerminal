@@ -1,5 +1,4 @@
-﻿using System;
-using static suitsTerminal.StringStuff;
+﻿using static suitsTerminal.StringStuff;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.CommandHandler;
 using static suitsTerminal.AdvancedMenu;
@@ -8,7 +7,7 @@ namespace suitsTerminal
 {
     internal class ChatHandler
     {
-        internal static string lastCommandRun;
+        internal static string lastCommandRun = "";
         internal static void HandleChatMessage(string command)
         {
             if (lastCommandRun == command)
@@ -39,7 +38,7 @@ namespace suitsTerminal
                     else
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid page number format: {pageNum}");
-                        suitsTerminal.X($"Invalid page number format: {pageNum}");
+                        suitsTerminal.WARNING($"Invalid page number format: {pageNum}");
                         lastCommandRun = command;
                         return;
                     }
@@ -72,7 +71,7 @@ namespace suitsTerminal
                         else
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid suit number: {suitNum}");
-                            suitsTerminal.X($"Invalid suit number: {suitNum}");
+                            suitsTerminal.WARNING($"Invalid suit number: {suitNum}");
                             lastCommandRun = command;
                             return;
                         }
@@ -80,7 +79,7 @@ namespace suitsTerminal
                     else
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid suit number format: {suitNum}");
-                        suitsTerminal.X($"Invalid suit number format: {suitNum}");
+                        suitsTerminal.WARNING($"Invalid suit number format: {suitNum}");
                         lastCommandRun = command;
                         return;
                     }

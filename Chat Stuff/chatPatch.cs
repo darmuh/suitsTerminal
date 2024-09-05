@@ -1,9 +1,5 @@
 ﻿using HarmonyLib;
-using System;
 using UnityEngine;
-using static suitsTerminal.AllSuits;
-using static suitsTerminal.StringStuff;
-using static suitsTerminal.CommandHandler;
 
 namespace suitsTerminal
 {
@@ -13,7 +9,7 @@ namespace suitsTerminal
         internal static string lastMessage = "";
         static void Postfix(HUDManager __instance)
         {
-            if(SConfig.chatCommands.Value)
+            if(SConfig.ChatCommands.Value)
             {
                 if (lastMessage == __instance.lastChatMessage) //avoid patching for every single chat message
                     return;

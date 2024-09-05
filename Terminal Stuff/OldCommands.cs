@@ -1,6 +1,4 @@
-﻿using Steamworks.Ugc;
-using System;
-using static suitsTerminal.StringStuff;
+﻿using static suitsTerminal.StringStuff;
 using static suitsTerminal.Misc;
 using static suitsTerminal.AllSuits;
 using System.Collections.Generic;
@@ -11,9 +9,13 @@ namespace suitsTerminal
 {
     internal class OldCommands
     {
-        internal static void CreateOldWearCommands(UnlockableSuit item)
+        internal static void CreateOldWearCommands(UnlockableSuit item, List<string> dontAddTerminal)
         {
-            if (SConfig.terminalCommands.Value && !SConfig.advancedTerminalMenu.Value)
+
+            if (dontAddTerminal.Contains(UnlockableItems[item.syncedSuitID.Value].unlockableName.ToLower()))
+                return;
+
+            if (SConfig.TerminalCommands.Value && !SConfig.AdvancedTerminalMenu.Value)
             {
                 //AddCommand(string textFail, bool clearText, string keyWord, bool isVerb, string nodeName, string category, string description, CommandDelegate methodName)
                 string SuitName = "";
@@ -24,7 +26,7 @@ namespace suitsTerminal
                     if (suitNames.Contains(SuitName.ToLower()))
                     {
                         SuitName += "z";
-                        suitsTerminal.X($"Duplicate found. Updated SuitName: {SuitName}");
+                        suitsTerminal.WARNING($"Duplicate found. Updated SuitName: {SuitName}");
                     }
                     suitNames.Add(SuitName.ToLower());
                     CommandHandler.AddCommand(true, "wear " + SuitName, SuitName, CommandHandler.SuitPickCommand, ConfigSetup.defaultListing);
@@ -41,11 +43,11 @@ namespace suitsTerminal
                 else if (item.syncedSuitID.Value < 0)
                 {
                     weirdSuitNum++;
-                    suitsTerminal.X($"Skipping suit with invalid ID number: {item.syncedSuitID.Value}");
+                    suitsTerminal.WARNING($"Skipping suit with invalid ID number: {item.syncedSuitID.Value}");
                 }
                 else
                 {
-                    suitsTerminal.X($"leaving this here but it should never happen");
+                    suitsTerminal.WARNING($"Unexpected condition in CreateOldWearCommands!");
                 }
 
                 CreateOldPageCommands();
@@ -97,7 +99,7 @@ namespace suitsTerminal
         {
             List<Page> pages = PageSplitter.SplitTextIntoPages(suitsList.ToString(), 6);
 
-            if (SConfig.terminalCommands.Value)
+            if (SConfig.TerminalCommands.Value)
             {
                 foreach (var page in pages)
                 {
@@ -117,7 +119,7 @@ namespace suitsTerminal
         {
             List<Page> pages = PageSplitter.SplitTextIntoPages(suitsList.ToString(), 6);
 
-            if (SConfig.terminalCommands.Value)
+            if (SConfig.TerminalCommands.Value)
             {
                 foreach (var page in pages)
                 {
@@ -152,7 +154,7 @@ namespace suitsTerminal
 
         internal static void MakeRandomSuitCommand()
         {
-            if (!SConfig.randomSuitCommand.Value)
+            if (!SConfig.RandomSuitCommand.Value)
                 return;
             
             CommandHandler.AddCommand(true, "randomsuit", "random suit command", CommandHandler.RandomSuit, ConfigSetup.defaultListing, "other", "Equip a random suit");

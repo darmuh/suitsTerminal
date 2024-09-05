@@ -1,12 +1,9 @@
-﻿using GameNetcodeStuff;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.StringStuff;
 using OpenLib.CoreMethods;
-using OpenBodyCams;
+using static OpenLib.Common.CommonStringStuff;
 
 namespace suitsTerminal
 {
@@ -38,7 +35,7 @@ namespace suitsTerminal
                     }
                     else
                     {
-                        suitsTerminal.X($"Random suit ID was invalid or null");
+                        suitsTerminal.WARNING($"Random suit ID was invalid or null");
                     }
                 }
             }
@@ -70,7 +67,7 @@ namespace suitsTerminal
                     return;
                 }
             }
-            suitToUse = null;
+            suitToUse = null!;
         }
 
         private static void PickUnlockableBasedOnID(int suitID, out UnlockableItem itemToUse)
@@ -83,7 +80,7 @@ namespace suitsTerminal
                     return;
                 }
             }
-            itemToUse = null;
+            itemToUse = null!;
         }
 
         private static void PickSuitBasedOnItem(UnlockableItem itemGiven, out UnlockableSuit suitToWear)
@@ -97,7 +94,7 @@ namespace suitsTerminal
                     return;
                 }
             }
-            suitToWear = null;
+            suitToWear = null!;
         }
 
         private static void FindSuitWithoutID(string suitName, List<int> dontUse)
@@ -175,12 +172,12 @@ namespace suitsTerminal
                         suitsTerminal.X("3.");
                         if (UnlockableItems.Count < suit.syncedSuitID.Value)
                         {
-                            suitsTerminal.Log.LogError("suit change encountered error with suitID");
+                            suitsTerminal.WARNING("suit change encountered error with suitID");
                             return;
                         }
 
-                        string SuitName = UnlockableItems[suit.syncedSuitID.Value].unlockableName;
-                        if (SuitName.Equals(selectedSuit))
+                        string SuitName = UnlockableItems[suit.syncedSuitID.Value].unlockableName.ToLower();
+                        if (SuitName.Equals(selectedSuit.ToLower()))
                         {
                             suitsTerminal.X("4.");
                             suit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
@@ -202,7 +199,7 @@ namespace suitsTerminal
             suitsTerminal.X($"Suit Count: {allSuits.Count}");
             suitsTerminal.X($"Unlockables Count: {UnlockableItems.Count}");
 
-            string cleanedText = GetScreenCleanedText(suitsTerminal.Terminal);
+            string cleanedText = GetCleanedScreenText(suitsTerminal.Terminal).ToLower();
             string displayText;
 
             if (UnlockableItems != null)
@@ -231,26 +228,6 @@ namespace suitsTerminal
 
             displayText = $"Unable to set suit to match command: {cleanedText}";
             return displayText;
-        }
-
-        private static string GetScreenCleanedText(Terminal __instance)
-        {
-            string s = __instance.screenText.text.Substring(__instance.screenText.text.Length - __instance.textAdded);
-            return RemovePunctuation(s);
-        }
-
-        private static string RemovePunctuation(string s) //copied from game files
-        {
-            StringBuilder stringBuilder = new();
-            foreach (char c in s)
-            {
-                if (!char.IsPunctuation(c))
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            return stringBuilder.ToString().ToLower();
         }
 
         internal static void AddCommand(bool clearText, string keyWord, string nodeName, Func<string> methodName, MainListing nodeListing, string category = "", string description = "")

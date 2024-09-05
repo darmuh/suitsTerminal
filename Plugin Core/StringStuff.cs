@@ -1,11 +1,10 @@
-﻿using Steamworks.Ugc;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
 using static suitsTerminal.AllSuits;
+using static OpenLib.Common.CommonStringStuff;
 
 namespace suitsTerminal
 {
@@ -78,10 +77,11 @@ namespace suitsTerminal
             return message.ToString();
         }
 
-        internal static string AdvancedMenuDisplay(List<string> menuItems, int activeIndex, int pageSize, int currentPage)
+        internal static string AdvancedMenuDisplay(List<string> menuItems, int activeIndex, int pageSize, int currentPage, bool goingForward = true)
         {
             // Ensure currentPage is within valid range
             currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)menuItems.Count / pageSize));
+            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(SConfig.DontAddToTerminal.Value, ','));
 
             // Calculate the start and end indexes for the current page
             int startIndex = (currentPage - 1) * pageSize;
@@ -103,11 +103,30 @@ namespace suitsTerminal
             // Iterate through each item in the current page
             for (int i = startIndex; i < endIndex; i++)
             {
+                // Check if menuItem should be displayed in terminal
+                bool isHidden = dontAddTerminal.Contains(menuItems[i].ToLower());
+
                 // Check if the menuItem is in favSuits
                 bool isFavorite = favSuits.Contains(menuItems[i]);
-
+                string menuItem = "";
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
-                string menuItem = (i == activeIndex)
+                
+                //Hide hidden menuItem and adjust activeIndex
+                if (isHidden && i == activeIndex)
+                {
+                    if (goingForward && activeIndex <= menuItems.Count - 1 || activeIndex < 1)
+                        activeIndex++;
+                    else if(!goingForward && activeIndex >= 1 || activeIndex >= menuItems.Count - 1)
+                        activeIndex--;
+
+                    activeSelection = activeIndex;
+                    suitsTerminal.X("Adjusting activeIndex to account for suit that should not be displayed in terminal");
+                    continue;
+                }
+                else if(isHidden)
+                    continue;
+
+                menuItem = (i == activeIndex)
                     ? "> " + ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "")
                     : ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "");
 
@@ -126,9 +145,10 @@ namespace suitsTerminal
             // Display pagination information
             //Page [LeftArrow] < 6/10 > [RightArrow]
             message.Append("\r\n\r\n");
+            message.Append($"Currently Wearing: {menuItems[currentlyWearing]}\r\n\r\n");
             message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)} > [{rightString}]\r\n");
             message.Append($"Leave Menu: [{leaveString}]\tSelect Suit: [{selectString}]\r\n");
-            message.Append($"\r\n\r\n>>>\tDisplay Help Page: [{helpMenuKeyString}]\t<<\r\n");
+            message.Append($"\r\n>>>\tDisplay Help Page: [{helpMenuKeyString}]\t<<\r\n");
             return message.ToString();
         }
 

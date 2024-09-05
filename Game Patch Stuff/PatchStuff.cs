@@ -1,41 +1,16 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 using UnityEngine;
 using System.Text;
-using GameNetcodeStuff;
 using static suitsTerminal.Misc;
-using BepInEx.Bootstrap;
 
 namespace suitsTerminal
 {
-    
-    public class Suits_Patch : MonoBehaviour
-    {
-        [HarmonyPatch(typeof(PlayerControllerB), "SpawnPlayerAnimation")]
-        public class PlayerSpawnPatch : MonoBehaviour
-        {
-            static void Postfix()
-            {
-                if (!rackSituated)
-                {
-                    suitsTerminal.X("player loaded & rackSituated is false, fixing suits rack");
-                    AdvancedMenu.InitSettings();
-                    InitThisPlugin.InitSuitsTerm();
-                    PictureInPicture.InitPiP();
-                    hasLaunched = true;
-                    return;
-                }
-                else
-                    return;
-            }
-        }
-    }
 
     public class SuitInfo : MonoBehaviour
     {
-        public string suitTag;
+        public string suitTag = "";
     }
 
     [HarmonyPatch(typeof(StartOfRound), "PositionSuitsOnRack")]
@@ -52,30 +27,6 @@ namespace suitsTerminal
                 InitThisPlugin.InitSuitsTerm();
             } 
                 
-        }
-    }
-
-    [HarmonyPatch(typeof(GameNetworkManager), "Start")]
-    public class GameStartPatch
-    {
-        public static void Postfix()
-        {
-            //hasLaunched = false;
-            CompatibilityCheck();
-        }
-
-        private static void CompatibilityCheck()
-        {
-            if (Chainloader.PluginInfos.ContainsKey("Zaggy1024.OpenBodyCams"))
-            {
-                suitsTerminal.X("OpenBodyCams by Zaggy1024 detected!");
-                suitsTerminal.OpenBodyCams = true;
-            }
-            if (Chainloader.PluginInfos.ContainsKey("darmuh.TerminalStuff"))
-            {
-                suitsTerminal.X("darmuhsTerminalStuff detected!");
-                suitsTerminal.TerminalStuff = true;
-            }
         }
     }
 

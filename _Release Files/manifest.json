@@ -1,6 +1,6 @@
 {
   "name": "suitsTerminal",
-  "version_number": "1.4.2",
+  "version_number": "1.4.4",
   "website_url": "https://github.com/darmuh/suitsTerminal",
   "description": "An alternative solution to having too many suits crowding the suits rack! This mod will remove all suits from the rack and allow them to be selected via the terminal. Rack modification is configurable and can even be used alongside mods like TooManySuits!",
   "dependencies": [

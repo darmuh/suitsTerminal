@@ -1,5 +1,4 @@
-﻿using OpenBodyCams;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -10,11 +9,11 @@ namespace suitsTerminal
     internal class PictureInPicture
     {
         internal static bool PiPCreated = false;
-        internal static GameObject pipGameObject = null;
-        internal static GameObject camGameObject = null;
+        internal static GameObject pipGameObject = null!;
+        internal static GameObject camGameObject = null!;
         internal static int cullingMaskInt;
-        internal static Camera playerCam = null;
-        internal static RawImage pipRawImage = null;
+        internal static Camera playerCam = null!;
+        internal static RawImage pipRawImage = null!;
         internal static bool pipActive = false;
         internal static float initCamHeight;
         internal static int heightStep;
@@ -24,12 +23,12 @@ namespace suitsTerminal
 
         internal static void InitPiP()
         {
-            if (PiPCreated || !SConfig.enablePiPCamera.Value )
+            if (PiPCreated || !SConfig.EnablePiPCamera.Value )
                 return;
 
             if (suitsTerminal.Terminal.terminalImage == null)
             {
-                suitsTerminal.X("Original terminalImage not found or split view already created");
+                suitsTerminal.WARNING("Original terminalImage not found");
                 return;
             }
 
@@ -173,11 +172,11 @@ namespace suitsTerminal
 
         internal static void TogglePiP(bool state)
         {
-            if (!SConfig.enablePiPCamera.Value)
+            if (!SConfig.EnablePiPCamera.Value)
                 return;
 
             pipActive = state;
-            if(suitsTerminal.OpenBodyCams && SConfig.useOpenBodyCams.Value)
+            if(suitsTerminal.OpenBodyCams && SConfig.UseOpenBodyCams.Value)
             {
                 suitsTerminal.X("OpenBodyCams detected, using OBC for Mirror");
                 OpenBodyCams.TerminalMirrorStatus(state);
@@ -194,21 +193,23 @@ namespace suitsTerminal
             playerCam.cameraType = CameraType.Game;
 
             Transform termTransform = suitsTerminal.Terminal.transform;
-            Transform playerTransform = StartOfRound.Instance.localPlayerController.transform;
+            Transform playerTransform = GameNetworkManager.Instance.localPlayerController.transform;
             suitsTerminal.X("camTransform assigned to terminal");
 
             // Calculate the opposite direction directly in local space
-            Vector3 oppositeDirection = -playerTransform.forward;
+            //Vector3 oppositeDirection = -playerTransform.forward;
 
             // Calculate the new rotation to look behind
-            Quaternion newRotation = Quaternion.LookRotation(oppositeDirection, playerTransform.up);
+            Quaternion newRotation = Quaternion.LookRotation(-playerTransform.forward, playerTransform.up);
 
             // Define the distance to back up the camera
             float distanceBehind = 1f;
 
             // Set camera's rotation and position
             playerCam.transform.rotation = newRotation;
-            playerCam.transform.position = playerTransform.position - oppositeDirection * distanceBehind + playerTransform.up * 2f;
+            suitsTerminal.X($"rotation: {newRotation}");
+            playerCam.transform.position = playerTransform.position - (-playerTransform.forward) * distanceBehind + playerTransform.up * 2f;
+            suitsTerminal.X($"position: {playerCam.transform.position}");
             initCamHeight = playerCam.transform.position.y;
             suitsTerminal.X($"initCamHeight: {initCamHeight}");
 

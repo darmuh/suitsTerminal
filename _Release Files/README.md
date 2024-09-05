@@ -22,10 +22,17 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 	- Default keybinds are [favItemKey = F] and [favMenuKey = F1].
 
  - Add only specific suits to the rack's 13 available spots.
-	- When [suitsOnRackCustom] is enabled, will only show suits that match the suit names listed in [suitsOnRackList].
-	- Note that each suit name should be separated by a comma and that the suit names ARE case sensitive.
+	- Use [SuitsOnRackOnly] to specify a specific list of suit names to show on the rack.
+	- Use [DontAddToRack] to specify a list of suit names that should NOT show on the rack.
+	- Leave both lists blank if you dont want to specify specific suit names.
 	- Favorite some suits and look at favoritesMenuList for examples of suit names.
 	- These settings do not override any of the following config options: [suitsOnRack], [dontRemove], [hideRack]
+
+ - Specify suits that should NOT be available in the terminal via [DontAddToTerminal]
+	- Leave blank if you would like all suits added to the terminal
+
+ - Set a new default suit with the [DefaultSuit] configuration item.
+	- This feature will automatically disable itself if SuitSaver is present to avoid conflicts.
 
  - Controls for the advancedTerminalMenu are completely configurable, any key except for tab is acceptable.
 	- See valid key names here - https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.Key.html

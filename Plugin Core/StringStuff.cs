@@ -108,7 +108,7 @@ namespace suitsTerminal
 
                 // Check if the menuItem is in favSuits
                 bool isFavorite = favSuits.Contains(menuItems[i]);
-                string menuItem = "";
+                
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
                 
                 //Hide hidden menuItem and adjust activeIndex
@@ -126,7 +126,7 @@ namespace suitsTerminal
                 else if(isHidden)
                     continue;
 
-                menuItem = (i == activeIndex)
+                string menuItem = (i == activeIndex)
                     ? "> " + ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "")
                     : ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "");
 
@@ -145,7 +145,7 @@ namespace suitsTerminal
             // Display pagination information
             //Page [LeftArrow] < 6/10 > [RightArrow]
             message.Append("\r\n\r\n");
-            message.Append($"Currently Wearing: {menuItems[currentlyWearing]}\r\n\r\n");
+            message.Append($"Currently Wearing: {UnlockableItems[StartOfRound.Instance.localPlayerController.currentSuitID].unlockableName}\r\n\r\n");
             message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)} > [{rightString}]\r\n");
             message.Append($"Leave Menu: [{leaveString}]\tSelect Suit: [{selectString}]\r\n");
             message.Append($"\r\n>>>\tDisplay Help Page: [{helpMenuKeyString}]\t<<\r\n");

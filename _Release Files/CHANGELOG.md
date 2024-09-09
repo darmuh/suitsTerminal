@@ -1,5 +1,9 @@
 # Change Log
 
+### [1.4.5]
+ - Fixed error with favorites menu that would break suitsTerminal completely.
+	- Thanks @Lunxara for the report.
+
 ### [1.4.4]
  - Added [DefaultSuit] configuration item which will allow for setting a new default suit to wear when loading in to the game.
 	- If SuitSaver is present, this will be completely disabled to avoid conflicts.

@@ -40,8 +40,8 @@ namespace suitsTerminal
 
         internal static bool inFavsMenu = false;
         internal static bool inHelpMenu = false;
-        internal static int currentPage;
-        internal static int activeSelection;
+        internal static int currentPage = 1;
+        internal static int activeSelection = 0;
         internal static bool exitSpecialMenu = false;
 
         public static bool specialMenusActive = false;

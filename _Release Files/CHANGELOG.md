@@ -1,5 +1,9 @@
 # Change Log
 
+### [1.5.1]
+ - Fixed fatal error that broke advancedsuitsmenu, sorry for missing this.
+ - Added some more logging for when these fatal errors occur to directly point to the exact issue.
+
 ### [1.5.0]
  - Slight backend rework. Utilizing a new class that tracks relevant information for each suit.
 	- Fixes issue of suits that were hidden from terminal causing odd desyncs in the menus

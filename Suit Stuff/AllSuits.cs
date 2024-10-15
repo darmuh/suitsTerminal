@@ -20,53 +20,8 @@ namespace suitsTerminal
         {
             suitNameToID.Clear();
             suitListing.NameList.Clear();
-            CheckForDuplicateSuitNames();
             FixRack();
             OldCommands.MakeRandomSuitCommand();
-        }
-
-        private static void CheckForDuplicateSuitNames()
-        {
-            List<string> fullList = [];
-            List<string> duplicatesFound = [];
-            // Populate suitNames based on suitNameToID
-            foreach (var kvp in suitNameToID)
-            {
-                // Check if the suit name already exists in suitNames
-                if (!fullList.Any(name => string.Equals(name, kvp.Value, StringComparison.OrdinalIgnoreCase)))
-                {
-                    // If not, add it directly to suitNames
-                    fullList.Add(kvp.Value);
-                }
-                else
-                {
-                    // If it does, append the integer after ^ to make it unique
-                    duplicatesFound.Add(kvp.Value);
-                }
-            }
-
-            CreateFinalSuitsList(duplicatesFound);
-        }
-
-        private static void CreateFinalSuitsList(List<string> duplicateSuitNames)
-        {
-            // Populate suitNames based on suitNameToID
-            foreach (var kvp in suitNameToID)
-            {
-                // If the suit name has not been encountered yet, add it to suitNames and the set
-                if (!duplicateSuitNames.Any(name => string.Equals(name, kvp.Value, StringComparison.OrdinalIgnoreCase)))
-                {
-                    suitListing.NameList.Add(kvp.Value);
-                }
-                else
-                {
-                    // If the suit name has been encountered, create a unique suit name with the associated key
-                    string uniqueSuitName = $"{kvp.Value}^({kvp.Key})";
-
-                    // Add both the original and unique suit names to suitNames
-                    suitListing.NameList.Add(uniqueSuitName);
-                }
-            }
         }
 
         private static bool AddSuitToList(UnlockableSuit suit)

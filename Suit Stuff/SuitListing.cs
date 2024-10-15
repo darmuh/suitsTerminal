@@ -52,7 +52,7 @@ namespace suitsTerminal.Suit_Stuff
         internal UnlockableSuit Suit;
         internal bool HideFromTerminal = false;
         internal bool IsOnRack = false;
-        internal string Name;
+        internal string Name = "placeholder";
 
         //extra stuff
         internal bool IsFav = false;
@@ -64,6 +64,7 @@ namespace suitsTerminal.Suit_Stuff
         {
             Suit = item;
             Name = GetName(item, UnlockableItems, ref suitNameToID);
+            suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
             IsFav = IsFavorite();
             SetIndex();
@@ -74,6 +75,7 @@ namespace suitsTerminal.Suit_Stuff
         {
             Suit = item;
             Name = GetName(item, UnlockableItems, ref suitNameToID);
+            suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
             IsFav = IsFavorite();
             SetIndex();

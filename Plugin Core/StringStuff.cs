@@ -98,7 +98,16 @@ namespace suitsTerminal
 
         internal static string AdvancedMenuDisplay(SuitListing suitListing, int activeIndex, int pageSize, int currentPage)
         {
+            Plugin.X($"activeIndex: {activeIndex}\npageSize: {pageSize}\ncurrentPage: {currentPage}");
+            if(suitListing == null)
+            {
+                Plugin.ERROR("suitsTerminal FATAL ERROR: suitListing is NULL");
+                return "suitsTerminal FATAL ERROR: suitListing is NULL";
+            }
+
             int listing = GetListing(suitListing);
+
+            Plugin.X($"listing count: {listing}");
 
             // Ensure currentPage is within valid range
             currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)listing / pageSize));
@@ -128,6 +137,12 @@ namespace suitsTerminal
                     suit = suitListing.SuitsList.Where(x => x.MainMenuIndex == i).FirstOrDefault();
                 else
                     suit = suitListing.SuitsList.Where(x => x.FavIndex == i).FirstOrDefault();
+
+                if(suit == null)
+                {
+                    Plugin.ERROR($"suitsTerminal FATAL ERROR: Unable to index suit listing @ [ {i} ]");
+                    return $"suitsTerminal FATAL ERROR: Unable to index suit listing @ [ {i} ]";
+                }
 
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
 

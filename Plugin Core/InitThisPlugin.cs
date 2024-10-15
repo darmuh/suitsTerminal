@@ -12,27 +12,27 @@ namespace suitsTerminal
         {
             if (initStarted)
             {
-                suitsTerminal.X("init already started, ending func");
+                Plugin.X("init already started, ending func");
                 return;
             }
-               
+
 
             initStarted = true;
-            suitsTerminal.X($"Suits patch, normSuit value: {normSuit} & showSuit value: {showSuit}");
+            Plugin.X($"Suits patch, showSuit value: {suitsOnRack}");
             InitSuitsListing();
 
             if (hintOnce)
                 return;
 
-            if (suitsTerminal.Terminal == null)
+            if (Plugin.Terminal == null)
             {
-                suitsTerminal.Log.LogError("~~ FATAL ERROR ~~");
-                suitsTerminal.Log.LogError("Terminal instance is NULL");
-                suitsTerminal.Log.LogError("~~ FATAL ERROR ~~");
+                Plugin.Log.LogError("~~ FATAL ERROR ~~");
+                Plugin.Log.LogError("Terminal instance is NULL");
+                Plugin.Log.LogError("~~ FATAL ERROR ~~");
                 return;
             }
-            suitsTerminal.Terminal.StartCoroutine(ChatHints());
-            suitsTerminal.Terminal.StartCoroutine(HudHints());
+            Plugin.Terminal.StartCoroutine(ChatHints());
+            Plugin.Terminal.StartCoroutine(HudHints());
             hintOnce = true;
         }
     }

@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using suitsTerminal.Suit_Stuff;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
 using static suitsTerminal.AllSuits;
-using static OpenLib.Common.CommonStringStuff;
 
 namespace suitsTerminal
 {
@@ -41,21 +40,23 @@ namespace suitsTerminal
             {
                 int excessLength = stringBuilder.Length - 14;
                 stringBuilder.Remove(14, excessLength);
-                //suitsTerminal.X($"terminalFriendlystring: {stringBuilder}");
+                //Plugin.X($"terminalFriendlystring: {stringBuilder}");
             }
 
 
             return stringBuilder.ToString().ToLower();
         }
 
-        internal static string ChatListing(List<string> menuItems, int pageSize, int currentPage)
+        internal static string ChatListing(SuitListing suitListing, int pageSize, int currentPage)
         {
+            int listing = suitListing.SuitsList.Count;
+
             // Ensure currentPage is within valid range
-            currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)menuItems.Count / pageSize));
+            currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)listing / pageSize));
 
             // Calculate the start and end indexes for the current page
             int startIndex = (currentPage - 1) * pageSize;
-            int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
+            int endIndex = Mathf.Min(startIndex + pageSize, listing);
             StringBuilder message = new();
 
             message.Append("\r\n");
@@ -63,8 +64,10 @@ namespace suitsTerminal
             // Iterate through each item in the current page
             for (int i = startIndex; i < endIndex; i++)
             {
+                SuitAttributes suit = suitListing.SuitsList[i];
+
                 // Append "[EQUIPPED]" line if applicable
-                string menuItem = (i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i];
+                string menuItem = $"{suit.Name}" + (suit.currentSuit ? " [EQUIPPED]" : "");
 
                 // Display the menu item
                 message.Append($"'!wear {i}' (" + menuItem + ")\r\n");
@@ -72,20 +75,37 @@ namespace suitsTerminal
 
             // Display pagination information
             message.Append("\r\n");
-            message.Append($"Page {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)}\r\n");
+            message.Append($"Page {currentPage}/{Mathf.CeilToInt((float)listing / pageSize)}\r\n");
 
             return message.ToString();
         }
 
-        internal static string AdvancedMenuDisplay(List<string> menuItems, int activeIndex, int pageSize, int currentPage, bool goingForward = true)
+        internal static int GetListing(SuitListing suitListing)
         {
+            if (inFavsMenu)
+                suitListing.CurrentMenu = 1;
+            else
+                suitListing.CurrentMenu = 0;
+
+            int listing;
+            if (suitListing.CurrentMenu == 0)
+                listing = suitListing.NameList.Count;
+            else
+                listing = suitListing.FavList.Count;
+
+            return listing;
+        }
+
+        internal static string AdvancedMenuDisplay(SuitListing suitListing, int activeIndex, int pageSize, int currentPage)
+        {
+            int listing = GetListing(suitListing);
+
             // Ensure currentPage is within valid range
-            currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)menuItems.Count / pageSize));
-            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(SConfig.DontAddToTerminal.Value, ','));
+            currentPage = Mathf.Clamp(currentPage, 1, Mathf.CeilToInt((float)listing / pageSize));
 
             // Calculate the start and end indexes for the current page
             int startIndex = (currentPage - 1) * pageSize;
-            int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
+            int endIndex = Mathf.Min(startIndex + pageSize, listing);
             int totalItems = 0;
             int emptySpace;
             StringBuilder message = new();
@@ -96,39 +116,26 @@ namespace suitsTerminal
             // Recalculate activeIndex based on the current page
             // Ensure activeIndex is within the range of items on the current page
             activeIndex = Mathf.Clamp(activeIndex, startIndex, endIndex - 1);
-            suitsTerminal.X($"activeSelection: {activeSelection} activeIndex: {activeIndex}");
-            suitsTerminal.X("matching values");
+            Plugin.X($"activeSelection: {activeSelection} activeIndex: {activeIndex}");
+            Plugin.X("matching values");
             activeSelection = activeIndex;
 
             // Iterate through each item in the current page
             for (int i = startIndex; i < endIndex; i++)
             {
-                // Check if menuItem should be displayed in terminal
-                bool isHidden = dontAddTerminal.Contains(menuItems[i].ToLower());
+                SuitAttributes suit;
+                if (suitListing.CurrentMenu == 0)
+                    suit = suitListing.SuitsList.Where(x => x.MainMenuIndex == i).FirstOrDefault();
+                else
+                    suit = suitListing.SuitsList.Where(x => x.FavIndex == i).FirstOrDefault();
 
-                // Check if the menuItem is in favSuits
-                bool isFavorite = favSuits.Contains(menuItems[i]);
-                
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
-                
-                //Hide hidden menuItem and adjust activeIndex
-                if (isHidden && i == activeIndex)
-                {
-                    if (goingForward && activeIndex <= menuItems.Count - 1 || activeIndex < 1)
-                        activeIndex++;
-                    else if(!goingForward && activeIndex >= 1 || activeIndex >= menuItems.Count - 1)
-                        activeIndex--;
 
-                    activeSelection = activeIndex;
-                    suitsTerminal.X("Adjusting activeIndex to account for suit that should not be displayed in terminal");
-                    continue;
-                }
-                else if(isHidden)
-                    continue;
+                activeSelection = activeIndex;
 
                 string menuItem = (i == activeIndex)
-                    ? "> " + ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "")
-                    : ((i == currentlyWearing) ? menuItems[i] + " [EQUIPPED]" : menuItems[i]) + (isFavorite ? " (*)" : "");
+                    ? $"> {suit.Name}" + (suit.currentSuit ? " [EQUIPPED]" : "") + (suit.IsFav ? " (*)" : "")
+                    : $"{suit.Name}" + (suit.currentSuit ? " [EQUIPPED]" : "") + (suit.IsFav ? " (*)" : "");
 
                 // Display the menu item
                 message.Append(menuItem + "\r\n");
@@ -146,57 +153,25 @@ namespace suitsTerminal
             //Page [LeftArrow] < 6/10 > [RightArrow]
             message.Append("\r\n\r\n");
             message.Append($"Currently Wearing: {UnlockableItems[StartOfRound.Instance.localPlayerController.currentSuitID].unlockableName}\r\n\r\n");
-            message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)menuItems.Count / pageSize)} > [{rightString}]\r\n");
+            message.Append($"Page [{leftString}] < {currentPage}/{Mathf.CeilToInt((float)listing / pageSize)} > [{rightString}]\r\n");
             message.Append($"Leave Menu: [{leaveString}]\tSelect Suit: [{selectString}]\r\n");
             message.Append($"\r\n>>>\tDisplay Help Page: [{helpMenuKeyString}]\t<<\r\n");
             return message.ToString();
         }
 
-        internal static string GetActiveMenuItem(List<string> menuItems, int activeIndex, int pageSize, int currentPage)
+        internal static SuitAttributes GetMenuItemSuit(SuitListing suitListing, int activeIndex)
         {
-            suitsTerminal.X("GetActiveMenuItem");
-            // Calculate the start and end indexes for the current page
-            int startIndex = (currentPage - 1) * pageSize;
-            int endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
-
-            // Ensure activeIndex is within the bounds of the current page
-            if (activeIndex < startIndex || activeIndex >= endIndex)
+            SuitAttributes suit;
+            if (suitListing.CurrentMenu == 0)
             {
-                // Adjust currentPage to bring activeIndex within the current page range
-                currentPage = (activeIndex / pageSize) + 1;
-                startIndex = (currentPage - 1) * pageSize;
-                endIndex = Mathf.Min(startIndex + pageSize, menuItems.Count);
+                suit = suitListing.SuitsList.Find(x => x.MainMenuIndex == activeIndex);
+                return suit;
             }
-
-            // Retrieve the active menu item
-            string menuItem = menuItems[activeIndex];
-            suitsTerminal.X($"Selecting Active Menu Item: {menuItem}");
-
-            return menuItem;
-        }
-
-        internal static List<string> GetListFromConfigItem(string configItem)
-        {
-            List<string> keywordsInConfig = configItem.Split(';')
-                                      .Select(item => item.TrimStart())
-                                      .ToList();
-            return keywordsInConfig;
-        }
-
-        internal static List<int> GetNumberListFromStringList(List<string> stringList)
-        {
-            List<int> numbersList = [];
-            foreach(string item in stringList)
+            else
             {
-                if (int.TryParse(item, out int number))
-                {
-                    numbersList.Add(number);
-                }
-                else
-                    suitsTerminal.Log.LogError($"Could not parse {item} to integer");
+                suit = suitListing.SuitsList.Find(x => x.FavIndex == activeIndex);
+                return suit;
             }
-
-            return numbersList;
         }
 
     }

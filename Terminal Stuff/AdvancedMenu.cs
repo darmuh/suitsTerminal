@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine.InputSystem;
-using Key = UnityEngine.InputSystem.Key;
+﻿using OpenLib.Common;
+using OpenLib.ConfigManager;
+using OpenLib.CoreMethods;
+using suitsTerminal.Suit_Stuff;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static suitsTerminal.AllSuits;
+using static suitsTerminal.Misc;
+using static suitsTerminal.PictureInPicture;
 using static suitsTerminal.SConfig;
 using static suitsTerminal.StringStuff;
-using static suitsTerminal.AllSuits;
-using static suitsTerminal.PictureInPicture;
-using static suitsTerminal.Misc;
-using OpenLib.CoreMethods;
-using System.Text;
-using OpenLib.ConfigManager;
-using static OpenLib.Common.CommonStringStuff;
-using System.Linq;
+using Key = UnityEngine.InputSystem.Key;
 
 namespace suitsTerminal
 {
@@ -43,11 +42,10 @@ namespace suitsTerminal
         internal static bool inHelpMenu = false;
         internal static int currentPage;
         internal static int activeSelection;
-        internal static int currentlyWearing;
         internal static bool exitSpecialMenu = false;
 
         public static bool specialMenusActive = false;
-        
+
         internal static TerminalNode menuDisplay = null!;
 
         internal static bool initKeySettings = false;
@@ -59,11 +57,11 @@ namespace suitsTerminal
 
             initKeySettings = true;
             keyActions.Clear();
-            suitsTerminal.X("Loading keybinds from config");
+            Plugin.X("Loading keybinds from config");
             CollectionOfKeys();
             TogglePiPKey();
             CreateMenuCommand();
-            if(menuDisplay == null )
+            if (menuDisplay == null)
                 menuDisplay = AddingThings.CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
 
             initKeySettings = false;
@@ -75,7 +73,7 @@ namespace suitsTerminal
                 return;
 
             GetCurrentSuitID();
-            suitsTerminal.X($"Currently Wearing: {currentlyWearing}\ncurrentSuitID: {StartOfRound.Instance.localPlayerController.currentSuitID}\n UnlockableItems: {UnlockableItems.Count}");
+            Plugin.X($"currentSuitID: {StartOfRound.Instance.localPlayerController.currentSuitID}\n UnlockableItems: {UnlockableItems.Count}");
         }
 
         internal static void CreateMenuCommand()
@@ -118,17 +116,17 @@ namespace suitsTerminal
 
         private static void BindKeys(string menuAction, Key givenKey, ref string givenKeyString, string defaultKeyString, Key defaultKey)
         {
-            suitsTerminal.X($"Binding {menuAction}");
-            if(givenKey != Key.None)
+            Plugin.X($"Binding {menuAction}");
+            if (givenKey != Key.None)
             {
                 keyActions.Add(givenKey, menuAction);
-                suitsTerminal.X($"{givenKeyString} bound to {menuAction}");
+                Plugin.X($"{givenKeyString} bound to {menuAction}");
             }
             else
             {
                 keyActions.Add(defaultKey, menuAction);
                 givenKeyString = defaultKeyString;
-                suitsTerminal.X($"{givenKeyString} bound to {menuAction}");
+                Plugin.X($"{givenKeyString} bound to {menuAction}");
             }
         }
 
@@ -183,21 +181,21 @@ namespace suitsTerminal
             {
                 if (invalidKeys.Contains(keyFromString))
                 {
-                    suitsTerminal.WARNING("Tab Key detected, rejecting bind.");
+                    Plugin.WARNING("Tab Key detected, rejecting bind.");
                     validKey = Key.None;
                     return false;
                 }
                 else if (keyActions.ContainsKey(keyFromString))
                 {
-                    suitsTerminal.WARNING("Key was already bound to something, returning false");
+                    Plugin.WARNING("Key was already bound to something, returning false");
                     string allKeys = string.Join(", ", keyActions.Keys);
-                    suitsTerminal.WARNING($"Key list: {allKeys}");
+                    Plugin.WARNING($"Key list: {allKeys}");
                     validKey = Key.None;
                     return false;
                 }
                 else
                 {
-                    suitsTerminal.X("Valid Key Detected and being assigned to bind");
+                    Plugin.X("Valid Key Detected and being assigned to bind");
                     validKey = keyFromString;
                     return true;
                 }
@@ -207,20 +205,20 @@ namespace suitsTerminal
                 validKey = Key.None;
                 return false;
             }
-                
+
         }
 
         internal static void TerminalInputEnabled(bool state)
         {
-            if(state == false)
+            if (state == false)
             {
-                suitsTerminal.Terminal.screenText.interactable = false;
-                suitsTerminal.Terminal.currentNode.maxCharactersToType = 0;
+                Plugin.Terminal.screenText.interactable = false;
+                Plugin.Terminal.currentNode.maxCharactersToType = 0;
             }
             else
             {
-                suitsTerminal.Terminal.screenText.interactable = true;
-                suitsTerminal.Terminal.currentNode.maxCharactersToType = 25;
+                Plugin.Terminal.screenText.interactable = true;
+                Plugin.Terminal.currentNode.maxCharactersToType = 25;
             }
         }
 
@@ -234,7 +232,7 @@ namespace suitsTerminal
                 if (Keyboard.current[keyAction.Key].isPressed)
                 {
                     keyBeingPressed = keyAction.Key;
-                    suitsTerminal.X($"Key detected in use: {keyAction.Key}");
+                    Plugin.X($"Key detected in use: {keyAction.Key}");
                     return true;
                 }
             }
@@ -251,43 +249,37 @@ namespace suitsTerminal
                 keyActions.TryGetValue(key, out string value);
 
                 // Execute the action corresponding to the key
-                suitsTerminal.X($"Attempting to match given key to action: {value}");
+                Plugin.X($"Attempting to match given key to action: {value}");
 
                 HandleKeyAction(value);
                 return;
             }
             else
-                suitsTerminal.Log.LogError("Shortcut KeyActions list not updating properly");
+                Plugin.Log.LogError("Shortcut KeyActions list not updating properly");
         }
 
-        private static Camera GetCam()
+        internal static Camera GetCam()
         {
-            if(suitsTerminal.OpenBodyCams && UseOpenBodyCams.Value)
+            if (OpenLib.Plugin.instance.OpenBodyCamsMod && UseOpenBodyCams.Value)
             {
-                return OpenBodyCams.GetMirrorCam();
+                Camera Cam = OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
+                if (Cam == null)
+                {
+                    OpenLib.Compat.OpenBodyCamFuncs.OpenBodyCamsMirrorStatus(true, ObcResolution.Value, 0.1f, false, ref CamStuff.ObcCameraHolder);
+                }
+
+                return OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
             }
             else
-                return playerCam;
-        }
-
-        private static int GetFirstValidMenuItem(List<string> currentMenu, List<string> dontAddTerminal)
-        {
-            int firstValid = 0;
-            foreach(string item in currentMenu)
             {
-                if (dontAddTerminal.Contains(item.ToLower()))
-                    firstValid++;
-                else
-                    return firstValid;
+                playerCam = CamStuff.MyCameraHolder.GetComponent<Camera>();
+                return playerCam!;
             }
 
-            return firstValid;
         }
 
         private static void HandleKeyAction(string value)
         {
-            List<string> currentMenu = GetString();
-            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(DontAddToTerminal.Value, ','));
             Camera currentCam = GetCam();
 
             if (value == "previous_page" && !inHelpMenu)
@@ -295,19 +287,19 @@ namespace suitsTerminal
                 if (currentPage > 0)
                     currentPage--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "next_page" && !inHelpMenu)
             {
                 currentPage++;
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "previous_item" && !inHelpMenu)
@@ -315,19 +307,19 @@ namespace suitsTerminal
                 if (activeSelection > 0)
                     activeSelection--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage, false);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "next_item" && !inHelpMenu)
             {
                 activeSelection++;
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "leave_menu")
@@ -338,123 +330,103 @@ namespace suitsTerminal
             }
             else if (value == "menu_select" && !inHelpMenu)
             {
-                string selectedSuit = GetActiveMenuItem(currentMenu, activeSelection, 10, currentPage);
-                if (dontAddTerminal.Contains(selectedSuit))
-                    return;
-
-                CommandHandler.AdvancedSuitPick(selectedSuit);
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                SuitAttributes suit = GetMenuItemSuit(suitListing, activeSelection);
+                CommandHandler.BetterSuitPick(suit);
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
-                suitsTerminal.Terminal.StartCoroutine(TransformHotfix(currentCam));
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 return;
             }
             else if (value == "toggle_pip" && !inHelpMenu)
             {
                 TogglePiP(!pipActive);
-                suitsTerminal.X($"Toggling PiP to state {!pipActive}");
+                Plugin.X($"Toggling PiP to state {!pipActive}");
                 return;
             }
             else if (value == "pip_height" && !inHelpMenu)
             {
+                if (currentCam == null)
+                    return;
+
                 MoveCamera(currentCam.transform, ref heightStep);
-                suitsTerminal.X($"Changing PiP height to {heightStep}");
+                Plugin.X($"Changing PiP height to {heightStep}");
             }
             else if (value == "pip_rotate" && !inHelpMenu)
             {
-                RotateCameraAroundPlayer(StartOfRound.Instance.localPlayerController.transform, currentCam.transform);
-                suitsTerminal.X($"Rotating PiP around player");
+                if (currentCam == null)
+                    return;
+
+                RotateCameraAroundPlayer(StartOfRound.Instance.localPlayerController.meshContainer, currentCam.transform);
+                Plugin.X($"Rotating PiP around player");
             }
             else if (value == "pip_zoom" && !inHelpMenu)
             {
+                if (currentCam == null)
+                    return;
+
                 ChangeCamZoom(currentCam, ref zoomStep);
-                suitsTerminal.X($"Changing PiP zoom to zoomStep: [{zoomStep}]");
+                Plugin.X($"Changing PiP zoom to zoomStep: [{zoomStep}]");
             }
             else if (value == "favorite_item" && !inHelpMenu)
             {
-                string selectedSuit = GetActiveMenuItem(suitNames, activeSelection, 10, currentPage);
-                if(favSuits.Contains(selectedSuit))
-                    favSuits.Remove(selectedSuit);
-                else
-                    favSuits.Add(selectedSuit);
+                SuitAttributes selectedSuit = GetMenuItemSuit(suitListing, activeSelection);
+                if (suitListing.FavList.Contains(selectedSuit.Name))
+                {
+                    selectedSuit.RemoveFromFavs();
+                    foreach (SuitAttributes fav in suitListing.SuitsList)
+                        fav.RefreshFavIndex();
 
-                SaveToConfig(favSuits, out string saveToConfig);
+                    Plugin.Log.LogInfo($"{selectedSuit.Name} removed from favorites listing");
+                }
+                else
+                {
+                    selectedSuit.AddToFavs();
+                    Plugin.Log.LogInfo($"{selectedSuit.Name} added to favorites listing");
+                }
+
+                SaveToConfig(suitListing.FavList, out string saveToConfig);
                 FavoritesMenuList.Value = saveToConfig;
-                suitsTerminal.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
-                menuDisplay.displayText = AdvancedMenuDisplay(suitNames, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
             }
             else if (value == "favorites_menu" && !inHelpMenu)
             {
                 inFavsMenu = !inFavsMenu;
-                List<string> newMenu = GetString();
                 currentPage = 1;
-                activeSelection = GetFirstValidMenuItem(currentMenu, dontAddTerminal);
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(newMenu, activeSelection, 10, currentPage);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, currentPage);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
-                DisplayAllMenuItemsLog(newMenu);
             }
             else if (value == "help_menu")
             {
                 inHelpMenu = !inHelpMenu;
                 currentPage = 1;
-                activeSelection = GetFirstValidMenuItem(currentMenu, dontAddTerminal);
                 GetCurrentSuitNum();
-                menuDisplay.displayText = HelpMenuDisplay(inHelpMenu, currentMenu);
+                menuDisplay.displayText = HelpMenuDisplay(inHelpMenu);
 
                 TogglePiP(!inHelpMenu);
-                suitsTerminal.Terminal.LoadNewNode(menuDisplay);
+                Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
             }
         }
 
-        internal static IEnumerator TransformHotfix(Camera currentCam)
-        {
-            if (!suitsTerminal.OpenBodyCams)
-                yield break;
-            if (!UseOpenBodyCams.Value)
-                yield break;
-
-            yield return new WaitForEndOfFrame();
-            CamInit(currentCam);
-        }
-
-        private static void DisplayAllMenuItemsLog(List<string> menuListing)
-        {
-            StringBuilder fullList = new();
-            foreach(string item in menuListing)
-            {
-                fullList.Append(item + "\n");
-            }
-                suitsTerminal.X($"{fullList}");
-        }
-
         internal static void GetCurrentSuitID()
         {
-            foreach (UnlockableSuit suit in allSuits)
+            foreach (SuitAttributes item in suitListing.SuitsList)
             {
-                if (suit.suitID == StartOfRound.Instance.localPlayerController.currentSuitID ||
-                    suit.syncedSuitID.Value == StartOfRound.Instance.localPlayerController.currentSuitID)
+                if (item.Suit.suitID == StartOfRound.Instance.localPlayerController.currentSuitID ||
+                    item.Suit.syncedSuitID.Value == StartOfRound.Instance.localPlayerController.currentSuitID)
                 {
-                    if (!inFavsMenu)
-                        currentlyWearing = allSuits.IndexOf(suit);  // Assign directly to currentlyWearing
-                    else
-                    {
-                        string unlockableName = UnlockableItems[suit.syncedSuitID.Value].unlockableName;
-                        int indexOf = favSuits.IndexOf(unlockableName);
-                        if (indexOf == -1)
-                            currentlyWearing = favSuits.IndexOf(unlockableName + $"^({suit.syncedSuitID.Value})");
-                        else
-                            currentlyWearing = indexOf;
-                    }
-                        
-                    break;  // Exit the loop once a match is found
+                    item.currentSuit = true;
+                    Plugin.X($"Detected wearing - {item.Name}");
                 }
+                else
+                    item.currentSuit = false;
             }
         }
 
@@ -463,7 +435,7 @@ namespace suitsTerminal
             if (!EnablePiPCamera.Value)
                 return;
 
-            pipRawImage.transform.SetParent(suitsTerminal.Terminal.screenText.image.transform);
+            pipRawImage.transform.SetParent(Plugin.Terminal.screenText.image.transform);
         }
 
         internal static IEnumerator ActiveMenu()
@@ -471,8 +443,6 @@ namespace suitsTerminal
             if (specialMenusActive)
                 yield break;
 
-            List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(DontAddToTerminal.Value, ','));
-            Camera currentCam = GetCam();
             specialMenusActive = true;
             inFavsMenu = false;
             rotateStep = 0;
@@ -480,16 +450,15 @@ namespace suitsTerminal
             zoomStep = 1;
             GetCurrentSuitNum();
             TogglePiP(true);
-            suitsTerminal.Terminal.screenText.DeactivateInputField();
-            suitsTerminal.Terminal.screenText.interactable = false;
+            Plugin.Terminal.screenText.DeactivateInputField();
+            Plugin.Terminal.screenText.interactable = false;
             yield return new WaitForSeconds(0.2f);
-            suitsTerminal.X("ActiveMenu Coroutine");
+            Plugin.X("ActiveMenu Coroutine");
             currentPage = 1;
-            activeSelection = GetFirstValidMenuItem(suitNames, dontAddTerminal);
+            activeSelection = 0;
             PiPSetParent();
-            suitsTerminal.Terminal.StartCoroutine(TransformHotfix(currentCam));
 
-            while (suitsTerminal.Terminal.terminalInUse && AdvancedTerminalMenu.Value && !exitSpecialMenu)
+            while (Plugin.Terminal.terminalInUse && AdvancedTerminalMenu.Value && !exitSpecialMenu)
             {
                 if (AnyKeyIsPressed())
                 {
@@ -500,8 +469,8 @@ namespace suitsTerminal
                     yield return new WaitForSeconds(MenuPostSelectDelay.Value);
             }
 
-            if (!suitsTerminal.Terminal.terminalInUse)
-                suitsTerminal.X("Terminal no longer in use");
+            if (!Plugin.Terminal.terminalInUse)
+                Plugin.X("Terminal no longer in use");
 
             if (exitSpecialMenu)
                 exitSpecialMenu = false;
@@ -510,9 +479,9 @@ namespace suitsTerminal
 
             TogglePiP(false);
             yield return new WaitForSeconds(0.1f);
-            suitsTerminal.Terminal.screenText.ActivateInputField();
-            suitsTerminal.Terminal.screenText.interactable = true;
-            suitsTerminal.Terminal.LoadNewNode(suitsTerminal.Terminal.terminalNodes.specialNodes[13]);
+            Plugin.Terminal.screenText.ActivateInputField();
+            Plugin.Terminal.screenText.interactable = true;
+            Plugin.Terminal.LoadNewNode(Plugin.Terminal.terminalNodes.specialNodes[13]);
             yield break;
         }
     }

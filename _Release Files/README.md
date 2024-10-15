@@ -48,13 +48,13 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 		- togglePiPHeight: This key will allow you to change the height of the mirror camera to see different parts of the suit you've equipped.
 		- togglePiPRotation: This key will allow you to cycle between 4 different angles around the player so you can see each side of yourself and the back.
  
- - [NEW IN 1.3.0] OpenBodyCams Support has been added for the Mirror Camera
+ - OpenBodyCams Support has been added for the Mirror Camera
 	- The camera created with OpenBodyCams will be used in place of the base camera that has been used in this mod.
 	- All of the above binds will continue to apply to this camera.
 	- The configuration item [useOpenBodyCams] will determine whether OpenBodyCams is used to create the MirrorCamera.
 	- The configuration item [obcResolution] determines the resolution the camera created by OpenBodyCams will use.
 
- - [NEW IN 1.3.0] More configuration items have been added to customize the advancedTerminalMenu experience.
+ - Customize the advancedTerminalMenu experience.
 	- [menuKeyPressDelay] is the regular delay when checking for key presses in the advancedTerminalMenu. (This delay will be added ontop of menuPostSelectDelay)
 	- [menuPostSelectDelay] is the delay used after a key press is registered in the advancedTerminalMenu.
 	- I have modified the default values for these two. They were originally both set to 0.1 in previous versions of suitsTerminal.

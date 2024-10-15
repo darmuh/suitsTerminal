@@ -6,8 +6,7 @@ namespace suitsTerminal.EventSub
     {
         internal static void OnTerminalDisable()
         {
-            if (suitsTerminal.OpenBodyCams)
-                OpenBodyCams.ResidualCamsCheck();
+            //nothing needed at the moment
         }
     }
 }

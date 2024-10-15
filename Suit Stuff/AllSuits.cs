@@ -1,55 +1,27 @@
-﻿using System;
+﻿using suitsTerminal.Suit_Stuff;
+using System;
 using System.Collections.Generic;
-using static suitsTerminal.StringStuff;
-using static suitsTerminal.Misc;
-using static suitsTerminal.ProcessRack;
-using static suitsTerminal.Bools;
 using System.Linq;
 using UnityEngine;
-using Component = UnityEngine.Component;
-using static OpenLib.Common.CommonStringStuff;
+using static suitsTerminal.Bools;
+using static suitsTerminal.Misc;
+using static suitsTerminal.ProcessRack;
 
 namespace suitsTerminal
 {
     internal class AllSuits
     {
-        internal static List<UnlockableSuit> allSuits = [];
+        //internal static List<UnlockableSuit> allSuits = [];
         internal static List<UnlockableItem> UnlockableItems = [];
-        internal static Dictionary<int,string> suitNameToID = [];
-        internal static List<string> suitNames = [];
-        internal static List<string> favSuits = [];
-        internal static List<Page> suitsPages = [];
-        internal static bool favSuitsSet = false;
+        internal static Dictionary<int, string> suitNameToID = [];
+        internal static SuitListing suitListing = new();
 
         internal static void GetList()
         {
             suitNameToID.Clear();
-            suitNames.Clear();
-            weirdSuitNum = 0;
-            foreach (UnlockableSuit item in allSuits)
-            {
-                string SuitName;
-                if (item.syncedSuitID.Value >= 0 && AddSuitToList(item))
-                {
-                    SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
-
-                    if(!SConfig.AdvancedTerminalMenu.Value)
-                        SuitName = TerminalFriendlyString(SuitName);
-                    if (!suitNameToID.ContainsKey(item.syncedSuitID.Value))
-                        suitNameToID.Add(item.syncedSuitID.Value, SuitName);
-                    else
-                        suitsTerminal.WARNING($"WARNING: duplicate suitID detected: {item.syncedSuitID.Value}\n{SuitName} will not be added to listing");
-                }
-                else
-                {
-                    weirdSuitNum++;
-                    suitsTerminal.WARNING($"Skipping suit, either weird or locked.");
-                }
-            }
-
+            suitListing.NameList.Clear();
             CheckForDuplicateSuitNames();
             FixRack();
-            InitFavorites();
             OldCommands.MakeRandomSuitCommand();
         }
 
@@ -84,7 +56,7 @@ namespace suitsTerminal
                 // If the suit name has not been encountered yet, add it to suitNames and the set
                 if (!duplicateSuitNames.Any(name => string.Equals(name, kvp.Value, StringComparison.OrdinalIgnoreCase)))
                 {
-                    suitNames.Add(kvp.Value);
+                    suitListing.NameList.Add(kvp.Value);
                 }
                 else
                 {
@@ -92,7 +64,7 @@ namespace suitsTerminal
                     string uniqueSuitName = $"{kvp.Value}^({kvp.Key})";
 
                     // Add both the original and unique suit names to suitNames
-                    suitNames.Add(uniqueSuitName);
+                    suitListing.NameList.Add(uniqueSuitName);
                 }
             }
         }
@@ -108,11 +80,11 @@ namespace suitsTerminal
 
             if (!UnlockableItems[suit.syncedSuitID.Value].spawnPrefab)
             {
-                suitsTerminal.WARNING($"Locked suit [{UnlockableItems[suit.syncedSuitID.Value].unlockableName}] detected, not adding to list.");
-                suitsTerminal.X($"hasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
+                Plugin.WARNING($"Locked suit [{UnlockableItems[suit.syncedSuitID.Value].unlockableName}] detected, not adding to listings.");
+                Plugin.X($"hasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
                 return false;
             }
-            
+
             return true;
         }
 
@@ -122,14 +94,14 @@ namespace suitsTerminal
 
             if (!SConfig.KeepSuitsWithNegativeIDs.Value)
             {
-                allSuits.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
-                suitsTerminal.X("Removing suits with negative suitID values.");
+                suitListing.RawSuitsList.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
+                Plugin.X("Removing suits with negative suitID values.");
             }
             else
             {
-                suitsTerminal.X("Attempting to keep suits with negative suitID values.");
+                Plugin.X("Attempting to keep suits with negative suitID values.");
                 // Remove items with negative syncedSuitID and assign new random numbers
-                allSuits.RemoveAll(suit =>
+                suitListing.RawSuitsList.RemoveAll(suit =>
                 {
                     if (suit.syncedSuitID.Value < 0)
                     {
@@ -138,12 +110,12 @@ namespace suitsTerminal
                         do
                         {
                             newRandomNumber = UnityEngine.Random.Range(1, int.MaxValue);
-                        } while (allSuits.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
+                        } while (suitListing.RawSuitsList.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
 
                         // Assign the new random number
-                        suitsTerminal.X($"suit ID was {suit.syncedSuitID.Value}");
+                        Plugin.X($"suit ID was {suit.syncedSuitID.Value}");
                         suit.syncedSuitID.Value = newRandomNumber;
-                        suitsTerminal.X($"suit ID changed to {suit.syncedSuitID.Value}");
+                        Plugin.X($"suit ID changed to {suit.syncedSuitID.Value}");
 
                         return true; // Remove the item
                     }
@@ -159,66 +131,39 @@ namespace suitsTerminal
             }
             else if (SConfig.SuitsSortingStyle.Value == "none")
             {
-                suitsTerminal.Log.LogInfo("No sorting requested, host/client may be desynced.");
+                Plugin.Log.LogInfo("No sorting requested.");
             }
             else
-                suitsTerminal.WARNING("Config failure, no sorting");
+                Plugin.WARNING("Config failure, no sorting");
 
         }
 
-        private static void GetAllSuits()
+        internal static void InitSuitsListing()
         {
+            Plugin.X("InitSuitsListing");
             // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
-            allSuits.Clear();
-            allSuits = [.. Resources.FindObjectsOfTypeAll<UnlockableSuit>()];
-
-            // Order the list by syncedSuitID.Value
-            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => suit.suitID)];
+            suitListing.RawSuitsList.Clear();
+            suitListing.RawSuitsList = [.. Resources.FindObjectsOfTypeAll<UnlockableSuit>()];
 
             UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
             RemoveBadSuitIDs();
+            GetList();
         }
 
         private static void OrderSuitsByName()
         {
             // Order the list by name
-            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => UnlockableItems[suit.syncedSuitID.Value].unlockableName)];
+            suitListing.RawSuitsList = [.. suitListing.RawSuitsList.OrderBy((UnlockableSuit suit) => UnlockableItems[suit.syncedSuitID.Value].unlockableName)];
         }
 
         private static void OrderSuitsByID()
         {
-            allSuits = [.. allSuits.OrderBy((UnlockableSuit suit) => suit.syncedSuitID.Value)];
-        }
-
-        internal static void InitSuitsListing()
-        {
-            GetAllSuits();
-            GetList();
-        }
-
-        private static void InitFavorites()
-        {
-            List<string> favConfigList = GetKeywordsPerConfigItem(SConfig.FavoritesMenuList.Value, ',');
-
-            favSuits.Clear();
-            if (favConfigList.Count == 0)
-                return;
-
-            foreach (string suitName in favConfigList)
-            {
-                if (suitNames.Contains(suitName) && !favSuits.Contains(suitName))
-                {
-                    favSuits.Add(suitName);
-                    suitsTerminal.X($"Added [{suitName}] to favorites list.");
-                }
-                else
-                    suitsTerminal.WARNING($"[{suitName}] not loaded to favorites. Suit is locked, already added, or not found.");  
-            }
+            suitListing.RawSuitsList = [.. suitListing.RawSuitsList.OrderBy((UnlockableSuit suit) => suit.syncedSuitID.Value)];
         }
 
         private static void HideBootsAndRack()
         {
-            if(rackSituated) 
+            if (rackSituated)
                 return;
 
             if (SConfig.HideBoots.Value)
@@ -235,83 +180,70 @@ namespace suitsTerminal
                 GameObject clothingRack = GetGameObject("Environment/HangarShip/NurbsPath.002");
                 GameObject.Destroy(clothingRack);
             }
-   
+
         }
 
         private static void FixRack()
         {
-            suitsTerminal.X($"Suit Count: {allSuits.Count}");
-            suitsTerminal.X($"Unlockables Count: {UnlockableItems.Count}");
+            Plugin.X($"Raw Suit Count: {suitListing.RawSuitsList.Count}");
+            Plugin.X($"Unlockables Count: {UnlockableItems.Count}");
             weirdSuitNum = 0;
-            reorderSuits = 0;
-            normSuit = 0;
-
-            List<string> customSuitNames = GetKeywordsPerConfigItem(SConfig.SuitsOnRackOnly.Value, ',');
 
             HideBootsAndRack();
 
-            foreach (UnlockableSuit item in allSuits)
+            foreach (UnlockableSuit item in suitListing.RawSuitsList)
             {
-                AutoParentToShip component = ((Component)item).gameObject.GetComponent<AutoParentToShip>();
-                SuitInfo suitInfoComponent = component.gameObject.GetComponent<SuitInfo>();
+                Plugin.X($"checking - {item.syncedSuitID.Value}");
 
-                List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(SConfig.DontAddToTerminal.Value, ','));
-                OldCommands.CreateOldWearCommands(item, dontAddTerminal);
+                if (!AddSuitToList(item))
+                    continue;
+
+                AutoParentToShip component = item.gameObject.GetComponent<AutoParentToShip>();
+                SuitAttributes suit;
+
+                if (suitListing.Contains(item, out suit))
+                {
+                    Plugin.X($"SuitAttributes detected valid {suit}, no need to update");
+                }
+                else if (suitListing.Contains(UnlockableItems[item.syncedSuitID.Value].unlockableName, out suit))
+                {
+                    suit.UpdateSuit(item, UnlockableItems, ref suitNameToID);
+                    Plugin.X($"Updated suit attributes for {suit.Name}");
+                }
+                else
+                {
+                    suit = new(item, UnlockableItems, ref suitNameToID);
+                    suitListing.SuitsList.Add(suit);
+                }
+
+                OldCommands.CreateOldWearCommands(suit);
 
                 if (!SConfig.DontRemove.Value)
                 {
-                    isHanging = false;
-
-                    if (suitInfoComponent != null)
+                    if (ShouldShowSuit(suit))
                     {
-                        string suitTag = suitInfoComponent.suitTag;
-
-                        if (suitTag == "hanging")
-                        {
-                            isHanging = true;
-                            suitsTerminal.X($"Hanging suit detected - {suitTag}");
-                        }
-                        else if (suitTag == "hidden")
-                        {
-                            isHanging = false;
-                            suitsTerminal.X($"Hidden suit detected - {suitTag}");
-                        }
-                        else
-                        {
-                            suitInfoComponent.suitTag = "hidden";
-                        }
-                    }
-
-                    if (!ShouldShowSuit(item, customSuitNames))
-                    {
-                        ProcessHiddenSuit(component);
-                        normSuit++;
-                    }
-                    else if (rackSituated && ShouldShowSuit(item, customSuitNames))
-                    {
-                        ProcessHangingSuit(component);
-                    }
-                    else if (!rackSituated && ShouldShowSuit(item, customSuitNames))
-                    {
-                        ProcessVisibleSuit(component, showSuit);
-                        normSuit++;
+                        suit.IsOnRack = true;
+                        ProcessVisibleSuit(component, suitsOnRack);
                     }
                     else
                     {
+                        suit.IsOnRack = false;
                         ProcessHiddenSuit(component);
                     }
 
-                    if (showSuit == SConfig.SuitsOnRack.Value && !rackSituated)
+                    if (suitsOnRack == SConfig.SuitsOnRack.Value && !rackSituated)
                     {
                         rackSituated = true;
-                        suitsTerminal.X($"Max suits are on the rack now. rack is situated, yippeee!!!");
-                    }   
-                }  
+                        Plugin.X($"Max suits are on the rack now. rack is situated, yippeee!!!");
+                    }
+                }
             }
+
+            OldCommands.CreateOldPageCommands();
 
             InitThisPlugin.initStarted = false;
         }
 
-        
+
     }
 }

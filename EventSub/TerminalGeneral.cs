@@ -10,7 +10,7 @@ namespace suitsTerminal.EventSub
 
             if (StartOfRound.Instance.unlockablesList.unlockables[node.shipUnlockableID].unlockableType == 0) //suit purchase detected
             {
-                suitsTerminal.X("suit purchase detected, refreshing suitsTerminal");
+                Plugin.X("suit purchase detected, refreshing suitsTerminal");
                 InitThisPlugin.InitSuitsTerm();
             }
         }

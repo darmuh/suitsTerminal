@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace suitsTerminal
@@ -14,7 +11,7 @@ namespace suitsTerminal
                 yield break;
 
             yield return new WaitForSeconds(5);
-            suitsTerminal.X("hint in chat.");
+            Plugin.X("hint in chat.");
 
             if (SConfig.TerminalCommands.Value)
                 HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]: Access more suits by typing 'suits' in the terminal.");
@@ -29,7 +26,7 @@ namespace suitsTerminal
                 yield break;
 
             yield return new WaitForSeconds(20);
-            suitsTerminal.X("hint on hud.");
+            Plugin.X("hint on hud.");
             if (SConfig.SuitsOnRack.Value > 0 && !SConfig.DontRemove.Value && SConfig.TerminalCommands.Value && !SConfig.ChatCommands.Value)
             {
                 HUDManager.Instance.DisplayTip("Suits Access", "Excess suits have been moved to the terminal for storage. Use command 'suits' in the terminal to access them and change your suit!", false, false, "suitsTerminal-Hint");

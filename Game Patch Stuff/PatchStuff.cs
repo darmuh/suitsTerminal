@@ -1,17 +1,11 @@
 ﻿using HarmonyLib;
-using System.Collections.Generic;
 using System;
-using UnityEngine;
+using System.Collections.Generic;
 using System.Text;
 using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {
-
-    public class SuitInfo : MonoBehaviour
-    {
-        public string suitTag = "";
-    }
 
     [HarmonyPatch(typeof(StartOfRound), "PositionSuitsOnRack")]
     public class SuitBoughtByOthersPatch
@@ -21,12 +15,12 @@ namespace suitsTerminal
             if (__instance == null)
                 return;
 
-            if(hasLaunched)
+            if (hasLaunched)
             {
-                suitsTerminal.X("suits rack func called, calling InitSuitsTerm func");
+                Plugin.X("suits rack func called, calling InitSuitsTerm func");
                 InitThisPlugin.InitSuitsTerm();
-            } 
-                
+            }
+
         }
     }
 

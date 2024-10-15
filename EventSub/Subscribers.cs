@@ -1,12 +1,9 @@
 ﻿using OpenLib.Events;
+using suitsTerminal.Suit_Stuff;
+using System.Linq;
 using static OpenLib.Common.StartGame;
-using static OpenLib.Common.CommonStringStuff;
-using static suitsTerminal.Misc;
 using static suitsTerminal.AllSuits;
-using System.Collections.Generic;
-using OpenBodyCams;
-using UnityEngine;
-using System.Collections;
+using static suitsTerminal.Misc;
 
 namespace suitsTerminal.EventSub
 {
@@ -31,20 +28,18 @@ namespace suitsTerminal.EventSub
 
         internal static void OnTerminalAwake(Terminal instance)
         {
-            suitsTerminal.Terminal = instance;
-            suitsTerminal.X($"Setting suitsTerminal.Terminal");
+            Plugin.Terminal = instance;
+            Plugin.X($"Setting suitsTerminal.Terminal");
             ResetVars();
         }
         private static void ResetVars()
         {
             hasLaunched = false;
-            normSuit = 0;
-            showSuit = 0;
+            suitsOnRack = 0;
             hintOnce = false;
             rackSituated = false;
-            favSuitsSet = false;
             PictureInPicture.PiPCreated = false;
-            suitsTerminal.X("set initial variables");
+            Plugin.X("set initial variables");
         }
 
         internal static void OnGameStart()
@@ -54,17 +49,13 @@ namespace suitsTerminal.EventSub
 
         private static void CompatibilityCheck()
         {
-            if (SoftCompatibility("Zaggy1024.OpenBodyCams", ref suitsTerminal.OpenBodyCams))
+            if (SoftCompatibility("darmuh.TerminalStuff", ref Plugin.TerminalStuff))
             {
-                suitsTerminal.X("OpenBodyCams compatibility enabled!");
+                Plugin.X("darmuhsTerminalStuff compatibility enabled!");
             }
-            if (SoftCompatibility("darmuh.TerminalStuff", ref suitsTerminal.TerminalStuff))
+            if (SoftCompatibility("Hexnet.lethalcompany.suitsaver", ref Plugin.SuitSaver))
             {
-                suitsTerminal.X("darmuhsTerminalStuff compatibility enabled!");
-            }
-            if(SoftCompatibility("Hexnet.lethalcompany.suitsaver", ref suitsTerminal.SuitSaver))
-            {
-                suitsTerminal.X("Suitsaver compatibility enabled!\nDefaultSuit will not be loaded");
+                Plugin.X("Suitsaver compatibility enabled!\nDefaultSuit will not be loaded");
             }
         }
 
@@ -73,27 +64,27 @@ namespace suitsTerminal.EventSub
             if (SConfig.DefaultSuit.Value.Length < 1 || SConfig.DefaultSuit.Value.ToLower() == "default")
                 return;
 
-            if(suitsTerminal.SuitSaver)
+            if (Plugin.SuitSaver)
             {
-                suitsTerminal.WARNING("Suitsaver detected, default suit will not be loaded.");
+                Plugin.WARNING("Suitsaver detected, default suit will not be loaded.");
                 return;
             }
 
-            List<string> lowerCaseSuits = GetListToLower(suitNames);
-            if (lowerCaseSuits.Contains(SConfig.DefaultSuit.Value.ToLower()))
+            if (suitListing.SuitsList.Any(x => x.Name.ToLower() == SConfig.DefaultSuit.Value.ToLower()))
             {
-                suitsTerminal.X($"Setting default suit: {SConfig.DefaultSuit.Value}");
-                CommandHandler.AdvancedSuitPick(SConfig.DefaultSuit.Value);
+                SuitAttributes suit = suitListing.SuitsList.Find(x => x.Name.ToLower() == SConfig.DefaultSuit.Value.ToLower());
+                CommandHandler.BetterSuitPick(suit);
             }
             else
-                suitsTerminal.WARNING($"Could not set default suit to {SConfig.DefaultSuit.Value}");
+                Plugin.WARNING($"Could not set default suit to {SConfig.DefaultSuit.Value}");
         }
 
         internal static void OnPlayerSpawn()
         {
             if (!rackSituated)
             {
-                suitsTerminal.X("player loaded & rackSituated is false, fixing suits rack");
+                Plugin.X("player loaded & rackSituated is false, fixing suits rack");
+                PiPStuff();
                 AdvancedMenu.InitSettings();
                 InitThisPlugin.InitSuitsTerm();
                 PictureInPicture.InitPiP();
@@ -102,6 +93,12 @@ namespace suitsTerminal.EventSub
             }
             else
                 return;
+        }
+
+        private static void PiPStuff()
+        {
+            PictureInPicture.shadowDefault = StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode;
+            PictureInPicture.modelLayerDefault = StartOfRound.Instance.localPlayerController.thisPlayerModel.gameObject.layer;
         }
     }
 }

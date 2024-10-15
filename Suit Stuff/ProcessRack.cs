@@ -1,5 +1,5 @@
-﻿using static suitsTerminal.Misc;
-using UnityEngine;
+﻿using UnityEngine;
+using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {
@@ -7,41 +7,23 @@ namespace suitsTerminal
     {
         internal static void ProcessHiddenSuit(AutoParentToShip component)
         {
-            _ = component.gameObject.GetComponent<SuitInfo>() ?? component.gameObject.AddComponent<SuitInfo>();
-
-            //suitsTerminal.X("processhiddensuit method");
-            component.GetComponent<SuitInfo>().suitTag = "hidden";
+            //Plugin.X("processhiddensuit method");
             component.disableObject = true;
             component.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
             component.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
         }
 
-        internal static void ProcessHangingSuit(AutoParentToShip component)
-        {
-            //suitsTerminal.X("processhangingsuit");
-            component.disableObject = false;
-            component.overrideOffset = true;
-
-            float offsetModifier = 0.18f;
-
-            component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (float)reorderSuits;
-            component.rotationOffset = new Vector3(0f, 90f, 0f);
-            reorderSuits++;
-        }
-
         internal static void ProcessVisibleSuit(AutoParentToShip component, int suitNumber)
         {
-            //suitsTerminal.X("processvisiblesuit");
-            _ = component.gameObject.GetComponent<SuitInfo>() ?? component.gameObject.AddComponent<SuitInfo>();
-            component.GetComponent<SuitInfo>().suitTag = "hanging";
+            //Plugin.X("processvisiblesuit");
             component.overrideOffset = true;
 
             float offsetModifier = 0.18f;
 
-            component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (float)suitNumber;
+            component.positionOffset = new Vector3(-2.45f, 2.75f, -8.41f) + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * suitNumber;
             component.rotationOffset = new Vector3(0f, 90f, 0f);
 
-            showSuit++;
+            suitsOnRack++;
         }
     }
 }

@@ -1,5 +1,17 @@
 # Change Log
 
+### [1.5.0]
+ - Slight backend rework. Utilizing a new class that tracks relevant information for each suit.
+	- Fixes issue of suits that were hidden from terminal causing odd desyncs in the menus
+	- Should also be much more efficient (resource-wise)
+ - Fixed issues with different camera implementations
+	- OpenBodyCams cameras will no longer randomly change positions when equipping a suit
+	- Homebrew cams have been moved to OpenLib with built in compatibility for TooManyEmotes, ModelReplacementAPI, and MirrorDecor.
+ - Changed mirror camera type to a non-orthographic view
+	- Zoom steps now change camera fov
+	- Set height positions have also been changed completely
+ - General code cleanup
+
 ### [1.4.5]
  - Fixed error with favorites menu that would break suitsTerminal completely.
 	- Thanks @Lunxara for the report.

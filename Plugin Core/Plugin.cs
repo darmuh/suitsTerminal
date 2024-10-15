@@ -8,13 +8,12 @@ using static suitsTerminal.Misc;
 namespace suitsTerminal
 {
     [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("darmuh.OpenLib", "0.1.8")]
+    [BepInDependency("darmuh.OpenLib", "0.2.3")]
 
-    public class suitsTerminal : BaseUnityPlugin
+    public class Plugin : BaseUnityPlugin
     {
-        public static suitsTerminal instance;
+        public static Plugin instance;
         internal static bool TerminalStuff = false;
-        internal static bool OpenBodyCams = false;
         internal static bool SuitSaver = false;
         //internal static MainListing sT = new();
 
@@ -22,7 +21,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.4.5";
+            public const string PLUGIN_VERSION = "1.5.0";
         }
 
         public static Terminal Terminal;
@@ -73,9 +72,9 @@ namespace suitsTerminal
             Log.LogWarning(message);
         }
 
-        public static void ERROR(string message) 
+        public static void ERROR(string message)
         {
-            Log.LogError(message); 
+            Log.LogError(message);
         }
 
     }

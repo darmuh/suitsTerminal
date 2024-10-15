@@ -1,7 +1,8 @@
-﻿using static suitsTerminal.StringStuff;
+﻿using suitsTerminal.Suit_Stuff;
+using static suitsTerminal.AdvancedMenu;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.CommandHandler;
-using static suitsTerminal.AdvancedMenu;
+using static suitsTerminal.StringStuff;
 
 namespace suitsTerminal
 {
@@ -20,7 +21,7 @@ namespace suitsTerminal
                 if (args.Length == 1)
                 {
                     GetCurrentSuitID();
-                    string message = ChatListing(suitNames, 6, 1);
+                    string message = ChatListing(suitListing, 6, 1);
                     HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t {message}");
                     lastCommandRun = command;
                     return;
@@ -30,7 +31,7 @@ namespace suitsTerminal
                     string pageNum = args[1];
                     if (int.TryParse(pageNum, out int pageNumVal))
                     {
-                        string message = ChatListing(suitNames, 6, pageNumVal);
+                        string message = ChatListing(suitListing, 6, pageNumVal);
                         HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t {message}");
                         lastCommandRun = command;
                         return;
@@ -38,7 +39,7 @@ namespace suitsTerminal
                     else
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid page number format: {pageNum}");
-                        suitsTerminal.WARNING($"Invalid page number format: {pageNum}");
+                        Plugin.WARNING($"Invalid page number format: {pageNum}");
                         lastCommandRun = command;
                         return;
                     }
@@ -59,11 +60,11 @@ namespace suitsTerminal
                     string suitNum = args[1];
                     if (int.TryParse(suitNum, out int suitNumVal))
                     {
-                        if (suitNumVal >= 0 && suitNumVal < suitNames.Count)
+                        if (suitNumVal >= 0 && suitNumVal < suitListing.SuitsList.Count)
                         {
-                            string suitName = suitNames[suitNumVal];
-                            suitsTerminal.X($"wear command");
-                            AdvancedSuitPick(suitName);
+                            SuitAttributes suit = suitListing.SuitsList[suitNumVal];
+                            Plugin.X($"wear command");
+                            BetterSuitPick(suit);
                             GetCurrentSuitID();
                             lastCommandRun = command;
                             return;
@@ -71,7 +72,7 @@ namespace suitsTerminal
                         else
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid suit number: {suitNum}");
-                            suitsTerminal.WARNING($"Invalid suit number: {suitNum}");
+                            Plugin.WARNING($"Invalid suit number: {suitNum}");
                             lastCommandRun = command;
                             return;
                         }
@@ -79,7 +80,7 @@ namespace suitsTerminal
                     else
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]:\t Invalid suit number format: {suitNum}");
-                        suitsTerminal.WARNING($"Invalid suit number format: {suitNum}");
+                        Plugin.WARNING($"Invalid suit number format: {suitNum}");
                         lastCommandRun = command;
                         return;
                     }

@@ -9,42 +9,42 @@ namespace suitsTerminal
         //establish commands that can be turned on or off here
         public static ConfigEntry<bool> ExtensiveLogging { get; internal set; }
         public static ConfigEntry<int> SuitsOnRack { get; internal set; }
-        public static ConfigEntry<bool> HideRack{ get; internal set; }
-        public static ConfigEntry<bool> HideBoots{ get; internal set; }
-        public static ConfigEntry<bool> KeepSuitsWithNegativeIDs{ get; internal set; }
-        public static ConfigEntry<bool> RandomSuitCommand{ get; internal set; }
-        public static ConfigEntry<bool> ChatCommands{ get; internal set; }
-        public static ConfigEntry<bool> DontRemove{ get; internal set; }
-        public static ConfigEntry<bool> EnforcePaidSuits{ get; internal set; }
-        public static ConfigEntry<bool> TerminalCommands{ get; internal set; }
-        public static ConfigEntry<bool> AdvancedTerminalMenu{ get; internal set; }
-        public static ConfigEntry<bool> EnablePiPCamera{ get; internal set; }
-        public static ConfigEntry<bool> ChatHints{ get; internal set; }
-        public static ConfigEntry<bool> BannerHints{ get; internal set; }
+        public static ConfigEntry<bool> HideRack { get; internal set; }
+        public static ConfigEntry<bool> HideBoots { get; internal set; }
+        public static ConfigEntry<bool> KeepSuitsWithNegativeIDs { get; internal set; }
+        public static ConfigEntry<bool> RandomSuitCommand { get; internal set; }
+        public static ConfigEntry<bool> ChatCommands { get; internal set; }
+        public static ConfigEntry<bool> DontRemove { get; internal set; }
+        public static ConfigEntry<bool> EnforcePaidSuits { get; internal set; }
+        public static ConfigEntry<bool> TerminalCommands { get; internal set; }
+        public static ConfigEntry<bool> AdvancedTerminalMenu { get; internal set; }
+        public static ConfigEntry<bool> EnablePiPCamera { get; internal set; }
+        public static ConfigEntry<bool> ChatHints { get; internal set; }
+        public static ConfigEntry<bool> BannerHints { get; internal set; }
         public static ConfigEntry<bool> UseOpenBodyCams { get; internal set; }
         public static ConfigEntry<string> ObcResolution { get; internal set; }
-        public static ConfigEntry<string> DefaultSuit {  get; internal set; }
+        public static ConfigEntry<string> DefaultSuit { get; internal set; }
 
 
-        public static ConfigEntry<string> MenuUp{ get; internal set; }
-        public static ConfigEntry<string> MenuDown{ get; internal set; }
-        public static ConfigEntry<string> MenuLeft{ get; internal set; }
-        public static ConfigEntry<string> MenuRight{ get; internal set; }
-        public static ConfigEntry<string> LeaveMenu{ get; internal set; }
-        public static ConfigEntry<string> SelectMenu{ get; internal set; }
-        public static ConfigEntry<string> HelpMenu{ get; internal set; }
-        public static ConfigEntry<string> FavItemKey{ get; internal set; }
-        public static ConfigEntry<string> FavMenuKey{ get; internal set; }
-        public static ConfigEntry<string> TogglePiP{ get; internal set; }
-        public static ConfigEntry<string> TogglePiPZoom{ get; internal set; }
-        public static ConfigEntry<string> TogglePiPRotation{ get; internal set; }
-        public static ConfigEntry<string> TogglePiPHeight{ get; internal set; }
+        public static ConfigEntry<string> MenuUp { get; internal set; }
+        public static ConfigEntry<string> MenuDown { get; internal set; }
+        public static ConfigEntry<string> MenuLeft { get; internal set; }
+        public static ConfigEntry<string> MenuRight { get; internal set; }
+        public static ConfigEntry<string> LeaveMenu { get; internal set; }
+        public static ConfigEntry<string> SelectMenu { get; internal set; }
+        public static ConfigEntry<string> HelpMenu { get; internal set; }
+        public static ConfigEntry<string> FavItemKey { get; internal set; }
+        public static ConfigEntry<string> FavMenuKey { get; internal set; }
+        public static ConfigEntry<string> TogglePiP { get; internal set; }
+        public static ConfigEntry<string> TogglePiPZoom { get; internal set; }
+        public static ConfigEntry<string> TogglePiPRotation { get; internal set; }
+        public static ConfigEntry<string> TogglePiPHeight { get; internal set; }
 
-        public static ConfigEntry<string> SuitsOnRackOnly{ get; internal set; }
+        public static ConfigEntry<string> SuitsOnRackOnly { get; internal set; }
         public static ConfigEntry<string> DontAddToRack { get; internal set; }
         public static ConfigEntry<string> DontAddToTerminal { get; internal set; }
-        public static ConfigEntry<string> FavoritesMenuList{ get; internal set; }
-        public static ConfigEntry<string> SuitsSortingStyle{ get; internal set; }
+        public static ConfigEntry<string> FavoritesMenuList { get; internal set; }
+        public static ConfigEntry<string> SuitsSortingStyle { get; internal set; }
 
         public static ConfigEntry<float> MenuKeyPressDelay { get; internal set; }
         public static ConfigEntry<float> MenuPostSelectDelay { get; internal set; }
@@ -53,7 +53,7 @@ namespace suitsTerminal
         public static void Settings()
         {
 
-            suitsTerminal.Log.LogInfo("Reading configuration settings");
+            Plugin.Log.LogInfo("Reading configuration settings");
 
             //General Configs
             AdvancedTerminalMenu = MakeBool("General", "AdvancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
@@ -92,7 +92,7 @@ namespace suitsTerminal
             TogglePiPZoom = MakeString("AdvancedTerminalMenu", "TogglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
             TogglePiPRotation = MakeString("AdvancedTerminalMenu", "TogglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
             TogglePiPHeight = MakeString("AdvancedTerminalMenu", "TogglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
-            
+
             //Hints
             ChatHints = MakeBool("Hints", "ChatHints", false, "Determines whether chat hints are displayed at load in.");
             BannerHints = MakeBool("Hints", "BannerHints", true, "Determines whether banner hints are displayed at load in.");
@@ -106,44 +106,44 @@ namespace suitsTerminal
             MenuPostSelectDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the AdvancedTerminalMenu.", 0.05f, 1f);
 
             //creds to Kittenji
-            PropertyInfo orphanedEntriesProp = suitsTerminal.instance.Config.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
+            PropertyInfo orphanedEntriesProp = Plugin.instance.Config.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(suitsTerminal.instance.Config, null);
+            var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(Plugin.instance.Config, null);
 
             orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
-            suitsTerminal.instance.Config.Save(); // Save the config file
+            Plugin.instance.Config.Save(); // Save the config file
         }
 
         private static ConfigEntry<bool> MakeBool(string section, string configItemName, bool defaultValue, string configDescription)
         {
-            return suitsTerminal.instance.Config.Bind<bool>(section, configItemName, defaultValue, configDescription);
+            return Plugin.instance.Config.Bind<bool>(section, configItemName, defaultValue, configDescription);
         }
 
         private static ConfigEntry<int> MakeInt(string section, string configItemName, int defaultValue, string configDescription)
         {
-            return suitsTerminal.instance.Config.Bind<int>(section, configItemName, defaultValue, configDescription);
+            return Plugin.instance.Config.Bind<int>(section, configItemName, defaultValue, configDescription);
         }
 
         private static ConfigEntry<string> MakeClampedString(string section, string configItemName, string defaultValue, string configDescription, AcceptableValueList<string> acceptedValues)
         {
-            return suitsTerminal.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, acceptedValues));
+            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, acceptedValues));
         }
 
         private static ConfigEntry<int> MakeClampedInt(string section, string configItemName, int defaultValue, string configDescription, int minValue, int maxValue)
         {
-            return suitsTerminal.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<int>(minValue, maxValue)));
+            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<int>(minValue, maxValue)));
         }
 
         private static ConfigEntry<float> MakeClampedFloat(string section, string configItemName, float defaultValue, string configDescription, float minValue, float maxValue)
         {
-            return suitsTerminal.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<float>(minValue, maxValue)));
+            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<float>(minValue, maxValue)));
         }
 
         private static ConfigEntry<string> MakeString(string section, string configItemName, string defaultValue, string configDescription)
         {
             //monitorMessages = Plugin.instance.Config.Bind("Ship Stuff", "monitorMessages", "BEHIND YOU, HAVING FUN?, TAG YOU'RE IT, DANCE FOR ME, IM HIDING, #######, ERROR, DEATH, NO MORE SCRAP", "Comma-separated list of messages the ghostGirl can display on the ship monitors when sending a code.");
 
-            return suitsTerminal.instance.Config.Bind(section, configItemName, defaultValue, configDescription);
+            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, configDescription);
         }
     }
 }

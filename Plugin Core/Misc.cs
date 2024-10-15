@@ -10,39 +10,21 @@ namespace suitsTerminal
     {
         internal static bool keywordsCreated = false;
         internal static bool rackSituated = false;
-        internal static int normSuit = 0;
-        internal static int showSuit = 0;
+        internal static int suitsOnRack = 0;
         internal static int weirdSuitNum = 0;
-        internal static int reorderSuits = 0;
         internal static bool hasLaunched = false;
         internal static bool hintOnce = false;
-        internal static bool isHanging = false;
-
-        internal static List<string> GetString()
-        {
-            if(favSuits.Count == 0)
-            {
-                suitsTerminal.X("Favorite suits empty, displaying regular menu");
-                inFavsMenu = false;
-                return suitNames;
-            }
-
-            if (inFavsMenu)
-                return favSuits;
-            else
-                return suitNames;
-        }
 
         internal static GameObject GetGameObject(string location)
         {
             return GameObject.Find(location);
         }
 
-        internal static string HelpMenuDisplay(bool inHelpMenu, List<string> currentMenu)
+        internal static string HelpMenuDisplay(bool inHelpMenu)
         {
             if (inHelpMenu)
             {
-                suitsTerminal.X("Help Menu Enabled, showing help information");
+                Plugin.X("Help Menu Enabled, showing help information");
                 StringBuilder message = new();
 
                 message.Append($"========= AdvancedsuitsMenu Help Page  =========\r\n");
@@ -59,15 +41,15 @@ namespace suitsTerminal
             }
             else
             {
-                suitsTerminal.X("Help Menu disabled, returning to menu selection...");
-                return StringStuff.AdvancedMenuDisplay(currentMenu, activeSelection, 10, currentPage);
+                Plugin.X("Help Menu disabled, returning to menu selection...");
+                return StringStuff.AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
             }
         }
 
         internal static void SaveToConfig(List<string> stringList, out string configItem)
         {
             configItem = string.Join(", ", stringList);
-            suitsTerminal.X($"Saving to config\n{configItem}");
+            Plugin.X($"Saving to config\n{configItem}");
         }
 
     }

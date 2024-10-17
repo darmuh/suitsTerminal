@@ -138,13 +138,18 @@ namespace suitsTerminal
                 return;
 
             Plugin.X($"TogglePiP: {state}");
+            pipActive = state;
+            pipRawImage.enabled = state;
+            pipGameObject.SetActive(state);
 
             if (OpenLib.Plugin.instance.OpenBodyCamsMod && SConfig.UseOpenBodyCams.Value)
             {
-                Camera Cam = AdvancedMenu.GetCam();
                 Plugin.X("OpenBodyCams detected, using OBC for Mirror");
                 OpenLib.Compat.OpenBodyCamFuncs.OpenBodyCamsMirrorStatus(state, SConfig.ObcResolution.Value, 0.1f, false, ref CamStuff.ObcCameraHolder);
+
+                Camera Cam = OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
                 Cam.fieldOfView = 100f;
+                Plugin.X($"isActive [ Cam ] - {Cam.isActiveAndEnabled}");
                 pipRawImage.texture = OpenLib.Compat.OpenBodyCamFuncs.GetTexture(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
             }
             else
@@ -181,9 +186,8 @@ namespace suitsTerminal
 
             }
 
-            pipActive = state;
-            pipRawImage.enabled = state;
-            pipGameObject.SetActive(state);
+
+            Plugin.X($"isActive [ pipGameObject ] - {pipGameObject.activeSelf}\nisActive [ pipRawImage ] {pipRawImage.isActiveAndEnabled}\nisActive [ pipActive ] - {pipActive}");
             //Plugin.Log.LogInfo($"pipGameObject: {pipGameObject.activeSelf}\npipRawImage: {pipRawImage.isActiveAndEnabled}\npipActive: {pipActive}");
         }
     }

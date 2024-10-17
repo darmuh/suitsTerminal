@@ -262,12 +262,7 @@ namespace suitsTerminal
         {
             if (OpenLib.Plugin.instance.OpenBodyCamsMod && UseOpenBodyCams.Value)
             {
-                Camera Cam = OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
-                if (Cam == null)
-                {
-                    OpenLib.Compat.OpenBodyCamFuncs.OpenBodyCamsMirrorStatus(true, ObcResolution.Value, 0.1f, false, ref CamStuff.ObcCameraHolder);
-                }
-
+                Plugin.X("Returning Cam from OpenLib OpenBodyCams Compat!");
                 return OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
             }
             else

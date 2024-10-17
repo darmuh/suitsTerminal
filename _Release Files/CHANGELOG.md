@@ -1,5 +1,14 @@
 # Change Log
 
+### [1.5.2]
+ - Fixed indexing issue when suits contain the exact same name
+	- some backend changes related to this, now tracking unique suit ID numbers
+ - Fixed similar but unrelated issue where non-host clients were getting an indexing error
+ - Removed config option for keeping negative suit IDs as this just creates a duplicate of the default suit and nothing else.
+ - Fixed some compatibility issues with terminalstuff
+	- Thank you @moroxide for the help in troubleshooting this.
+ - Minor fix for old terminal command creation
+
 ### [1.5.1]
  - Fixed fatal error that broke advancedsuitsmenu, sorry for missing this.
  - Added some more logging for when these fatal errors occur to directly point to the exact issue.

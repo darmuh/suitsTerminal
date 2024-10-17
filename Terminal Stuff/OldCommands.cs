@@ -10,7 +10,7 @@ namespace suitsTerminal
 {
     internal class OldCommands
     {
-        internal static void CreateOldWearCommands(SuitAttributes suit)
+        internal static void CreateOldWearCommands(SuitAttributes suit, ref List<string> suitNames)
         {
             if (!SConfig.TerminalCommands.Value)
                 return;
@@ -20,8 +20,6 @@ namespace suitsTerminal
 
             if (suit.HideFromTerminal)
                 return;
-
-            List<string> suitNames = suitListing.NameList;
 
             //AddCommand(string textFail, bool clearText, string keyWord, bool isVerb, string nodeName, string category, string description, CommandDelegate methodName)
 

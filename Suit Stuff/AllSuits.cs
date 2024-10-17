@@ -1,4 +1,5 @@
-﻿using suitsTerminal.Suit_Stuff;
+﻿using Steamworks.Ugc;
+using suitsTerminal.Suit_Stuff;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,6 @@ namespace suitsTerminal
         internal static List<UnlockableItem> UnlockableItems = [];
         internal static Dictionary<int, string> suitNameToID = [];
         internal static SuitListing suitListing = new();
-
-        internal static void GetList()
-        {
-            suitNameToID.Clear();
-            suitListing.NameList.Clear();
-            FixRack();
-            OldCommands.MakeRandomSuitCommand();
-        }
 
         private static bool AddSuitToList(UnlockableSuit suit)
         {
@@ -45,39 +38,16 @@ namespace suitsTerminal
 
         private static void RemoveBadSuitIDs()
         {
+            Plugin.X("Removing suits with negative suitID values.");
             // Remove items with negative syncedSuitID
-
-            if (!SConfig.KeepSuitsWithNegativeIDs.Value)
+            foreach (UnlockableSuit suit in suitListing.RawSuitsList)
             {
-                suitListing.RawSuitsList.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
-                Plugin.X("Removing suits with negative suitID values.");
+                if (suit.syncedSuitID.Value < 0)
+                    Plugin.X($"Negative value [ {suit.syncedSuitID.Value} ] detected for suit\nRemoving from suitsTerminal listing");
             }
-            else
-            {
-                Plugin.X("Attempting to keep suits with negative suitID values.");
-                // Remove items with negative syncedSuitID and assign new random numbers
-                suitListing.RawSuitsList.RemoveAll(suit =>
-                {
-                    if (suit.syncedSuitID.Value < 0)
-                    {
-                        // Generate a new random number
-                        int newRandomNumber;
-                        do
-                        {
-                            newRandomNumber = UnityEngine.Random.Range(1, int.MaxValue);
-                        } while (suitListing.RawSuitsList.Any(otherSuit => otherSuit.syncedSuitID.Value == newRandomNumber));
 
-                        // Assign the new random number
-                        Plugin.X($"suit ID was {suit.syncedSuitID.Value}");
-                        suit.syncedSuitID.Value = newRandomNumber;
-                        Plugin.X($"suit ID changed to {suit.syncedSuitID.Value}");
+            suitListing.RawSuitsList.RemoveAll(suit => suit.syncedSuitID.Value < 0); //simply remove bad suit IDs
 
-                        return true; // Remove the item
-                    }
-
-                    return false; // Keep the item
-                });
-            }
             if (SConfig.SuitsSortingStyle.Value == "alphabetical")
                 OrderSuitsByName();
             else if (SConfig.SuitsSortingStyle.Value == "numerical")
@@ -99,10 +69,14 @@ namespace suitsTerminal
             // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
             suitListing.RawSuitsList.Clear();
             suitListing.RawSuitsList = [.. Resources.FindObjectsOfTypeAll<UnlockableSuit>()];
+            suitNameToID.Clear();
+            suitListing.NameList.Clear();
+
 
             UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
             RemoveBadSuitIDs();
-            GetList();
+            FixRack();
+            OldCommands.MakeRandomSuitCommand();
         }
 
         private static void OrderSuitsByName()
@@ -146,6 +120,8 @@ namespace suitsTerminal
 
             HideBootsAndRack();
 
+            List<string> names = []; //for old terminal commands to track duplicates
+
             foreach (UnlockableSuit item in suitListing.RawSuitsList)
             {
                 Plugin.X($"checking - {item.syncedSuitID.Value}");
@@ -158,12 +134,13 @@ namespace suitsTerminal
 
                 if (suitListing.Contains(item, out suit))
                 {
-                    Plugin.X($"SuitAttributes detected valid {suit}, no need to update");
+                    suit.UpdateSuit(item, UnlockableItems, ref suitNameToID);
+                    Plugin.X($"Updated suit attributes for {suit.Name} with ID {suit.UniqueID}");
                 }
-                else if (suitListing.Contains(UnlockableItems[item.syncedSuitID.Value].unlockableName, out suit))
+                else if (suitListing.Contains(item.syncedSuitID.Value, out suit))
                 {
                     suit.UpdateSuit(item, UnlockableItems, ref suitNameToID);
-                    Plugin.X($"Updated suit attributes for {suit.Name}");
+                    Plugin.X($"Updated suit attributes for {suit.Name} with ID {suit.UniqueID}");
                 }
                 else
                 {
@@ -171,7 +148,7 @@ namespace suitsTerminal
                     suitListing.SuitsList.Add(suit);
                 }
 
-                OldCommands.CreateOldWearCommands(suit);
+                OldCommands.CreateOldWearCommands(suit, ref names);
 
                 if (!SConfig.DontRemove.Value)
                 {
@@ -193,6 +170,8 @@ namespace suitsTerminal
                     }
                 }
             }
+
+            Plugin.X($"Main list count: {suitListing.NameList.Count}\nFav list count: {suitListing.FavList.Count}");
 
             OldCommands.CreateOldPageCommands();
 

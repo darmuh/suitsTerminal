@@ -15,11 +15,11 @@ namespace suitsTerminal.Suit_Stuff
         internal List<string> NameList = [];
         internal List<string> FavList = [];
 
-        internal bool Contains(string query, out SuitAttributes thisSuit)
+        internal bool Contains(int query, out SuitAttributes thisSuit)
         {
             foreach (SuitAttributes suit in SuitsList)
             {
-                if (suit.Name.ToLower() == query.ToLower())
+                if (suit.UniqueID == query)
                 {
                     thisSuit = suit;
                     return true;
@@ -53,6 +53,7 @@ namespace suitsTerminal.Suit_Stuff
         internal bool HideFromTerminal = false;
         internal bool IsOnRack = false;
         internal string Name = "placeholder";
+        internal int UniqueID = -1;
 
         //extra stuff
         internal bool IsFav = false;
@@ -64,6 +65,7 @@ namespace suitsTerminal.Suit_Stuff
         {
             Suit = item;
             Name = GetName(item, UnlockableItems, ref suitNameToID);
+            UniqueID = item.syncedSuitID.Value;
             suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
             IsFav = IsFavorite();
@@ -75,6 +77,7 @@ namespace suitsTerminal.Suit_Stuff
         {
             Suit = item;
             Name = GetName(item, UnlockableItems, ref suitNameToID);
+            UniqueID = item.syncedSuitID.Value;
             suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
             IsFav = IsFavorite();
@@ -156,6 +159,9 @@ namespace suitsTerminal.Suit_Stuff
         internal static string GetName(UnlockableSuit item, List<UnlockableItem> UnlockableItems, ref Dictionary<int, string> suitNameToID)
         {
             string SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
+
+            if (suitListing.NameList.Contains(SuitName) && SConfig.AdvancedTerminalMenu.Value)
+                SuitName = SuitName + "(1)"; //suit with same name exists, adding to name for advanced menu only
 
             if (!SConfig.AdvancedTerminalMenu.Value)
                 SuitName = TerminalFriendlyString(SuitName);

@@ -11,7 +11,6 @@ namespace suitsTerminal
         public static ConfigEntry<int> SuitsOnRack { get; internal set; }
         public static ConfigEntry<bool> HideRack { get; internal set; }
         public static ConfigEntry<bool> HideBoots { get; internal set; }
-        public static ConfigEntry<bool> KeepSuitsWithNegativeIDs { get; internal set; }
         public static ConfigEntry<bool> RandomSuitCommand { get; internal set; }
         public static ConfigEntry<bool> ChatCommands { get; internal set; }
         public static ConfigEntry<bool> DontRemove { get; internal set; }
@@ -59,7 +58,6 @@ namespace suitsTerminal
             AdvancedTerminalMenu = MakeBool("General", "AdvancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
             ExtensiveLogging = MakeBool("General", "ExtensiveLogging", false, "Enable or Disable extensive logging for this mod.");
             EnforcePaidSuits = MakeBool("General", "EnforcePaidSuits", true, "Enable or Disable enforcing paid suits being locked until they are paid for & unlocked.");
-            KeepSuitsWithNegativeIDs = MakeBool("General", "KeepSuitsWithNegativeIDs", false, "Enable this to attempt to keep suits with negative suitIDs, this option could break the mod or others");
             RandomSuitCommand = MakeBool("General", "RandomSuitCommand", false, "Enable/Disable the randomsuit terminal command.");
             ChatCommands = MakeBool("General", "ChatCommands", false, "Enable/Disable suits commands via chat (!suits/!wear).");
             TerminalCommands = MakeBool("General", "TerminalCommands", true, "Enable/Disable the base suits commands via terminal (suits, wear).");

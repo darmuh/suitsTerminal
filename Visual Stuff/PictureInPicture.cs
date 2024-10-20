@@ -167,20 +167,13 @@ namespace suitsTerminal
 
                 if (!OpenLib.Plugin.instance.ModelReplacement)
                 {
-                    Plugin.X($"mask before - {playerCam.cullingMask}");
-                    playerCam.cullingMask |= LayerMask.GetMask("Vehicle");
-                    Plugin.X($"mask after - {playerCam.cullingMask}");
-
                     if (state)
                     {
                         StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = ShadowCastingMode.Off;
-                        StartOfRound.Instance.localPlayerController.thisPlayerModel.gameObject.layer = LayerMask.NameToLayer("Vehicle");
-
                     }
                     else
                     {
                         StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = shadowDefault;
-                        StartOfRound.Instance.localPlayerController.thisPlayerModel.gameObject.layer = modelLayerDefault;
                     }
                 }
 

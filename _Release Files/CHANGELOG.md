@@ -1,5 +1,10 @@
 # Change Log
 
+### [1.5.3]
+ - Adjusted camera mask to use layer 23 instead of layer 30 (in line with most other mods)
+	- This should fix [issue #15](https://github.com/darmuh/suitsTerminal/issues/15) on github
+ - Fixed SuitsOnRackOnly config item, thanks CoolLKKPS for the report on [github](https://github.com/darmuh/suitsTerminal/issues/14)
+
 ### [1.5.2]
  - Fixed indexing issue when suits contain the exact same name
 	- some backend changes related to this, now tracking unique suit ID numbers

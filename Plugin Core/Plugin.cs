@@ -8,7 +8,7 @@ using static suitsTerminal.Misc;
 namespace suitsTerminal
 {
     [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("darmuh.OpenLib", "0.2.4")]
+    [BepInDependency("darmuh.OpenLib", "0.2.5")]
 
     public class Plugin : BaseUnityPlugin
     {
@@ -21,7 +21,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.5.2";
+            public const string PLUGIN_VERSION = "1.5.3";
         }
 
         public static Terminal Terminal;

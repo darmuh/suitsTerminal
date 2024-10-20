@@ -1,5 +1,6 @@
 ﻿using suitsTerminal.Suit_Stuff;
 using System.Collections.Generic;
+using System.Linq;
 using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.Misc;
 
@@ -27,7 +28,7 @@ namespace suitsTerminal
             if (rackSituated && !suit.IsOnRack)
                 return false;
 
-            if (suitsOnRackOnly.Count > 0 && !suitsOnRackOnly.Contains(suit.Name.ToLower()))
+            if (suitsOnRackOnly.Count > 0 && !suitsOnRackOnly.Any(s => s.ToLower() == suit.Name.ToLower()))
                 return false;
 
             if (rackSituated && suit.IsOnRack)

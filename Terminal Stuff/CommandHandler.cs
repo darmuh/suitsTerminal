@@ -33,7 +33,8 @@ namespace suitsTerminal
         internal static string AdvancedSuitsTerm()
         {
             Plugin.Terminal.StartCoroutine(AdvancedMenu.ActiveMenu());
-            string displayText = AdvancedMenuDisplay(suitListing, 0, 10, 1);
+            int page = 1;
+            string displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref page);
             return displayText;
         }
 

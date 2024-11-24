@@ -11,8 +11,9 @@
         "dependencies": {
           "BepInEx.AssemblyPublicizer.MSBuild": "0.4.1",
           "0Harmony": "2.9.0.0",
+          "Assembly-CSharp": "0.0.0.0",
           "Facepunch.Steamworks.Win64": "1.0.0.0",
-          "OpenLib": "0.2.2.0",
+          "OpenLib": "0.2.8.0",
           "Unity.Collections": "0.0.0.0",
           "Unity.InputSystem": "1.7.0.0",
           "Unity.Netcode.Runtime": "0.0.0.0",
@@ -24,8 +25,7 @@
           "UnityEngine": "0.0.0.0",
           "UnityEngine.UI": "1.0.0.0",
           "UnityEngine.UIModule": "0.0.0.0",
-          "UnityEngine.VideoModule": "0.0.0.0",
-          "Assembly-CSharp": "0.0.0.0"
+          "UnityEngine.VideoModule": "0.0.0.0"
         },
         "runtime": {
           "suitsTerminal.dll": {}
@@ -67,6 +67,14 @@
           }
         }
       },
+      "Assembly-CSharp/0.0.0.0": {
+        "runtime": {
+          "Assembly-CSharp.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "Facepunch.Steamworks.Win64/1.0.0.0": {
         "runtime": {
           "Facepunch.Steamworks.Win64.dll": {
@@ -75,11 +83,11 @@
           }
         }
       },
-      "OpenLib/0.2.2.0": {
+      "OpenLib/0.2.8.0": {
         "runtime": {
           "OpenLib.dll": {
-            "assemblyVersion": "0.2.2.0",
-            "fileVersion": "0.2.2.0"
+            "assemblyVersion": "0.2.8.0",
+            "fileVersion": "0.2.8.0"
           }
         }
       },
@@ -174,14 +182,6 @@
       "UnityEngine.VideoModule/0.0.0.0": {
         "runtime": {
           "UnityEngine.VideoModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "Assembly-CSharp/0.0.0.0": {
-        "runtime": {
-          "Assembly-CSharp.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -431,12 +431,17 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Assembly-CSharp/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "Facepunch.Steamworks.Win64/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "OpenLib/0.2.2.0": {
+    "OpenLib/0.2.8.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -497,11 +502,6 @@
       "sha512": ""
     },
     "UnityEngine.VideoModule/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Assembly-CSharp/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

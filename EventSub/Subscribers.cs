@@ -40,11 +40,26 @@ namespace suitsTerminal.EventSub
             rackSituated = false;
             PictureInPicture.PiPCreated = false;
             Plugin.X("set initial variables");
+
+            if(resetSuitPlacementOnRestart)
+            {
+                ResetSuitPlacementVars(); //rack settings config change
+            }
+        }
+
+        private static void ResetSuitPlacementVars()
+        {
+            if (suitListing.SuitsList.Count == 0)
+                return;
+
+            suitListing.SuitsList.ForEach(s => s.IsOnRack = false);
+            resetSuitPlacementOnRestart = false;
         }
 
         internal static void OnGameStart()
         {
             CompatibilityCheck();
+            InitFavoritesListing();
         }
 
         private static void CompatibilityCheck()

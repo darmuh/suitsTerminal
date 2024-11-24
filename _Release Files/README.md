@@ -20,6 +20,8 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 	- To see only your favorited suits, press the [favMenuKey] to toggle the menu to the favorites list.
 	- Favorites will be saved to the [favoritesMenuList] configuration item.
 	- Default keybinds are [favItemKey = F] and [favMenuKey = F1].
+	- [NEW IN 1.5.4] Enable [PersonalizedFavorites] to have persisting personal favorites across all mod profiles. 
+		- This information is personal to you and will not be shared via profile code or in a modpack
 
  - Add only specific suits to the rack's 13 available spots.
 	- Use [SuitsOnRackOnly] to specify a specific list of suit names to show on the rack.

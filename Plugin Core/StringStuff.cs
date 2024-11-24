@@ -96,7 +96,7 @@ namespace suitsTerminal
             return listing;
         }
 
-        internal static string AdvancedMenuDisplay(SuitListing suitListing, int activeIndex, int pageSize, int currentPage)
+        internal static string AdvancedMenuDisplay(SuitListing suitListing, int activeIndex, int pageSize, ref int currentPage)
         {
             Plugin.X($"activeIndex: {activeIndex}\npageSize: {pageSize}\ncurrentPage: {currentPage}");
             if(suitListing == null)

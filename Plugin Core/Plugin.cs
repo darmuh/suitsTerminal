@@ -8,7 +8,7 @@ using static suitsTerminal.Misc;
 namespace suitsTerminal
 {
     [BepInPlugin("darmuh.suitsTerminal", "suitsTerminal", PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("darmuh.OpenLib", "0.2.5")]
+    [BepInDependency("darmuh.OpenLib", "0.2.8")]
 
     public class Plugin : BaseUnityPlugin
     {
@@ -21,7 +21,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.5.3";
+            public const string PLUGIN_VERSION = "1.5.4";
         }
 
         public static Terminal Terminal;
@@ -39,24 +39,6 @@ namespace suitsTerminal
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
 
             Subscribers.Subscribe();
-
-            //start of networking stuff
-            /*
-            var types = Assembly.GetExecutingAssembly().GetTypes();
-            foreach (var type in types)
-            {
-                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                foreach (var method in methods)
-                {
-                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-                    if (attributes.Length > 0)
-                    {
-                        method.Invoke(null, null);
-                    }
-                }
-            }
-            */
-            //end of networking stuff
         }
 
         public static void X(string message)

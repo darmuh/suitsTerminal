@@ -1,12 +1,14 @@
 ﻿using Steamworks.Ugc;
 using suitsTerminal.Suit_Stuff;
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using static suitsTerminal.Bools;
 using static suitsTerminal.Misc;
 using static suitsTerminal.ProcessRack;
+using static OpenLib.Common.CommonStringStuff;
+using System;
 
 namespace suitsTerminal
 {
@@ -16,6 +18,7 @@ namespace suitsTerminal
         internal static List<UnlockableItem> UnlockableItems = [];
         internal static Dictionary<int, string> suitNameToID = [];
         internal static SuitListing suitListing = new();
+        internal static List<string> favsList = [];
 
         private static bool AddSuitToList(UnlockableSuit suit)
         {
@@ -61,6 +64,34 @@ namespace suitsTerminal
             else
                 Plugin.WARNING("Config failure, no sorting");
 
+        }
+
+        internal static void InitFavoritesListing(bool checkList = false)
+        {       
+            if (SConfig.PersonalizedFavorites.Value)
+            {
+                string favsFilePath = Path.Combine(@"%userprofile%\appdata\locallow\ZeekerssRBLX\Lethal Company", "suitsTerminal");
+                favsFilePath = Environment.ExpandEnvironmentVariables(favsFilePath);
+                if (!Directory.Exists(favsFilePath))
+                    Directory.CreateDirectory(favsFilePath);
+
+                Plugin.X($"Favorites file path - {favsFilePath}");
+
+                if (!File.Exists(favsFilePath + @"\masterFavsListing.txt"))
+                    File.WriteAllText(favsFilePath + @"\masterFavsListing.txt", SConfig.FavoritesMenuList.Value);
+
+                string favoritesText = File.ReadAllText(favsFilePath + @"\masterFavsListing.txt");
+                Plugin.X($"favoritesText: {favoritesText}");
+                favsList = GetKeywordsPerConfigItem(favoritesText, ',');
+                foreach(string fav in favsList)
+                {
+                    Plugin.X($"-- {fav} --");
+                }
+            }
+            else
+                favsList = GetKeywordsPerConfigItem(SConfig.FavoritesMenuList.Value, ',');
+
+            suitListing?.RefreshFavorites(checkList);
         }
 
         internal static void InitSuitsListing()
@@ -130,9 +161,8 @@ namespace suitsTerminal
                     continue;
 
                 AutoParentToShip component = item.gameObject.GetComponent<AutoParentToShip>();
-                SuitAttributes suit;
 
-                if (suitListing.Contains(item, out suit))
+                if (suitListing.Contains(item, out SuitAttributes suit))
                 {
                     suit.UpdateSuit(item, UnlockableItems, ref suitNameToID);
                     Plugin.X($"Updated suit attributes for {suit.Name} with ID {suit.UniqueID}");
@@ -146,6 +176,7 @@ namespace suitsTerminal
                 {
                     suit = new(item, UnlockableItems, ref suitNameToID);
                     suitListing.SuitsList.Add(suit);
+                    Plugin.X($"Added suit attributes for {suit.Name} with ID {suit.UniqueID}");
                 }
 
                 OldCommands.CreateOldWearCommands(suit, ref names);
@@ -156,11 +187,13 @@ namespace suitsTerminal
                     {
                         suit.IsOnRack = true;
                         ProcessVisibleSuit(component, suitsOnRack);
+                        Plugin.X($"Showing suit - [ {suit.Name} ]");
                     }
                     else
                     {
                         suit.IsOnRack = false;
                         ProcessHiddenSuit(component);
+                        Plugin.X($"Hiding suit - [ {suit.Name} ]");
                     }
 
                     if (suitsOnRack == SConfig.SuitsOnRack.Value && !rackSituated)
@@ -170,6 +203,9 @@ namespace suitsTerminal
                     }
                 }
             }
+
+            if(SConfig.DontRemove.Value)
+                Plugin.WARNING("suitsTerminal is NOT touching the rack!!!");
 
             Plugin.X($"Main list count: {suitListing.NameList.Count}\nFav list count: {suitListing.FavList.Count}");
 

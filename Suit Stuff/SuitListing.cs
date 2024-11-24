@@ -45,6 +45,31 @@ namespace suitsTerminal.Suit_Stuff
             thisSuit = null!;
             return false;
         }
+
+        internal void RefreshFavorites(bool checkList = false)
+        {
+            if (suitListing.SuitsList.Count == 0)
+                return;
+
+            if (checkList)
+            {
+                suitListing.FavList = []; //empty list
+
+                foreach (SuitAttributes fav in SuitsList)
+                {
+                    fav.FavIndex = -1;
+                    fav.IsFav = fav.IsFavorite();
+                    fav.SetIndex();
+                    Plugin.X($"SuitAttributes updated for {fav.Name}");
+                }
+            }
+            else
+            {
+                foreach (SuitAttributes fav in SuitsList)
+                    fav.RefreshFavIndex();
+            }
+        }
+
     }
 
     internal class SuitAttributes
@@ -94,7 +119,7 @@ namespace suitsTerminal.Suit_Stuff
             }
             this.MainMenuIndex = suitListing.NameList.IndexOf(this.Name);
 
-            if (this.IsFav)
+            if (this.IsFav && !suitListing.FavList.Contains(this.Name))
             {
                 this.AddToFavs();
             }
@@ -112,9 +137,10 @@ namespace suitsTerminal.Suit_Stuff
 
         internal bool IsFavorite()
         {
-            List<string> favConfigList = GetKeywordsPerConfigItem(SConfig.FavoritesMenuList.Value, ',');
+            if (favsList.Count == 0)
+                return false;
 
-            if (favConfigList.Any(x => x.ToLower() == this.Name.ToLower()))
+            if (favsList.Any(x => x.ToLower() == this.Name.ToLower()))
             {
                 Plugin.X($"{this.Name} is detected in favorites list");
                 return true;
@@ -134,6 +160,13 @@ namespace suitsTerminal.Suit_Stuff
         internal void AddToFavs()
         {
             this.IsFav = true;
+
+            if (suitListing.FavList.Contains(this.Name))
+            {
+                this.FavIndex = suitListing.FavList.IndexOf(this.Name);
+                return;
+            }
+            
             suitListing.FavList.Add(this.Name);
             this.FavIndex = suitListing.FavList.IndexOf(this.Name);
         }

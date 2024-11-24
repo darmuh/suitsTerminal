@@ -1,11 +1,25 @@
 # Change Log
 
-### [1.5.3]
+## [1.5.4]
+ - Fixed various issues with favorites menu such as
+	- Fatal index error when the config item has 0 favorited suits.
+	- Fatal index error due to duplicate favorite items causing extra pages than needed
+ - Fixed various issues when changing rack setting config items between lobby loads.
+ - Fixed issue with pagination system that would increase the page counter even if there was not a new page displayed
+ - Added new config item [PersonalizedFavorites] which will NOT save favorites to the config item.
+	- This will save your favorites to a text file located in the following folder 'AppData\LocalLow\ZeekerssRBLX\Lethal Company\suitsTerminal'
+	- This file will persist between different mod profiles so you do not need to re-favorite when using a new profile code.
+	- If a suit in your favorites does not exist in the current profile it will be ignored (not cause issues)
+ - Added some more descriptive logging messages under extensive logging.
+ - Added some warning logs to indicate the mod is not touching the suits rack. If you have another mod taking care of the rack, like TooManySuits, this can be ignored and is just informative.
+	- I added this for any potential reported issues with the rack not adjusting properly due to user config error.
+
+## [1.5.3]
  - Adjusted camera mask to use layer 23 instead of layer 30 (in line with most other mods)
 	- This should fix [issue #15](https://github.com/darmuh/suitsTerminal/issues/15) on github
  - Fixed SuitsOnRackOnly config item, thanks CoolLKKPS for the report on [github](https://github.com/darmuh/suitsTerminal/issues/14)
 
-### [1.5.2]
+## [1.5.2]
  - Fixed indexing issue when suits contain the exact same name
 	- some backend changes related to this, now tracking unique suit ID numbers
  - Fixed similar but unrelated issue where non-host clients were getting an indexing error
@@ -14,11 +28,11 @@
 	- Thank you @moroxide for the help in troubleshooting this.
  - Minor fix for old terminal command creation
 
-### [1.5.1]
+## [1.5.1]
  - Fixed fatal error that broke advancedsuitsmenu, sorry for missing this.
  - Added some more logging for when these fatal errors occur to directly point to the exact issue.
 
-### [1.5.0]
+## [1.5.0]
  - Slight backend rework. Utilizing a new class that tracks relevant information for each suit.
 	- Fixes issue of suits that were hidden from terminal causing odd desyncs in the menus
 	- Should also be much more efficient (resource-wise)
@@ -30,15 +44,15 @@
 	- Set height positions have also been changed completely
  - General code cleanup
 
-### [1.4.5]
+## [1.4.5]
  - Fixed error with favorites menu that would break suitsTerminal completely.
 	- Thanks @Lunxara for the report.
 
-### [1.4.4]
+## [1.4.4]
  - Added [DefaultSuit] configuration item which will allow for setting a new default suit to wear when loading in to the game.
 	- If SuitSaver is present, this will be completely disabled to avoid conflicts.
 
-### [1.4.3]
+## [1.4.3]
  - Updated configuration item names, descriptions, and default values for clarity.
  - Added TransformHotfix to mirror camera for reproducible issue that I cant seem to solve.
 	- The issue is if you switch suits from the rack and then go to the terminal and enter the suits menu it will almost always break the mirror camera position/rotation.
@@ -54,16 +68,16 @@
  - Updated advancedSuitsMenu formatting, will now show currently equipped suit name at the bottom of the listing above page numbers
  - Added nullable to project and better error handling messages
 
-### [1.4.2]
+## [1.4.2]
  - Added fix for compatibility with upcoming terminalstuff update
  - Hopefully fixed NRE error with addcommand method (unable to replicate on my end)
  - Updated to OpenLib 0.1.8
  - Update advancedSuitsMenu to accept 0 input to hopefully fix some issues where other mods would place words into the node anyway
 
-### [1.4.1]
+## [1.4.1]
  - Fix manifest to include "darmuh-OpenLib-0.1.3"
 
-### [1.4.0]
+## [1.4.0]
  - This mod is now utilizing OpenLib for it's interactions with the terminal
  - Fixed issue where homebrew mirror camera would not show the player.
 	- Thanks Zaggy for the pointer
@@ -71,7 +85,7 @@
  - Some terminal commands added with this mod will be added to the "other" command listing
  - Version information will now autopopulate to the file properties
 
-### [1.3.0]
+## [1.3.0]
  - Legonzaur on Github fixed an issue where all suits were still getting loaded by the game despite being hidden, causing a large amount of RAM usage.
 	- Huge thankyou to all who put effort into this fix!
 	- While it was a relatively small change in the code, a lot of troubleshooting/effort was put into discovering this issue.
@@ -104,7 +118,7 @@
 	- One odd interaction I did find is that some suits could not be equipped from the terminal until you've at least cycled through all pages of TooManySuits' rack.
 		- Not sure if this is something I can fix on my end alone.
 
-### [1.2.0]
+## [1.2.0]
  - Fixed issue where equipping suits from the terminal would not save the suit with the suit saver mod enabled.
 	- This issue was resolved by using a different vanilla function to change a player's suit.
 		- This also simplified my code a bit more and I no longer need to grab a player's playerID when changing the suit.
@@ -132,7 +146,7 @@
 	- Added new config item to save favorited suits [favoritesMenuList]. These will be stored/loaded each play session.
  - Adjusted menu slightly to make room for new key bindings, may find an alternative solution to make the page feel less cramped in the future.
 
-### [1.1.3] 
+## [1.1.3] 
  - Added new configuration options for removing the suit rack and the boots below the suit rack
 	- Credits to Hamster (author of LethalPipeRemoval) for finding the specific objects.
 	- enable hideRack to remove suit rack (this will ignore the suitsOnRack configuration since the entire rack is being deleted).
@@ -147,11 +161,11 @@
 	- Attached the mirror camera to a specific object on the terminal so that it scrolls with the text.
 	- Increased the size of the mirror camera and added a slight opacity so that text behind it can still be seen.
 
-### [1.1.2]
+## [1.1.2]
  - Actually added the logic for handling the new configuration items for the advancedMenuSystem navigation. (lined out in below changes)
 	- Also modified some of the keybinding logic to better handle errors & standardize keybinds to a few re-usable methods.
 
-### [1.1.1]
+## [1.1.1]
 
  - Added new key binding configuration items for menu system:
 	- menuLeft: Change key used to navigate to previous page in advancedMenuSystem.
@@ -169,7 +183,7 @@
 	
  - Changed all TerminalAPI related keywords to nouns instead of verbs. This should fix odd errors that were occuring whenever trying to purchase a suit that had suit in the name.
 
-### [1.1.0]
+## [1.1.0]
 
  - Moved changelog to separate file from readme.
 
@@ -202,7 +216,7 @@
  - Fixed a long-time known issue of host/client having different suits on the rack
 	- Sorting is now done alphabetical instead of numerical by suitID to accomplish this.
 
-### [1.0.6]
+## [1.0.6]
 
  - Added configuration option to disable terminal commands.
 
@@ -210,19 +224,19 @@
  
  - Updated chat command handling and added more specific messages when loading in based on how the mod is configured.
 
-### [1.0.5]
+## [1.0.5]
  - Fixed purchase-able suits appearing floating next to the rack and not being wearable from the terminal.
  
  - Added chat commands similar to terminal commands. (!suits/!wear)
  
  - Added configuration option to disable chat commands.
 
-### [1.0.4] 
+## [1.0.4] 
  - Added character limit to suit names to resolve some issues with extra long suit names, thanks B1adeWo1f for the report on discord.
  
  - Added configuration option for enabling/disabling randomsuit command.
 
-### [1.0.3]
+## [1.0.3]
  - Updated compatibility for any mod that for whatever reason removes keywords like Advanced Company was doing.
  
  - Added configuration option to allow for leaving up to 13 suits on the rack. Default is 0.
@@ -231,15 +245,15 @@
  
  - Added command 'randomsuit' which will allow you to change to a random suit from the list.
 
-### [1.0.2]
+## [1.0.2]
  - Added compatibility check with Advanced Company that fixes the issue where it would break the terminal commands in this mod.
  
  - Removed method for replacing negative suitIDs and now just completely removing them. As far as I've seen the only suit that has this issue is the green suit from vanilla.
 
-### [1.0.1]
+## [1.0.1]
  - Fixed issue where the mod would break if the host closed and opened a new lobby (sorry I left this in 1.0.0, thought i'd put a fix in before publishing)
  
  - Added Hud/Chat hints when loading in to inform player that the suits were moved off the rack to the terminal.
 
-### [1.0.0]
+## [1.0.0]
 *Initial release version*

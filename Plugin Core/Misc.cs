@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
@@ -14,6 +16,7 @@ namespace suitsTerminal
         internal static int weirdSuitNum = 0;
         internal static bool hasLaunched = false;
         internal static bool hintOnce = false;
+        internal static bool resetSuitPlacementOnRestart = false;
 
         internal static GameObject GetGameObject(string location)
         {
@@ -42,7 +45,7 @@ namespace suitsTerminal
             else
             {
                 Plugin.X("Help Menu disabled, returning to menu selection...");
-                return StringStuff.AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                return StringStuff.AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
             }
         }
 
@@ -50,6 +53,19 @@ namespace suitsTerminal
         {
             configItem = string.Join(", ", stringList);
             Plugin.X($"Saving to config\n{configItem}");
+        }
+
+        internal static void SaveFavorites(string saveText)
+        {
+            if(SConfig.PersonalizedFavorites.Value)
+            {
+                string favsFilePath = Path.Combine(@"%userprofile%\appdata\locallow\ZeekerssRBLX\Lethal Company", "suitsTerminal") + "\\masterFavsListing.txt";
+                favsFilePath = Environment.ExpandEnvironmentVariables(favsFilePath);
+                File.WriteAllText(favsFilePath, saveText);
+                Plugin.X($"Favorites saved to file at {favsFilePath}");
+            }
+            else
+                SConfig.FavoritesMenuList.Value = saveText;
         }
 
     }

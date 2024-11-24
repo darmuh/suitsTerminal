@@ -282,7 +282,7 @@ namespace suitsTerminal
                 if (currentPage > 0)
                     currentPage--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -291,7 +291,7 @@ namespace suitsTerminal
             else if (value == "next_page" && !inHelpMenu)
             {
                 currentPage++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -302,7 +302,7 @@ namespace suitsTerminal
                 if (activeSelection > 0)
                     activeSelection--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -311,7 +311,7 @@ namespace suitsTerminal
             else if (value == "next_item" && !inHelpMenu)
             {
                 activeSelection++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
@@ -329,7 +329,7 @@ namespace suitsTerminal
                 CommandHandler.BetterSuitPick(suit);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
                 return;
@@ -370,10 +370,21 @@ namespace suitsTerminal
                 if (suitListing.FavList.Contains(selectedSuit.Name))
                 {
                     selectedSuit.RemoveFromFavs();
-                    foreach (SuitAttributes fav in suitListing.SuitsList)
-                        fav.RefreshFavIndex();
+                    suitListing.RefreshFavorites();
 
                     Plugin.Log.LogInfo($"{selectedSuit.Name} removed from favorites listing");
+                    if(suitListing.FavList.Count < 1)
+                    {
+                        inFavsMenu = false;
+                        currentPage = 1;
+                        GetCurrentSuitNum();
+                        menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
+                        Plugin.Terminal.LoadNewNode(menuDisplay);
+                        TerminalInputEnabled(false);
+                        SaveToConfig(suitListing.FavList, out string configSave);
+                        SaveFavorites(configSave);
+                        return;
+                    }
                 }
                 else
                 {
@@ -382,18 +393,21 @@ namespace suitsTerminal
                 }
 
                 SaveToConfig(suitListing.FavList, out string saveToConfig);
-                FavoritesMenuList.Value = saveToConfig;
+                SaveFavorites(saveToConfig);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
             }
             else if (value == "favorites_menu" && !inHelpMenu)
             {
+                if (!inFavsMenu && suitListing.FavList.Count < 1)
+                    return;
+
                 inFavsMenu = !inFavsMenu;
                 currentPage = 1;
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, currentPage);
+                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
                 TerminalInputEnabled(false);
             }

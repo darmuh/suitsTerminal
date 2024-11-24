@@ -43,6 +43,7 @@ namespace suitsTerminal
         public static ConfigEntry<string> DontAddToRack { get; internal set; }
         public static ConfigEntry<string> DontAddToTerminal { get; internal set; }
         public static ConfigEntry<string> FavoritesMenuList { get; internal set; }
+        public static ConfigEntry<bool> PersonalizedFavorites { get; internal set; }
         public static ConfigEntry<string> SuitsSortingStyle { get; internal set; }
 
         public static ConfigEntry<float> MenuKeyPressDelay { get; internal set; }
@@ -76,6 +77,7 @@ namespace suitsTerminal
 
             //Menu Binds
             FavoritesMenuList = MakeString("AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
+            PersonalizedFavorites = MakeBool("AdvancedTerminalMenu", "PersonalizedFavorites", false, "Enable this to ignore the FavoritesMenuList configuration item in favor of a personal file saving your favorites list.\nUse this if you dont want your favorites list to be shared with other players in modpacks/profile codes.");
             EnablePiPCamera = MakeBool("AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");
             MenuLeft = MakeString("AdvancedTerminalMenu", "MenuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
             MenuRight = MakeString("AdvancedTerminalMenu", "MenuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
@@ -110,6 +112,23 @@ namespace suitsTerminal
 
             orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
             Plugin.instance.Config.Save(); // Save the config file
+            Plugin.instance.Config.SettingChanged += OnSettingChanged;
+        }
+
+        private static void OnSettingChanged(object sender, SettingChangedEventArgs settingChangedArg)
+        {
+            if (settingChangedArg.ChangedSetting == null)
+                return;
+
+            Plugin.X("CONFIG SETTING CHANGE EVENT");
+            
+            if(settingChangedArg.ChangedSetting == PersonalizedFavorites)
+                AllSuits.InitFavoritesListing(true);
+
+            if(settingChangedArg.ChangedSetting.Definition.Section == "Rack Settings")
+            {
+                Misc.resetSuitPlacementOnRestart = true;
+            }
         }
 
         private static ConfigEntry<bool> MakeBool(string section, string configItemName, bool defaultValue, string configDescription)

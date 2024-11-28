@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.5.5]
+ - Updated menu handling to not throw the "Fatal Error" message into the terminal when a suit in the menu is NULL.
+	- Will now list the specific item in the menu as ``**MISSING SUIT**``
+	- Selecting a missing suit will not do anything.
+	- FYI, when host/client do not share the same amount of extra suits added by mods the suits will be desynced between players. This is not something that will be fixable by suitsTerminal.
+		- This is due to mismatched unlockable ID numbers from when the suit is added to the game by the mod that adds it.
+	- Changed duplicate name handling to show specific suit ID number rather than adding (1) to the name.
+
 ## [1.5.4]
  - Fixed various issues with favorites menu such as
 	- Fatal index error when the config item has 0 favorited suits.

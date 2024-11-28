@@ -138,19 +138,24 @@ namespace suitsTerminal
                 else
                     suit = suitListing.SuitsList.Where(x => x.FavIndex == i).FirstOrDefault();
 
-                if(suit == null)
-                {
-                    Plugin.ERROR($"suitsTerminal FATAL ERROR: Unable to index suit listing @ [ {i} ]");
-                    return $"suitsTerminal FATAL ERROR: Unable to index suit listing @ [ {i} ]";
-                }
-
                 // Prepend ">" to the active item and append "[EQUIPPED]" line if applicable
 
                 activeSelection = activeIndex;
+                string menuItem;
 
-                string menuItem = (i == activeIndex)
+                if(suit != null)
+                {
+                    menuItem = (i == activeIndex)
                     ? $"> {suit.Name}" + (suit.currentSuit ? " [EQUIPPED]" : "") + (suit.IsFav ? " (*)" : "")
                     : $"{suit.Name}" + (suit.currentSuit ? " [EQUIPPED]" : "") + (suit.IsFav ? " (*)" : "");
+                }
+                else
+                {
+                    menuItem = (i == activeIndex)
+                    ? $"> {i} - **MISSING SUIT**"
+                    : $"{i} - **MISSING SUIT**";
+                    Plugin.WARNING($"Unable to find suit at index [ {i} ] of suitsTerminal suitListing!");
+                }
 
                 // Display the menu item
                 message.Append(menuItem + "\r\n");

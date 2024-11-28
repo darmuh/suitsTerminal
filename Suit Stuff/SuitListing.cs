@@ -194,7 +194,7 @@ namespace suitsTerminal.Suit_Stuff
             string SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
 
             if (suitListing.NameList.Contains(SuitName) && SConfig.AdvancedTerminalMenu.Value)
-                SuitName = SuitName + "(1)"; //suit with same name exists, adding to name for advanced menu only
+                SuitName = SuitName + $"({item.suitID})"; //suit with same name exists, adding to name for advanced menu only
 
             if (!SConfig.AdvancedTerminalMenu.Value)
                 SuitName = TerminalFriendlyString(SuitName);

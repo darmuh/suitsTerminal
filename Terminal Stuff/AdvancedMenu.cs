@@ -326,6 +326,8 @@ namespace suitsTerminal
             else if (value == "menu_select" && !inHelpMenu)
             {
                 SuitAttributes suit = GetMenuItemSuit(suitListing, activeSelection);
+                if (suit == null)
+                    return;
                 CommandHandler.BetterSuitPick(suit);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 GetCurrentSuitNum();
@@ -367,6 +369,8 @@ namespace suitsTerminal
             else if (value == "favorite_item" && !inHelpMenu)
             {
                 SuitAttributes selectedSuit = GetMenuItemSuit(suitListing, activeSelection);
+                if (selectedSuit == null)
+                    return;
                 if (suitListing.FavList.Contains(selectedSuit.Name))
                 {
                     selectedSuit.RemoveFromFavs();

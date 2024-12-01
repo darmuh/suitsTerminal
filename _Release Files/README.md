@@ -55,11 +55,6 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 	- All of the above binds will continue to apply to this camera.
 	- The configuration item [useOpenBodyCams] will determine whether OpenBodyCams is used to create the MirrorCamera.
 	- The configuration item [obcResolution] determines the resolution the camera created by OpenBodyCams will use.
-
- - Customize the advancedTerminalMenu experience.
-	- [menuKeyPressDelay] is the regular delay when checking for key presses in the advancedTerminalMenu. (This delay will be added ontop of menuPostSelectDelay)
-	- [menuPostSelectDelay] is the delay used after a key press is registered in the advancedTerminalMenu.
-	- I have modified the default values for these two. They were originally both set to 0.1 in previous versions of suitsTerminal.
 	
  - Here is some videos from dev testing showcasing this mod's progression as newer features were developed. (note these videos are not the final product) 
 	- [v1.0.0 video demo (youtube)](https://www.youtube.com/watch?v=4qNo0Qn6zJk)

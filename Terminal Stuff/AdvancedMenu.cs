@@ -64,6 +64,7 @@ namespace suitsTerminal
             if (menuDisplay == null)
                 menuDisplay = AddingThings.CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
 
+            specialMenusActive = false;
             initKeySettings = false;
         }
 
@@ -319,8 +320,7 @@ namespace suitsTerminal
             }
             else if (value == "leave_menu")
             {
-                exitSpecialMenu = true;
-                TerminalInputEnabled(true);
+                MenuActive(false);
                 return;
             }
             else if (value == "menu_select" && !inHelpMenu)
@@ -451,50 +451,63 @@ namespace suitsTerminal
             pipRawImage.transform.SetParent(Plugin.Terminal.screenText.image.transform);
         }
 
-        internal static IEnumerator ActiveMenu()
+        internal static void OnTerminalKeyPress()
+        {
+            if (!specialMenusActive || !AdvancedTerminalMenu.Value)
+                return;
+
+            if (AnyKeyIsPressed())
+                HandleKeyPress(keyBeingPressed);
+        }
+
+        internal static void MenuActive(bool active)
+        {
+            if (active)
+                Plugin.Terminal.StartCoroutine(SuitsMenuStart());
+            else
+                Plugin.Terminal.StartCoroutine(SuitsMenuExit());
+
+        }
+
+        internal static IEnumerator SuitsMenuExit()
+        {
+            if (exitSpecialMenu)
+                yield break;
+
+            exitSpecialMenu = true;
+
+            yield return new WaitForEndOfFrame();
+            specialMenusActive = false;
+            TogglePiP(false);
+            Plugin.Terminal.screenText.interactable = true;
+            yield return new WaitForEndOfFrame();
+            Plugin.Terminal.LoadNewNode(Plugin.Terminal.terminalNodes.specialNodes[13]);
+            yield return new WaitForEndOfFrame();
+            Plugin.Terminal.screenText.ActivateInputField();
+            exitSpecialMenu = false;
+            yield break;
+        }
+
+        internal static IEnumerator SuitsMenuStart()
         {
             if (specialMenusActive)
                 yield break;
 
+            yield return new WaitForEndOfFrame();
             specialMenusActive = true;
             inFavsMenu = false;
             rotateStep = 0;
             heightStep = 0;
             zoomStep = 1;
             GetCurrentSuitNum();
+            yield return new WaitForEndOfFrame();
+            TerminalInputEnabled(false);
+            yield return new WaitForEndOfFrame();
             TogglePiP(true);
-            Plugin.Terminal.screenText.DeactivateInputField();
-            Plugin.Terminal.screenText.interactable = false;
-            yield return new WaitForSeconds(0.2f);
-            Plugin.X("ActiveMenu Coroutine");
+            yield return new WaitForEndOfFrame();
             currentPage = 1;
             activeSelection = 0;
             PiPSetParent();
-
-            while (Plugin.Terminal.terminalInUse && AdvancedTerminalMenu.Value && !exitSpecialMenu)
-            {
-                if (AnyKeyIsPressed())
-                {
-                    HandleKeyPress(keyBeingPressed);
-                    yield return new WaitForSeconds(MenuKeyPressDelay.Value);
-                }
-                else
-                    yield return new WaitForSeconds(MenuPostSelectDelay.Value);
-            }
-
-            if (!Plugin.Terminal.terminalInUse)
-                Plugin.X("Terminal no longer in use");
-
-            if (exitSpecialMenu)
-                exitSpecialMenu = false;
-
-            specialMenusActive = false;
-
-            TogglePiP(false);
-            yield return new WaitForSeconds(0.1f);
-            Plugin.Terminal.screenText.ActivateInputField();
-            Plugin.Terminal.screenText.interactable = true;
-            Plugin.Terminal.LoadNewNode(Plugin.Terminal.terminalNodes.specialNodes[13]);
             yield break;
         }
     }

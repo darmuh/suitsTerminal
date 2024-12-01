@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.5.6]
+ - Switched to new input handling system for advancedsuitsmenu using OpenLib's new TerminalKeyPressed Event
+	- Input should now feel one to one with each individual key press.
+	- You can no longer hold down a key to scroll through the menu.
+	- The ``MenuKeyPressDelay`` and ``MenuPostSelectDelay`` have been removed as they are no longer necessary.
+ - Updated to OpenLib 0.2.10
+
 ## [1.5.5]
  - Updated menu handling to not throw the "Fatal Error" message into the terminal when a suit in the menu is NULL.
 	- Will now list the specific item in the menu as ``**MISSING SUIT**``

@@ -102,8 +102,8 @@ namespace suitsTerminal
             ObcResolution = MakeString("OpenBodyCams", "ObcResolution", "1000; 700", "Set the resolution of the Mirror Camera created with OpenBodyCams");
 
             //Clamped Floats
-            MenuKeyPressDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuKeyPressDelay", 0.15f, "Regular delay when checking for key presses in the AdvancedTerminalMenu. (This delay will be added ontop of MenuPostSelectDelay)", 0.05f, 1f);
-            MenuPostSelectDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the AdvancedTerminalMenu.", 0.05f, 1f);
+            //MenuKeyPressDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuKeyPressDelay", 0.15f, "Regular delay when checking for key presses in the AdvancedTerminalMenu. (This delay will be added ontop of MenuPostSelectDelay)", 0.05f, 1f);
+            //MenuPostSelectDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the AdvancedTerminalMenu.", 0.05f, 1f);
 
             //creds to Kittenji
             PropertyInfo orphanedEntriesProp = Plugin.instance.Config.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);

@@ -12,18 +12,25 @@ namespace suitsTerminal.EventSub
         internal static void Subscribe()
         {
             EventManager.TerminalAwake.AddListener(OnTerminalAwake);
+            EventManager.TerminalQuit.AddListener(OnTerminalQuit);
             EventManager.TerminalDelayStart.AddListener(SetDefaultSuit);
             EventManager.TerminalLoadIfAffordable.AddListener(TerminalGeneral.OnLoadAffordable);
             EventManager.GameNetworkManagerStart.AddListener(OnGameStart);
             EventManager.PlayerSpawn.AddListener(OnPlayerSpawn);
 
             //Unique
-            //EventManager.GetNewDisplayText.AddListener(TerminalParse.OnNewDisplayText);
+            EventManager.TerminalKeyPressed.AddListener(AdvancedMenu.OnTerminalKeyPress);
         }
 
         internal static void SetDefaultSuit()
         {
             DefaultSuit();
+        }
+
+        internal static void OnTerminalQuit()
+        {
+            if(SConfig.AdvancedTerminalMenu.Value && AdvancedMenu.specialMenusActive)
+                AdvancedMenu.MenuActive(false);
         }
 
         internal static void OnTerminalAwake(Terminal instance)
@@ -39,6 +46,7 @@ namespace suitsTerminal.EventSub
             hintOnce = false;
             rackSituated = false;
             PictureInPicture.PiPCreated = false;
+            AdvancedMenu.specialMenusActive = false;
             Plugin.X("set initial variables");
 
             if(resetSuitPlacementOnRestart)

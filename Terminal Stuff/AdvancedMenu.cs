@@ -50,6 +50,9 @@ namespace suitsTerminal
 
         internal static bool initKeySettings = false;
 
+        public static Color CaretOriginal;
+        internal static Color transparent = new(0, 0, 0, 0);
+
         internal static void InitSettings()
         {
             if (initKeySettings)
@@ -62,7 +65,12 @@ namespace suitsTerminal
             TogglePiPKey();
             CreateMenuCommand();
             if (menuDisplay == null)
-                menuDisplay = AddingThings.CreateDummyNode("suitsTerminal AdvancedMenu", true, "");
+            {
+                if (DynamicBools.TryGetKeyword("suits", out TerminalKeyword suitsKW))
+                    menuDisplay = suitsKW.specialKeywordResult;
+                else
+                    Plugin.ERROR("Unable to get suits node for menuDisplay!!!");
+            }
 
             specialMenusActive = false;
             initKeySettings = false;
@@ -82,33 +90,37 @@ namespace suitsTerminal
             if (!AdvancedTerminalMenu.Value)
                 return;
 
-            CommandHandler.AddCommand(true, "suits", "advanced_suitsTerm", CommandHandler.AdvancedSuitsTerm, ConfigSetup.defaultListing, "other", "suitsTerminal advanced menu for changing suits");
+            menuDisplay = AddingThings.AddNodeManual("advanced_suitsTerm", "suits", CommandHandler.AdvancedSuitsTerm, true, 0, ConfigSetup.defaultListing);
+            if (LogicHandling.TryGetFromAllNodes("OtherCommands", out TerminalNode otherNode))
+            {
+                AddingThings.AddToExistingNodeText($"\n>SUITS\nsuitsTerminal advanced menu for changing & viewing suits", ref otherNode);
+            }
         }
 
         private static void CollectionOfKeys()
         {
-            CheckKeys(SConfig.MenuUp.Value, out Key upKey, out upString);
+            CheckKeys(MenuUp.Value, out Key upKey, out upString);
             BindKeys("previous_item", upKey, ref upString, "UpArrow", Key.UpArrow);
 
-            CheckKeys(SConfig.MenuDown.Value, out Key downKey, out downString);
+            CheckKeys(MenuDown.Value, out Key downKey, out downString);
             BindKeys("next_item", downKey, ref downString, "DownArrow", Key.DownArrow);
 
-            CheckKeys(SConfig.MenuLeft.Value, out Key leftKey, out leftString);
+            CheckKeys(MenuLeft.Value, out Key leftKey, out leftString);
             BindKeys("previous_page", leftKey, ref leftString, "LeftArrow", Key.LeftArrow);
 
-            CheckKeys(SConfig.MenuRight.Value, out Key rightKey, out rightString);
+            CheckKeys(MenuRight.Value, out Key rightKey, out rightString);
             BindKeys("next_page", rightKey, ref rightString, "RightArrow", Key.RightArrow);
 
-            CheckKeys(SConfig.LeaveMenu.Value, out Key leaveKey, out leaveString);
+            CheckKeys(LeaveMenu.Value, out Key leaveKey, out leaveString);
             BindKeys("leave_menu", leaveKey, ref leaveString, "Backspace", Key.Backspace);
 
-            CheckKeys(SConfig.SelectMenu.Value, out Key selectKey, out selectString);
+            CheckKeys(SelectMenu.Value, out Key selectKey, out selectString);
             BindKeys("menu_select", selectKey, ref selectString, "Enter", Key.Enter);
 
-            CheckKeys(SConfig.FavItemKey.Value, out Key favItemKey, out favItemKeyString);
+            CheckKeys(FavItemKey.Value, out Key favItemKey, out favItemKeyString);
             BindKeys("favorite_item", favItemKey, ref favItemKeyString, "F", Key.F);
 
-            CheckKeys(SConfig.FavMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
+            CheckKeys(FavMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
             BindKeys("favorites_menu", favMenuKey, ref favMenuKeyString, "F1", Key.F1);
 
             CheckKeys(HelpMenu.Value, out Key helpMenuKey, out helpMenuKeyString);
@@ -209,24 +221,9 @@ namespace suitsTerminal
 
         }
 
-        internal static void TerminalInputEnabled(bool state)
-        {
-            if (state == false)
-            {
-                Plugin.Terminal.screenText.interactable = false;
-                Plugin.Terminal.currentNode.maxCharactersToType = 0;
-            }
-            else
-            {
-                Plugin.Terminal.screenText.interactable = true;
-                Plugin.Terminal.currentNode.maxCharactersToType = 25;
-            }
-        }
-
         // Method to check if any key in the dictionary is pressed
         public static bool AnyKeyIsPressed()
         {
-            TerminalInputEnabled(false);
 
             foreach (var keyAction in keyActions)
             {
@@ -276,7 +273,10 @@ namespace suitsTerminal
 
         private static void HandleKeyAction(string value)
         {
-            Camera currentCam = GetCam();
+            Camera currentCam = null!;
+            
+            if (pipActive)
+                currentCam = GetCam();
 
             if (value == "previous_page" && !inHelpMenu)
             {
@@ -285,7 +285,6 @@ namespace suitsTerminal
 
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -294,7 +293,6 @@ namespace suitsTerminal
                 currentPage++;
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -305,7 +303,6 @@ namespace suitsTerminal
 
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -314,12 +311,12 @@ namespace suitsTerminal
                 activeSelection++;
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "leave_menu")
             {
+                inHelpMenu = false;
                 MenuActive(false);
                 return;
             }
@@ -333,7 +330,6 @@ namespace suitsTerminal
                 GetCurrentSuitNum();
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
                 return;
             }
             else if (value == "toggle_pip" && !inHelpMenu)
@@ -384,7 +380,6 @@ namespace suitsTerminal
                         GetCurrentSuitNum();
                         menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
                         Plugin.Terminal.LoadNewNode(menuDisplay);
-                        TerminalInputEnabled(false);
                         SaveToConfig(suitListing.FavList, out string configSave);
                         SaveFavorites(configSave);
                         return;
@@ -401,30 +396,32 @@ namespace suitsTerminal
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
             }
-            else if (value == "favorites_menu" && !inHelpMenu)
+            else if (value == "favorites_menu")
             {
                 if (!inFavsMenu && suitListing.FavList.Count < 1)
                     return;
+
+                if(inHelpMenu)
+                {
+                    inHelpMenu = false;
+                    TogglePiP(true);
+                }
 
                 inFavsMenu = !inFavsMenu;
                 currentPage = 1;
                 GetCurrentSuitNum();
                 menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
             }
             else if (value == "help_menu")
             {
                 inHelpMenu = !inHelpMenu;
-                currentPage = 1;
                 GetCurrentSuitNum();
                 menuDisplay.displayText = HelpMenuDisplay(inHelpMenu);
 
                 TogglePiP(!inHelpMenu);
                 Plugin.Terminal.LoadNewNode(menuDisplay);
-                TerminalInputEnabled(false);
             }
         }
 
@@ -460,31 +457,32 @@ namespace suitsTerminal
                 HandleKeyPress(keyBeingPressed);
         }
 
-        internal static void MenuActive(bool active)
+        internal static void MenuActive(bool active, bool enableInput = true)
         {
             if (active)
                 Plugin.Terminal.StartCoroutine(SuitsMenuStart());
             else
-                Plugin.Terminal.StartCoroutine(SuitsMenuExit());
+                Plugin.Terminal.StartCoroutine(SuitsMenuExit(enableInput));
 
         }
 
-        internal static IEnumerator SuitsMenuExit()
+        internal static IEnumerator SuitsMenuExit(bool enableInput)
         {
-            if (exitSpecialMenu)
-                yield break;
-
-            exitSpecialMenu = true;
-
             yield return new WaitForEndOfFrame();
             specialMenusActive = false;
             TogglePiP(false);
-            Plugin.Terminal.screenText.interactable = true;
+            
             yield return new WaitForEndOfFrame();
             Plugin.Terminal.LoadNewNode(Plugin.Terminal.terminalNodes.specialNodes[13]);
             yield return new WaitForEndOfFrame();
-            Plugin.Terminal.screenText.ActivateInputField();
-            exitSpecialMenu = false;
+            Plugin.Terminal.screenText.caretColor = CaretOriginal;
+
+            if (enableInput)
+            {
+                Plugin.Terminal.screenText.ActivateInputField();
+                Plugin.Terminal.screenText.interactable = true;
+            }
+
             yield break;
         }
 
@@ -494,19 +492,15 @@ namespace suitsTerminal
                 yield break;
 
             yield return new WaitForEndOfFrame();
+            Plugin.Terminal.screenText.caretColor = transparent;
             specialMenusActive = true;
-            inFavsMenu = false;
-            rotateStep = 0;
-            heightStep = 0;
-            zoomStep = 1;
             GetCurrentSuitNum();
             yield return new WaitForEndOfFrame();
-            TerminalInputEnabled(false);
+            Plugin.Terminal.screenText.DeactivateInputField();
+            Plugin.Terminal.screenText.interactable = false;
             yield return new WaitForEndOfFrame();
             TogglePiP(true);
             yield return new WaitForEndOfFrame();
-            currentPage = 1;
-            activeSelection = 0;
             PiPSetParent();
             yield break;
         }

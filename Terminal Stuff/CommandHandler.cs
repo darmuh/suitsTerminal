@@ -1,6 +1,5 @@
 ﻿using OpenLib.CoreMethods;
 using suitsTerminal.Suit_Stuff;
-using System;
 using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.AllSuits;
 using static suitsTerminal.StringStuff;
@@ -33,6 +32,13 @@ namespace suitsTerminal
         internal static string AdvancedSuitsTerm()
         {
             int page = 1;
+            AdvancedMenu.inFavsMenu = false;
+            PictureInPicture.rotateStep = 0;
+            PictureInPicture.heightStep = 0;
+            PictureInPicture.zoomStep = 1;
+            AdvancedMenu.currentPage = 1;
+            AdvancedMenu.activeSelection = 0;
+            AdvancedMenu.inHelpMenu = false;
             string displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref page);
             AdvancedMenu.MenuActive(true);
             return displayText;
@@ -81,19 +87,6 @@ namespace suitsTerminal
 
             displayText = $"Unable to set suit to match command: {cleanedText}";
             return displayText;
-        }
-
-        internal static void AddCommand(bool clearText, string keyWord, string nodeName, Func<string> methodName, MainListing nodeListing, string category = "", string description = "")
-        {
-            TerminalNode newNode = AddingThings.AddNodeManual(nodeName, keyWord, methodName, clearText, 0, nodeListing);
-            if (category.ToLower() == "other")
-            {
-                if (LogicHandling.TryGetFromAllNodes("OtherCommands", out TerminalNode otherNode))
-                {
-                    AddingThings.AddToExistingNodeText($"\n>{keyWord.ToUpper()}\n{description}", ref otherNode);
-                }
-            }
-
         }
 
         internal static void AddBasicCommand(string nodeName, string keyWord, string displayText, string category = "", string description = "")

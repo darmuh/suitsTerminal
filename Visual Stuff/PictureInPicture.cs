@@ -144,8 +144,11 @@ namespace suitsTerminal
 
             if (OpenLib.Plugin.instance.OpenBodyCamsMod && SConfig.UseOpenBodyCams.Value)
             {
-                Plugin.X("OpenBodyCams detected, using OBC for Mirror");
+                Plugin.X($"OpenBodyCams detected, using OBC for Mirror (state:{state})");
                 OpenLib.Compat.OpenBodyCamFuncs.OpenBodyCamsMirrorStatus(state, SConfig.ObcResolution.Value, 0.1f, false, ref CamStuff.ObcCameraHolder);
+
+                if (state == false)
+                    return;
 
                 Camera Cam = OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);
                 Cam.fieldOfView = 100f;
@@ -159,6 +162,9 @@ namespace suitsTerminal
 
                 CamStuff.CamInitMirror(CamStuff.MyCameraHolder, playerCam, 0.1f, false);
                 CamStuff.HomebrewCameraState(state, playerCam);
+
+                if (state == false)
+                    return;
 
                 playerCam.fieldOfView = 100f;
 

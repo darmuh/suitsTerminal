@@ -1,4 +1,5 @@
 ﻿using OpenLib.ConfigManager;
+using OpenLib.CoreMethods;
 using suitsTerminal.Suit_Stuff;
 using System.Collections.Generic;
 using System.Text;
@@ -32,13 +33,13 @@ namespace suitsTerminal
                     Plugin.WARNING($"Duplicate found. Updated SuitName: {suit.Name}");
                 }
                 suitNames.Add(suit.Name.ToLower());
-                CommandHandler.AddCommand(true, "wear " + suit.Name, suit.Name, CommandHandler.SuitPickCommand, ConfigSetup.defaultListing);
+                AddingThings.AddNodeManual(suit.Name, "wear " + suit.Name, CommandHandler.SuitPickCommand, true, 0, ConfigSetup.defaultListing);
                 Plugin.X($"Keyword for {suit.Name} added");
             }
             else if (suit.Suit.syncedSuitID.Value >= 0 && keywordsCreated)
             {
                 suit.Name = TerminalFriendlyString(suit.Name);
-                CommandHandler.AddCommand(true, "wear " + suit.Name, suit.Name, CommandHandler.SuitPickCommand, ConfigSetup.defaultListing);
+                AddingThings.AddNodeManual(suit.Name, "wear " + suit.Name, CommandHandler.SuitPickCommand, true, 0, ConfigSetup.defaultListing);
                 Plugin.X($"Keyword for {suit.Name} updated");
 
             }
@@ -173,7 +174,12 @@ namespace suitsTerminal
             if (!SConfig.RandomSuitCommand.Value)
                 return;
 
-            CommandHandler.AddCommand(true, "randomsuit", "random suit command", CommandHandler.RandomSuit, ConfigSetup.defaultListing, "other", "Equip a random suit");
+            AddingThings.AddNodeManual("suitsTerminal random", "randomsuit", CommandHandler.RandomSuit, true, 0, ConfigSetup.defaultListing);
+
+            if (LogicHandling.TryGetFromAllNodes("OtherCommands", out TerminalNode otherNode))
+            {
+                AddingThings.AddToExistingNodeText($"\n>RANDOMSUIT\nsuitsTerminal equip a random suit", ref otherNode);
+            }
 
         }
     }

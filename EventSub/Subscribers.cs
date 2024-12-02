@@ -13,7 +13,7 @@ namespace suitsTerminal.EventSub
         {
             EventManager.TerminalAwake.AddListener(OnTerminalAwake);
             EventManager.TerminalQuit.AddListener(OnTerminalQuit);
-            EventManager.TerminalDelayStart.AddListener(SetDefaultSuit);
+            EventManager.TerminalDelayStart.AddListener(OnTerminalDelayStart);
             EventManager.TerminalLoadIfAffordable.AddListener(TerminalGeneral.OnLoadAffordable);
             EventManager.GameNetworkManagerStart.AddListener(OnGameStart);
             EventManager.PlayerSpawn.AddListener(OnPlayerSpawn);
@@ -22,7 +22,7 @@ namespace suitsTerminal.EventSub
             EventManager.TerminalKeyPressed.AddListener(AdvancedMenu.OnTerminalKeyPress);
         }
 
-        internal static void SetDefaultSuit()
+        internal static void OnTerminalDelayStart()
         {
             DefaultSuit();
         }
@@ -30,7 +30,7 @@ namespace suitsTerminal.EventSub
         internal static void OnTerminalQuit()
         {
             if(SConfig.AdvancedTerminalMenu.Value && AdvancedMenu.specialMenusActive)
-                AdvancedMenu.MenuActive(false);
+                AdvancedMenu.MenuActive(false, false);
         }
 
         internal static void OnTerminalAwake(Terminal instance)
@@ -104,6 +104,7 @@ namespace suitsTerminal.EventSub
 
         internal static void OnPlayerSpawn()
         {
+            AdvancedMenu.CaretOriginal = Plugin.Terminal.screenText.caretColor;
             if (!rackSituated)
             {
                 Plugin.X("player loaded & rackSituated is false, fixing suits rack");

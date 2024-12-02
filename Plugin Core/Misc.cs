@@ -33,7 +33,7 @@ namespace suitsTerminal
                 message.Append($"========= AdvancedsuitsMenu Help Page  =========\r\n");
                 message.Append("\r\n\r\n");
 
-                message.Append($"Highlight Next Item: [{downString}]\r\nHighlight Last Item: [{upString}]\r\nFavorite Item: [{favItemKeyString}]\r\nShow Favorites Menu: [{favMenuKeyString}]\r\n");
+                message.Append($"Highlight Next Item: [{downString}]\r\nHighlight Last Item: [{upString}]\r\nFavorite Item: [{favItemKeyString}]\r\nToggle Favorites Menu: [{favMenuKeyString}]\r\n");
                 if (SConfig.EnablePiPCamera.Value)
                 {
                     message.Append($"Toggle Camera Preview: [{togglePiPstring}]\r\nRotate Camera: [{pipRotateString}]\r\nChange Camera Height: [{pipHeightString}]\r\nChange Camera Zoom: [{pipZoomString}]\r\n");

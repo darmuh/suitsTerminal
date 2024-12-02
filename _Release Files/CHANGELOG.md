@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.5.7]
+ - Fixed an error related to using the help menu that would throw errors related to the PictureInPicture camera.
+	- You can now toggle the favorites menus from the help menu.
+ - Fixed issue that would cause additional text to leak into other pages from inputs in the advancedsuitsmenu
+	- This also fixes the suits command sometimes not working (there was actually an extra empty space character in the input section for some reason lol)
+ - Removed some old redundant code from when I initially moved this mod to Openlib
+ - Added logic to make the terminal text caret (the blinking line) transparent when in the advancedsuitsmenu and return to the color it was when you first spawned.
+	- If you have mods that change this color (like darmuhsTerminalStuff) it will not update to the latest customization refresh but only what it was when you first spawned.
+		- In regards to darmuhsTerminalStuff, i'll add some compatibility for this on terminalstuff's side soon.
+
 ## [1.5.6]
  - Switched to new input handling system for advancedsuitsmenu using OpenLib's new TerminalKeyPressed Event
 	- Input should now feel one to one with each individual key press.

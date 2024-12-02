@@ -1,6 +1,5 @@
 ﻿using BepInEx.Configuration;
-using System.Collections.Generic;
-using System.Reflection;
+using static OpenLib.ConfigManager.ConfigSetup;
 
 namespace suitsTerminal
 {
@@ -56,61 +55,55 @@ namespace suitsTerminal
             Plugin.Log.LogInfo("Reading configuration settings");
 
             //General Configs
-            AdvancedTerminalMenu = MakeBool("General", "AdvancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
-            ExtensiveLogging = MakeBool("General", "ExtensiveLogging", false, "Enable or Disable extensive logging for this mod.");
-            EnforcePaidSuits = MakeBool("General", "EnforcePaidSuits", true, "Enable or Disable enforcing paid suits being locked until they are paid for & unlocked.");
-            RandomSuitCommand = MakeBool("General", "RandomSuitCommand", false, "Enable/Disable the randomsuit terminal command.");
-            ChatCommands = MakeBool("General", "ChatCommands", false, "Enable/Disable suits commands via chat (!suits/!wear).");
-            TerminalCommands = MakeBool("General", "TerminalCommands", true, "Enable/Disable the base suits commands via terminal (suits, wear).");
-            DontRemove = MakeBool("General", "DontRemove", false, "Enable this to stop this mod from removing suits from the rack and make it compatible with other mods like TooManySuits.");
-            DefaultSuit = MakeString("General", "DefaultSuit", "", "Automatically equip this suit when first loading in (in-place of the default orange\nThis configuration option is disabled if SuitSaver is present.");
-            DontAddToTerminal = MakeString("General", "DontAddToTerminal", "", "Comma-separated list of suits you do NOT want added to the terminal in any situation. Leave blank to disable this list.");
-
+            AdvancedTerminalMenu = MakeBool(Plugin.instance.Config, "General", "AdvancedTerminalMenu", true, "Enable this to utilize the advanced menu system and keybinds below");
+            ExtensiveLogging = MakeBool(Plugin.instance.Config, "General", "ExtensiveLogging", false, "Enable or Disable extensive logging for this mod.");
+            EnforcePaidSuits = MakeBool(Plugin.instance.Config, "General", "EnforcePaidSuits", true, "Enable or Disable enforcing paid suits being locked until they are paid for & unlocked.");
+            RandomSuitCommand = MakeBool(Plugin.instance.Config, "General", "RandomSuitCommand", false, "Enable/Disable the randomsuit terminal command.");
+            ChatCommands = MakeBool(Plugin.instance.Config, "General", "ChatCommands", false, "Enable/Disable suits commands via chat (!suits/!wear).");
+            TerminalCommands = MakeBool(Plugin.instance.Config, "General", "TerminalCommands", true, "Enable/Disable the base suits commands via terminal (suits, wear).");
+            DontRemove = MakeBool(Plugin.instance.Config, "General", "DontRemove", false, "Enable this to stop this mod from removing suits from the rack and make it compatible with other mods like TooManySuits.");
+            DefaultSuit = MakeString(Plugin.instance.Config, "General", "DefaultSuit", "", "Automatically equip this suit when first loading in (in-place of the default orange\nThis configuration option is disabled if SuitSaver is present.");
+            DontAddToTerminal = MakeString(Plugin.instance.Config, "General", "DontAddToTerminal", "", "Comma-separated list of suits you do NOT want added to the terminal in any situation. Leave blank to disable this list.");
 
             //rack config
-            SuitsOnRack = MakeClampedInt("Rack Settings", "SuitsOnRack", 13, "Number of suits to keep on the rack. (Up to 13)", 0, 13);
-            SuitsOnRackOnly = MakeString("Rack Settings", "SuitsOnRackOnly", "", "Comma-separated list of suits to display on the rack by name. Leave blank to disable this list.\nNOTE: This will make it so ONLY suits listed here will be added to the rack.\nIf no suits match this configuration item, no suits will be added to the rack.");
-            DontAddToRack = MakeString("Rack Settings", "DontAddToRack", "", "Comma-separated list of suits you do NOT want added to the rack in any situation. Leave blank to disable this list.");
-            HideBoots = MakeBool("Rack Settings", "HideBoots", false, "Enable this to hide the boots by the rack.");
-            HideRack = MakeBool("Rack Settings", "HideRack", false, "Enable this to hide the rack, (rack will not be hidden if DontRemove is enabled, SuitsOnRack integer will be ignored if rack hidden).");
-            SuitsSortingStyle = MakeClampedString("Rack Settings", "SuitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
+            SuitsOnRack = MakeClampedInt(Plugin.instance.Config, "Rack Settings", "SuitsOnRack", 13, "Number of suits to keep on the rack. (Up to 13)", 0, 13);
+            SuitsOnRackOnly = MakeString(Plugin.instance.Config, "Rack Settings", "SuitsOnRackOnly", "", "Comma-separated list of suits to display on the rack by name. Leave blank to disable this list.\nNOTE: This will make it so ONLY suits listed here will be added to the rack.\nIf no suits match this configuration item, no suits will be added to the rack.");
+            DontAddToRack = MakeString(Plugin.instance.Config, "Rack Settings", "DontAddToRack", "", "Comma-separated list of suits you do NOT want added to the rack in any situation. Leave blank to disable this list.");
+            HideBoots = MakeBool(Plugin.instance.Config, "Rack Settings", "HideBoots", false, "Enable this to hide the boots by the rack.");
+            HideRack = MakeBool(Plugin.instance.Config, "Rack Settings", "HideRack", false, "Enable this to hide the rack, (rack will not be hidden if DontRemove is enabled, SuitsOnRack integer will be ignored if rack hidden).");
+            SuitsSortingStyle = MakeClampedString(Plugin.instance.Config, "Rack Settings", "SuitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
 
             //Menu Binds
-            FavoritesMenuList = MakeString("AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
-            PersonalizedFavorites = MakeBool("AdvancedTerminalMenu", "PersonalizedFavorites", false, "Enable this to ignore the FavoritesMenuList configuration item in favor of a personal file saving your favorites list.\nUse this if you dont want your favorites list to be shared with other players in modpacks/profile codes.");
-            EnablePiPCamera = MakeBool("AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");
-            MenuLeft = MakeString("AdvancedTerminalMenu", "MenuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
-            MenuRight = MakeString("AdvancedTerminalMenu", "MenuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
-            MenuUp = MakeString("AdvancedTerminalMenu", "MenuUp", "UpArrow", "Set key to press to go to previous item on page in advanced menu system");
-            MenuDown = MakeString("AdvancedTerminalMenu", "MenuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
-            LeaveMenu = MakeString("AdvancedTerminalMenu", "LeaveMenu", "Backspace", "Set key to press to leave advanced menu system");
-            SelectMenu = MakeString("AdvancedTerminalMenu", "SelectMenu", "Enter", "Set key to press to select an item in advanced menu system");
-            HelpMenu = MakeString("AdvancedTerminalMenu", "HelpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
-            FavItemKey = MakeString("AdvancedTerminalMenu", "FavItemKey", "F", "Set key to press to set an item as a favorite in advanced menu system");
-            FavMenuKey = MakeString("AdvancedTerminalMenu", "FavMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
-            TogglePiP = MakeString("AdvancedTerminalMenu", "TogglePiP", "F12", "Set key to press to toggle PiP (mirror cam) on/off in advanced menu system");
-            TogglePiPZoom = MakeString("AdvancedTerminalMenu", "TogglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
-            TogglePiPRotation = MakeString("AdvancedTerminalMenu", "TogglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
-            TogglePiPHeight = MakeString("AdvancedTerminalMenu", "TogglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
+            FavoritesMenuList = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
+            PersonalizedFavorites = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "PersonalizedFavorites", false, "Enable this to ignore the FavoritesMenuList configuration item in favor of a personal file saving your favorites list.\nUse this if you dont want your favorites list to be shared with other players in modpacks/profile codes.");
+            EnablePiPCamera = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");
+            MenuLeft = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuLeft", "LeftArrow", "Set key to press to go to previous page in advanced menu system");
+            MenuRight = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuRight", "RightArrow", "Set key to press to go to next page in advanced menu system");
+            MenuUp = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuUp", "UpArrow", "Set key to press to go to previous item on page in advanced menu system");
+            MenuDown = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
+            LeaveMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "LeaveMenu", "Backspace", "Set key to press to leave advanced menu system");
+            SelectMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "SelectMenu", "Enter", "Set key to press to select an item in advanced menu system");
+            HelpMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "HelpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
+            FavItemKey = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavItemKey", "F", "Set key to press to set an item as a favorite in advanced menu system");
+            FavMenuKey = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
+            TogglePiP = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiP", "F12", "Set key to press to toggle PiP (mirror cam) on/off in advanced menu system");
+            TogglePiPZoom = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
+            TogglePiPRotation = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
+            TogglePiPHeight = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
 
             //Hints
-            ChatHints = MakeBool("Hints", "ChatHints", false, "Determines whether chat hints are displayed at load in.");
-            BannerHints = MakeBool("Hints", "BannerHints", true, "Determines whether banner hints are displayed at load in.");
+            ChatHints = MakeBool(Plugin.instance.Config, "Hints", "ChatHints", false, "Determines whether chat hints are displayed at load in.");
+            BannerHints = MakeBool(Plugin.instance.Config, "Hints", "BannerHints", true, "Determines whether banner hints are displayed at load in.");
 
             //OpenBodyCams
-            UseOpenBodyCams = MakeBool("OpenBodyCams", "UseOpenBodyCams", true, "Disable this to remove the banner hints displayed at load in.");
-            ObcResolution = MakeString("OpenBodyCams", "ObcResolution", "1000; 700", "Set the resolution of the Mirror Camera created with OpenBodyCams");
+            UseOpenBodyCams = MakeBool(Plugin.instance.Config, "OpenBodyCams", "UseOpenBodyCams", true, "Disable this to remove the banner hints displayed at load in.");
+            ObcResolution = MakeString(Plugin.instance.Config, "OpenBodyCams", "ObcResolution", "1000; 700", "Set the resolution of the Mirror Camera created with OpenBodyCams");
 
             //Clamped Floats
             //MenuKeyPressDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuKeyPressDelay", 0.15f, "Regular delay when checking for key presses in the AdvancedTerminalMenu. (This delay will be added ontop of MenuPostSelectDelay)", 0.05f, 1f);
             //MenuPostSelectDelay = MakeClampedFloat("AdvancedTerminalMenu", "MenuPostSelectDelay", 0.1f, "Delay used after a key press is registered in the AdvancedTerminalMenu.", 0.05f, 1f);
 
-            //creds to Kittenji
-            PropertyInfo orphanedEntriesProp = Plugin.instance.Config.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(Plugin.instance.Config, null);
-
-            orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
+            RemoveOrphanedEntries(Plugin.instance.Config);
             Plugin.instance.Config.Save(); // Save the config file
             Plugin.instance.Config.SettingChanged += OnSettingChanged;
         }
@@ -129,38 +122,6 @@ namespace suitsTerminal
             {
                 Misc.resetSuitPlacementOnRestart = true;
             }
-        }
-
-        private static ConfigEntry<bool> MakeBool(string section, string configItemName, bool defaultValue, string configDescription)
-        {
-            return Plugin.instance.Config.Bind<bool>(section, configItemName, defaultValue, configDescription);
-        }
-
-        private static ConfigEntry<int> MakeInt(string section, string configItemName, int defaultValue, string configDescription)
-        {
-            return Plugin.instance.Config.Bind<int>(section, configItemName, defaultValue, configDescription);
-        }
-
-        private static ConfigEntry<string> MakeClampedString(string section, string configItemName, string defaultValue, string configDescription, AcceptableValueList<string> acceptedValues)
-        {
-            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, acceptedValues));
-        }
-
-        private static ConfigEntry<int> MakeClampedInt(string section, string configItemName, int defaultValue, string configDescription, int minValue, int maxValue)
-        {
-            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<int>(minValue, maxValue)));
-        }
-
-        private static ConfigEntry<float> MakeClampedFloat(string section, string configItemName, float defaultValue, string configDescription, float minValue, float maxValue)
-        {
-            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, new ConfigDescription(configDescription, new AcceptableValueRange<float>(minValue, maxValue)));
-        }
-
-        private static ConfigEntry<string> MakeString(string section, string configItemName, string defaultValue, string configDescription)
-        {
-            //monitorMessages = Plugin.instance.Config.Bind("Ship Stuff", "monitorMessages", "BEHIND YOU, HAVING FUN?, TAG YOU'RE IT, DANCE FOR ME, IM HIDING, #######, ERROR, DEATH, NO MORE SCRAP", "Comma-separated list of messages the ghostGirl can display on the ship monitors when sending a code.");
-
-            return Plugin.instance.Config.Bind(section, configItemName, defaultValue, configDescription);
         }
     }
 }

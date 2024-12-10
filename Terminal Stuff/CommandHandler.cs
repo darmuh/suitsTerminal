@@ -39,6 +39,7 @@ namespace suitsTerminal
             AdvancedMenu.currentPage = 1;
             AdvancedMenu.activeSelection = 0;
             AdvancedMenu.inHelpMenu = false;
+            AdvancedMenu.GetCurrentSuitID();
             string displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref page);
             AdvancedMenu.MenuActive(true);
             return displayText;

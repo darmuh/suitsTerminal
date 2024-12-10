@@ -117,11 +117,6 @@ namespace suitsTerminal
             
             if(settingChangedArg.ChangedSetting == PersonalizedFavorites)
                 AllSuits.InitFavoritesListing(true);
-
-            if(settingChangedArg.ChangedSetting.Definition.Section == "Rack Settings")
-            {
-                Misc.resetSuitPlacementOnRestart = true;
-            }
         }
     }
 }

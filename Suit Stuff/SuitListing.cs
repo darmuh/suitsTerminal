@@ -15,6 +15,14 @@ namespace suitsTerminal.Suit_Stuff
         internal List<string> NameList = [];
         internal List<string> FavList = [];
 
+        internal void ClearAll()
+        {
+            this.NameList.Clear();
+            this.FavList.Clear();
+            this.CurrentMenu = 0;
+            this.SuitsList.ForEach(x => x.Reset());
+        }
+
         internal bool Contains(int query, out SuitAttributes thisSuit)
         {
             foreach (SuitAttributes suit in SuitsList)
@@ -85,6 +93,16 @@ namespace suitsTerminal.Suit_Stuff
         internal int MainMenuIndex = -1;
         internal int FavIndex = -1;
         internal bool currentSuit = false;
+
+        internal void Reset()
+        {
+            this.HideFromTerminal = false;
+            this.IsOnRack = false;
+            this.currentSuit = false;
+            this.FavIndex = -1;
+            this.IsFav = false;
+            this.MainMenuIndex = -1;
+        }
 
         internal SuitAttributes(UnlockableSuit item, List<UnlockableItem> UnlockableItems, ref Dictionary<int, string> suitNameToID)
         {

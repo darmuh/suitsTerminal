@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.5.8]
+ - Fixed issue with advanced suits menu not working since switching to the new input handling system when darmuhsTerminalStuff was not present.
+ - Added a check for TooManySuits. If present, this mod will not adjust the suits on the rack in anyway (even if DontRemove is set to false).
+ - Fixed issue where suits that were supposed to be on the rack were out of position in various ways.
+ - Fixed issue where, after being fired, paid suits would break the advancedsuitsmenu until a suit had been paid for.
+ - Fixed issue where sometimes the ``[EQUIPPED]`` tag would not show for the suit you're currently wearing when first opening the suits menu.
+
 ## [1.5.7]
  - Fixed an error related to using the help menu that would throw errors related to the PictureInPicture camera.
 	- You can now toggle the favorites menus from the help menu.

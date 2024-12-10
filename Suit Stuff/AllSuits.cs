@@ -20,7 +20,7 @@ namespace suitsTerminal
         internal static SuitListing suitListing = new();
         internal static List<string> favsList = [];
 
-        private static bool AddSuitToList(UnlockableSuit suit)
+        internal static bool AddSuitToList(UnlockableSuit suit)
         {
 
             if (!SConfig.EnforcePaidSuits.Value)
@@ -35,6 +35,15 @@ namespace suitsTerminal
                 Plugin.X($"hasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
                 return false;
             }
+
+            if (suit.suitRenderer.gameObject == null)
+            {
+                Plugin.WARNING($"Suit [{UnlockableItems[suit.syncedSuitID.Value].unlockableName}] game object detected as null, not adding to listings.");
+                Plugin.X($"hasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
+                return false;
+            }
+
+            Plugin.X($"{UnlockableItems[suit.syncedSuitID.Value].unlockableName}:\nhasBeenUnlockedByPlayer: {UnlockableItems[suit.syncedSuitID.Value].hasBeenUnlockedByPlayer} \nalreadyUnlocked: {UnlockableItems[suit.syncedSuitID.Value].alreadyUnlocked}");
 
             return true;
         }
@@ -97,15 +106,6 @@ namespace suitsTerminal
         internal static void InitSuitsListing()
         {
             Plugin.X("InitSuitsListing");
-            // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
-            suitListing.RawSuitsList.Clear();
-            suitListing.RawSuitsList = [.. Resources.FindObjectsOfTypeAll<UnlockableSuit>()];
-            suitNameToID.Clear();
-            suitListing.NameList.Clear();
-
-
-            UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
-            RemoveBadSuitIDs();
             FixRack();
             OldCommands.MakeRandomSuitCommand();
         }
@@ -126,28 +126,32 @@ namespace suitsTerminal
             if (rackSituated)
                 return;
 
-            if (SConfig.HideBoots.Value)
-            {
-                GameObject boots = GetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004");
+            if (SConfig.HideBoots.Value && TryGetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004", out GameObject boots))
                 GameObject.Destroy(boots);
-            }
 
             if (SConfig.DontRemove.Value)
                 return;
 
-            if (SConfig.HideRack.Value)
-            {
-                GameObject clothingRack = GetGameObject("Environment/HangarShip/NurbsPath.002");
+            if (SConfig.HideRack.Value && TryGetGameObject("Environment/HangarShip/NurbsPath.002", out GameObject clothingRack))
                 GameObject.Destroy(clothingRack);
-            }
 
         }
 
-        private static void FixRack()
+        internal static void FixRack()
         {
+            // Use Resources.FindObjectsOfTypeAll to find all instances of UnlockableSuit
+            suitListing.RawSuitsList.Clear();
+            suitListing.RawSuitsList = [.. UnityEngine.Object.FindObjectsByType<UnlockableSuit>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)];
+            suitNameToID.Clear();
+            suitListing.NameList.Clear();
+
+            UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
+            RemoveBadSuitIDs();
+
             Plugin.X($"Raw Suit Count: {suitListing.RawSuitsList.Count}");
             Plugin.X($"Unlockables Count: {UnlockableItems.Count}");
             weirdSuitNum = 0;
+            suitsOnRack = 0;
 
             HideBootsAndRack();
 
@@ -181,8 +185,11 @@ namespace suitsTerminal
 
                 OldCommands.CreateOldWearCommands(suit, ref names);
 
-                if (!SConfig.DontRemove.Value)
+                if (!SConfig.DontRemove.Value && !Plugin.TooManySuits)
                 {
+                    if (suit.IsOnRack && rackSituated)
+                        continue;
+
                     if (ShouldShowSuit(suit))
                     {
                         suit.IsOnRack = true;

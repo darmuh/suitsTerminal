@@ -31,9 +31,6 @@ namespace suitsTerminal
             if (suit.Name.Length > 1 && suitsOnRackOnly.Count > 0 && !suitsOnRackOnly.Any(s => s.ToLower() == suit.Name.ToLower()))
                 return false;
 
-            if (rackSituated && suit.IsOnRack)
-                return true;
-
             if (suitsOnRack < SConfig.SuitsOnRack.Value && !rackSituated)
                 return true;
 

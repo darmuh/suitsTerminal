@@ -1,10 +1,25 @@
 ﻿using System.Collections;
 using UnityEngine;
+using static suitsTerminal.AllSuits;
+using static suitsTerminal.Misc;
+using static suitsTerminal.EventSub.Subscribers;
 
 namespace suitsTerminal
 {
     internal class Enums
     {
+        internal static IEnumerator DelayFixRack()
+        {
+            yield return new WaitForSeconds(2);
+            suitsOnRack = 0;
+            rackSituated = false;
+            AdvancedMenu.specialMenusActive = false;
+            ResetSuitPlacementVars(true);
+            Plugin.X("ShipResetStuff!");
+            FixRack();
+            DefaultSuit();
+        }
+
         internal static IEnumerator ChatHints()
         {
             if (!SConfig.ChatHints.Value)

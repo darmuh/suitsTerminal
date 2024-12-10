@@ -16,11 +16,11 @@ namespace suitsTerminal
         internal static int weirdSuitNum = 0;
         internal static bool hasLaunched = false;
         internal static bool hintOnce = false;
-        internal static bool resetSuitPlacementOnRestart = false;
 
-        internal static GameObject GetGameObject(string location)
+        internal static bool TryGetGameObject(string location, out GameObject gameobj)
         {
-            return GameObject.Find(location);
+            gameobj = GameObject.Find(location);
+            return gameobj != null;
         }
 
         internal static string HelpMenuDisplay(bool inHelpMenu)

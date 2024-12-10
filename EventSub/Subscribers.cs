@@ -13,13 +13,17 @@ namespace suitsTerminal.EventSub
         {
             EventManager.TerminalAwake.AddListener(OnTerminalAwake);
             EventManager.TerminalQuit.AddListener(OnTerminalQuit);
+            EventManager.TerminalDisable.AddListener(OnTerminalDisable);
             EventManager.TerminalDelayStart.AddListener(OnTerminalDelayStart);
             EventManager.TerminalLoadIfAffordable.AddListener(TerminalGeneral.OnLoadAffordable);
             EventManager.GameNetworkManagerStart.AddListener(OnGameStart);
             EventManager.PlayerSpawn.AddListener(OnPlayerSpawn);
+            EventManager.ShipReset.AddListener(OnShipReset);
 
             //Unique
+            OpenLib.TerminalUpdatePatch.usePatch = true; //needed for below event listener
             EventManager.TerminalKeyPressed.AddListener(AdvancedMenu.OnTerminalKeyPress);
+            
         }
 
         internal static void OnTerminalDelayStart()
@@ -37,31 +41,41 @@ namespace suitsTerminal.EventSub
         {
             Plugin.Terminal = instance;
             Plugin.X($"Setting suitsTerminal.Terminal");
-            ResetVars();
         }
-        private static void ResetVars()
+
+        internal static void OnShipReset()
         {
-            hasLaunched = false;
+            StartOfRound.Instance.StartCoroutine(Enums.DelayFixRack());
+        }
+
+        internal static void OnTerminalDisable()
+        {
             suitsOnRack = 0;
+            hasLaunched = false;
             hintOnce = false;
             rackSituated = false;
             PictureInPicture.PiPCreated = false;
             AdvancedMenu.specialMenusActive = false;
             Plugin.X("set initial variables");
-
-            if(resetSuitPlacementOnRestart)
-            {
-                ResetSuitPlacementVars(); //rack settings config change
-            }
+            ResetSuitPlacementVars(true);
         }
 
-        private static void ResetSuitPlacementVars()
+        internal static void ResetSuitPlacementVars(bool unlocksReset)
         {
             if (suitListing.SuitsList.Count == 0)
                 return;
 
+            if (unlocksReset)
+            {
+                suitListing.ClearAll();
+                Plugin.X("suitlisting cleared!");
+                return;
+            }
+                
+
             suitListing.SuitsList.ForEach(s => s.IsOnRack = false);
-            resetSuitPlacementOnRestart = false;
+
+            rackSituated = false;
         }
 
         internal static void OnGameStart()
@@ -72,17 +86,20 @@ namespace suitsTerminal.EventSub
 
         private static void CompatibilityCheck()
         {
+            Plugin.X("Compatibility Check!");
+
             if (SoftCompatibility("darmuh.TerminalStuff", ref Plugin.TerminalStuff))
-            {
                 Plugin.X("darmuhsTerminalStuff compatibility enabled!");
-            }
+
             if (SoftCompatibility("Hexnet.lethalcompany.suitsaver", ref Plugin.SuitSaver))
-            {
                 Plugin.X("Suitsaver compatibility enabled!\nDefaultSuit will not be loaded");
-            }
+
+            if (SoftCompatibility("TooManySuits", ref Plugin.TooManySuits))
+                Plugin.X("TooManySuits Compatibility enabled!\nRack will be left untouched!");
+                
         }
 
-        private static void DefaultSuit()
+        internal static void DefaultSuit()
         {
             if (SConfig.DefaultSuit.Value.Length < 1 || SConfig.DefaultSuit.Value.ToLower() == "default")
                 return;

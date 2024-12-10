@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using suitsTerminal.EventSub;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,8 +18,9 @@ namespace suitsTerminal
 
             if (hasLaunched)
             {
-                Plugin.X("suits rack func called, calling InitSuitsTerm func");
-                InitThisPlugin.InitSuitsTerm();
+                Plugin.X("suits rack func called, calling FixRack func");
+                Subscribers.ResetSuitPlacementVars(false);
+                AllSuits.FixRack();
             }
 
         }

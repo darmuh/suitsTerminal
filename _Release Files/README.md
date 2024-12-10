@@ -7,33 +7,33 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 
 ### advancedTerminalMenu:
 
- - A singular 'suits' command will be generated.
+ - A singular ``suits`` command will be generated.
 	- duplicate suit names will be listed with their unique suitID.
 
- - The 'suits' command will bring up an interactive menu that can be navigated by arrow keys. (with advancedTerminalMenu enabled)
+ - The ``suits`` command will bring up an interactive menu that can be navigated by arrow keys. (with advancedTerminalMenu enabled)
 	- Please note that any other mod that uses the arrow keys for functionality may interfere with this menu.
 	- The specialMenusActive bool in this mod is public and accessible.
 	- The public bool can be used by other mods to indicate not to listen for shortcut during this specialmenu.
 
  - Favoriting system and separate favorites menu is now available.
-	- Simply press the [favItemKey] to add the currently selected suit to your favorite suits.
-	- To see only your favorited suits, press the [favMenuKey] to toggle the menu to the favorites list.
-	- Favorites will be saved to the [favoritesMenuList] configuration item.
-	- Default keybinds are [favItemKey = F] and [favMenuKey = F1].
-	- [NEW IN 1.5.4] Enable [PersonalizedFavorites] to have persisting personal favorites across all mod profiles. 
+	- Simply press the ``favItemKey`` to add the currently selected suit to your favorite suits.
+	- To see only your favorited suits, press the ``favMenuKey`` to toggle the menu to the favorites list.
+	- Favorites will be saved to the ``favoritesMenuList`` configuration item.
+	- Default keybinds are ``favItemKey = F`` and ``favMenuKey = F1``
+	- Enable ``PersonalizedFavorites`` to have persisting personal favorites across all mod profiles. 
 		- This information is personal to you and will not be shared via profile code or in a modpack
 
- - Add only specific suits to the rack's 13 available spots.
-	- Use [SuitsOnRackOnly] to specify a specific list of suit names to show on the rack.
-	- Use [DontAddToRack] to specify a list of suit names that should NOT show on the rack.
+ - Add only specific suits to the rack's ``13`` available spots.
+	- Use ``SuitsOnRackOnly`` to specify a specific list of suit names to show on the rack.
+	- Use ``DontAddToRack`` to specify a list of suit names that should NOT show on the rack.
 	- Leave both lists blank if you dont want to specify specific suit names.
 	- Favorite some suits and look at favoritesMenuList for examples of suit names.
-	- These settings do not override any of the following config options: [suitsOnRack], [dontRemove], [hideRack]
+	- These settings do not override any of the following config options: ``suitsOnRack``, ``dontRemove``, ``hideRack``
 
- - Specify suits that should NOT be available in the terminal via [DontAddToTerminal]
+ - Specify suits that should NOT be available in the terminal via ``DontAddToTerminal``
 	- Leave blank if you would like all suits added to the terminal
 
- - Set a new default suit with the [DefaultSuit] configuration item.
+ - Set a new default suit with the ``DefaultSuit`` configuration item.
 	- This feature will automatically disable itself if SuitSaver is present to avoid conflicts.
 
  - Controls for the advancedTerminalMenu are completely configurable, any key except for tab is acceptable.
@@ -50,6 +50,9 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 		- togglePiPHeight: This key will allow you to change the height of the mirror camera to see different parts of the suit you've equipped.
 		- togglePiPRotation: This key will allow you to cycle between 4 different angles around the player so you can see each side of yourself and the back.
  
+ - Completely compatibile with TooManySuits or any other mod that adjusts the suit rack by setting ``dontRemove`` to true.
+	- When TooManySuits is detected, the rack will never be touched. (as of 1.5.8+)
+
  - OpenBodyCams Support has been added for the Mirror Camera
 	- The camera created with OpenBodyCams will be used in place of the base camera that has been used in this mod.
 	- All of the above binds will continue to apply to this camera.
@@ -68,16 +71,16 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 
  - These commands utilize some of the advanceTerminalMenu's handling, while still requiring commands to be run like the legacy terminal commands.
 
- - Type !suits to see the first page, and !suits (page number) for each page after that.
+ - Type ``!suits`` to see the first page, and ``!suits (page number)`` for each page after that.
 
- - Type !wear and then the number associated with the suit name to equip it.
-	- So if you see '!wear 3' (Shrek) you will type !wear 3 in chat to equip it.
+ - Type ``!wear`` and then the number associated with the suit name to equip it.
+	- So if you see ``!wear 3 (Shrek)`` you will type ``!wear 3`` in chat to equip it.
 
 ### Legacy Terminal Commands:
 
  - A command will be generated for every page of suits (6 suits per terminal page)
 
- - 'suits' command is always the first page, each page after is 'suits (pagenumber)'
+ - ``suits`` command is always the first page, each page after is ``suits (pagenumber)``
 
  - Generates a command for every suit
 
@@ -85,7 +88,7 @@ You can also leave up to 13 suits (configurable) to remain on the rack via this 
 
  - you can see each suit name in the suits page commands
 
- - use command 'randomsuit' to wear a random suit from the list.
+ - use command ``randomsuit`` to wear a random suit from the list.
 
 FYI - This mod is more than capabale of adding more than the default maximum 100 suits from More_Suits. Feel free to change that configuration option and try to find the max possible suits you can add.
 

@@ -11,11 +11,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>False</Optimize>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>portable</DebugType>
+    <DebugType>full</DebugType>
+    <IsPublishable>False</IsPublishable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <DebugType>portable</DebugType>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>_Release Files\</OutputPath>
+	<DefineConstants>
+	</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<DebugSymbols>true</DebugSymbols>
+	<LangVersion>latest</LangVersion>
+	<IsPublishable>False</IsPublishable>
   </PropertyGroup>
   <PropertyGroup>
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +35,8 @@
     <Nullable>enable</Nullable>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <BaseOutputPath>D:\games\modding\LC\suitsTerminal\suitsTerminal\_Release Files</BaseOutputPath>
+    <Title>$(AssemblyName)</Title>
+    <PackageOutputPath>_Release Files\</PackageOutputPath>
   </PropertyGroup>
 <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />

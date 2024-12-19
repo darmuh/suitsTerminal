@@ -52,6 +52,9 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="darmuhsTerminalStuff" Publicize="true">
+      <HintPath>..\..\darmuhsTerminalStuff\darmuhsTerminalStuff\DarmuhsTerminalCommands\_Package\darmuhsTerminalStuff.dll</HintPath>
+    </Reference>
     <Reference Include="Facepunch.Steamworks.Win64, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>

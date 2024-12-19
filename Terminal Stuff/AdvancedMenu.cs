@@ -283,16 +283,14 @@ namespace suitsTerminal
                 if (currentPage > 0)
                     currentPage--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "next_page" && !inHelpMenu)
             {
                 currentPage++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -301,16 +299,14 @@ namespace suitsTerminal
                 if (activeSelection > 0)
                     activeSelection--;
 
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
             else if (value == "next_item" && !inHelpMenu)
             {
                 activeSelection++;
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 return;
             }
@@ -328,8 +324,7 @@ namespace suitsTerminal
                 CommandHandler.BetterSuitPick(suit);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
                 return;
             }
             else if (value == "toggle_pip" && !inHelpMenu)
@@ -378,8 +373,7 @@ namespace suitsTerminal
                         inFavsMenu = false;
                         currentPage = 1;
                         GetCurrentSuitNum();
-                        menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
-                        Plugin.Terminal.LoadNewNode(menuDisplay);
+                        LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage));
                         SaveToConfig(suitListing.FavList, out string configSave);
                         SaveFavorites(configSave);
                         return;
@@ -394,8 +388,8 @@ namespace suitsTerminal
                 SaveToConfig(suitListing.FavList, out string saveToConfig);
                 SaveFavorites(saveToConfig);
                 Plugin.X($"Current Page: {currentPage}\n Current Item: {activeSelection}");
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage));
+
             }
             else if (value == "favorites_menu")
             {
@@ -411,8 +405,7 @@ namespace suitsTerminal
                 inFavsMenu = !inFavsMenu;
                 currentPage = 1;
                 GetCurrentSuitNum();
-                menuDisplay.displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay, AdvancedMenuDisplay(suitListing, 0, 10, ref currentPage));
             }
             else if (value == "help_menu")
             {
@@ -421,8 +414,18 @@ namespace suitsTerminal
                 menuDisplay.displayText = HelpMenuDisplay(inHelpMenu);
 
                 TogglePiP(!inHelpMenu);
-                Plugin.Terminal.LoadNewNode(menuDisplay);
+                LoadPage(menuDisplay);
             }
+        }
+
+        internal static void LoadPage(TerminalNode menu, string displayText = "")
+        {
+            if(displayText.Length > 0)
+                menu.displayText = displayText;
+
+            Plugin.Terminal.LoadNewNode(menu);
+            if(Plugin.TerminalStuff)
+                Compatibility.TerminalStuffMod.NetSync(menu);
         }
 
         internal static void GetCurrentSuitID()
@@ -474,6 +477,7 @@ namespace suitsTerminal
             
             yield return new WaitForEndOfFrame();
             Plugin.Terminal.LoadNewNode(Plugin.Terminal.terminalNodes.specialNodes[13]);
+            Compatibility.TerminalStuffMod.NetSync(Plugin.Terminal.terminalNodes.specialNodes[13]);
             yield return new WaitForEndOfFrame();
             Plugin.Terminal.screenText.caretColor = CaretOriginal;
 

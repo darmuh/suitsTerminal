@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.5.11]
+ - Fixed soft compat for darmuhsTerminalStuff
+
+## [1.5.10]
+ - Fixed darmuhsTerminalStuff GUID
+
+## [1.5.9]
+ - Fixed issue with homebrew camera not updating LOD shadow level due to an early return that was added in 1.5.7 to fix another issue.
+	- Thank you @duskwise for the report and help with troubleshooting the issue.
+ - Added support for networked nodes when using darmuhsTerminalStuff.
+	- This should fix an issue where it appeared you were in the menu but the menu had not been started by the current player.
+	- Should also now sync the terminal display for other players when you are navigating the menus
+
 ## [1.5.8]
  - Fixed issue with advanced suits menu not working since switching to the new input handling system when darmuhsTerminalStuff was not present.
  - Added a check for TooManySuits. If present, this mod will not adjust the suits on the rack in anyway (even if DontRemove is set to false).

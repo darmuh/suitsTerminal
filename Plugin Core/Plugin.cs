@@ -22,7 +22,7 @@ namespace suitsTerminal
         {
             public const string PLUGIN_GUID = "darmuh.suitsTerminal";
             public const string PLUGIN_NAME = "suitsTerminal";
-            public const string PLUGIN_VERSION = "1.5.8";
+            public const string PLUGIN_VERSION = "1.5.11";
         }
 
         public static Terminal Terminal;

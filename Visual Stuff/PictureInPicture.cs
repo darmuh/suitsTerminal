@@ -163,23 +163,25 @@ namespace suitsTerminal
                 CamStuff.CamInitMirror(CamStuff.MyCameraHolder, playerCam, 0.1f, false);
                 CamStuff.HomebrewCameraState(state, playerCam);
 
-                if (state == false)
-                    return;
+                if (state != false)
+                {
+                    playerCam.fieldOfView = 100f;
 
-                playerCam.fieldOfView = 100f;
-
-                pipRawImage.texture = playerCam.targetTexture;
-                //Plugin.Log.LogInfo($"MirrorTexture state: {state}\nplayerCam: {playerCam.gameObject.activeSelf}\nCameraHolder {CamStuff.CameraHolder.activeSelf}");
+                    pipRawImage.texture = playerCam.targetTexture;
+                    //Plugin.Log.LogInfo($"MirrorTexture state: {state}\nplayerCam: {playerCam.gameObject.activeSelf}\nCameraHolder {CamStuff.CameraHolder.activeSelf}");
+                }
 
                 if (!OpenLib.Plugin.instance.ModelReplacement)
                 {
                     if (state)
                     {
                         StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = ShadowCastingMode.Off;
+                        Plugin.Log.LogInfo("Showing PlayerModel to player (player should be in terminal)");
                     }
                     else
                     {
                         StartOfRound.Instance.localPlayerController.thisPlayerModel.shadowCastingMode = shadowDefault;
+                        Plugin.Log.LogInfo("Hiding PlayerModel from player (PiP disabled or leaving suits menu)");
                     }
                 }
 

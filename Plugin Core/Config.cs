@@ -116,7 +116,7 @@ namespace suitsTerminal
             Plugin.X("CONFIG SETTING CHANGE EVENT");
             
             if(settingChangedArg.ChangedSetting == PersonalizedFavorites)
-                AllSuits.InitFavoritesListing(true);
+                AllSuits.InitFavoritesListing();
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 using static suitsTerminal.AllSuits;
-using static suitsTerminal.Misc;
 using static suitsTerminal.EventSub.Subscribers;
+using static suitsTerminal.Misc;
 
 namespace suitsTerminal
 {

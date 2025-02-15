@@ -1,5 +1,4 @@
-﻿using OpenLib.ConfigManager;
-using OpenLib.CoreMethods;
+﻿using OpenLib.CoreMethods;
 using suitsTerminal.Suit_Stuff;
 using System.Collections.Generic;
 using System.Text;
@@ -33,13 +32,13 @@ namespace suitsTerminal
                     Plugin.WARNING($"Duplicate found. Updated SuitName: {suit.Name}");
                 }
                 suitNames.Add(suit.Name.ToLower());
-                AddingThings.AddNodeManual(suit.Name, "wear " + suit.Name, CommandHandler.SuitPickCommand, true, 0, ConfigSetup.defaultListing);
+                AddWearCommandFor(suit);
                 Plugin.X($"Keyword for {suit.Name} added");
             }
             else if (suit.Suit.syncedSuitID.Value >= 0 && keywordsCreated)
             {
                 suit.Name = TerminalFriendlyString(suit.Name);
-                AddingThings.AddNodeManual(suit.Name, "wear " + suit.Name, CommandHandler.SuitPickCommand, true, 0, ConfigSetup.defaultListing);
+                AddWearCommandFor(suit);
                 Plugin.X($"Keyword for {suit.Name} updated");
 
             }
@@ -52,6 +51,13 @@ namespace suitsTerminal
             {
                 Plugin.WARNING($"Unexpected condition in CreateOldWearCommands!");
             }
+        }
+
+        internal static void AddWearCommandFor(SuitAttributes suit)
+        {
+            CommandManager picksuit = new(suit.Name, [$"wear {suit.Name}"], CommandHandler.SuitPickCommand);
+            picksuit.AddAtAwake = false;
+            picksuit.RegisterCommand();
         }
 
         internal static void CreateOldPageCommands()
@@ -174,7 +180,9 @@ namespace suitsTerminal
             if (!SConfig.RandomSuitCommand.Value)
                 return;
 
-            AddingThings.AddNodeManual("suitsTerminal random", "randomsuit", CommandHandler.RandomSuit, true, 0, ConfigSetup.defaultListing);
+            CommandManager picksuit = new("suitsTerminal random", ["randomsuit"], CommandHandler.RandomSuit, SConfig.RandomSuitCommand);
+            picksuit.AddAtAwake = false;
+            picksuit.RegisterCommand();
 
             if (LogicHandling.TryGetFromAllNodes("OtherCommands", out TerminalNode otherNode))
             {

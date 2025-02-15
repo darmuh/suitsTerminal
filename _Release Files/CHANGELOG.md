@@ -1,5 +1,22 @@
 # Change Log
 
+## [1.6.0]
+ - Moved menu system to OpenLib's BetterMenu system
+	- offloads a lot of the menu handling logic from this individual mod to OpenLib
+	- new menu is also a general improvement in comparison to suitsTerminal's old menu
+	- menu now has a main menu page with sub menus for favorites, picking a suit to wear, and the help page
+	- Updated duplicate names in advancedmenu to show the suit's syncedsuitid for the duplicate suit
+ - Moved the majority of command creation to OpenLib's new CommandManager system
+	- should be no noticeable difference, the new system is just a refactor of the old class that was used
+ - Optimized TogglePiP method to early return when state is what it's being set to
+ - Removed TerminalStuff soft compat (handled by OpenLib now)
+
+### If you experience issues with OpenLib version 0.3.0 or suitsTerminal 1.6.0, please report the issues with logs and revert to previous versions of both.	
+
+## [1.5.12]
+ - Fixed soft compat for darmuhsTerminalStuff (again)
+ - including correct dll file, 1.5.11 release looks to have had 1.5.10
+
 ## [1.5.11]
  - Fixed soft compat for darmuhsTerminalStuff
 

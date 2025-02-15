@@ -12,7 +12,7 @@ namespace suitsTerminal.EventSub
         internal static void Subscribe()
         {
             EventManager.TerminalAwake.AddListener(OnTerminalAwake);
-            EventManager.TerminalQuit.AddListener(OnTerminalQuit);
+            //EventManager.TerminalQuit.AddListener(OnTerminalQuit);
             EventManager.TerminalDisable.AddListener(OnTerminalDisable);
             EventManager.TerminalDelayStart.AddListener(OnTerminalDelayStart);
             EventManager.TerminalLoadIfAffordable.AddListener(TerminalGeneral.OnLoadAffordable);
@@ -22,19 +22,13 @@ namespace suitsTerminal.EventSub
 
             //Unique
             OpenLib.TerminalUpdatePatch.usePatch = true; //needed for below event listener
-            EventManager.TerminalKeyPressed.AddListener(AdvancedMenu.OnTerminalKeyPress);
+            //EventManager.TerminalKeyPressed.AddListener(AdvancedMenu.OnTerminalKeyPress);
             
         }
 
         internal static void OnTerminalDelayStart()
         {
             DefaultSuit();
-        }
-
-        internal static void OnTerminalQuit()
-        {
-            if(SConfig.AdvancedTerminalMenu.Value && AdvancedMenu.specialMenusActive)
-                AdvancedMenu.MenuActive(false, false);
         }
 
         internal static void OnTerminalAwake(Terminal instance)
@@ -71,7 +65,6 @@ namespace suitsTerminal.EventSub
                 Plugin.X("suitlisting cleared!");
                 return;
             }
-                
 
             suitListing.SuitsList.ForEach(s => s.IsOnRack = false);
 
@@ -81,15 +74,14 @@ namespace suitsTerminal.EventSub
         internal static void OnGameStart()
         {
             CompatibilityCheck();
-            InitFavoritesListing();
         }
 
         private static void CompatibilityCheck()
         {
             Plugin.X("Compatibility Check!");
 
-            if (SoftCompatibility("darmuh.TerminalStuff", ref Plugin.TerminalStuff))
-                Plugin.X("darmuhsTerminalStuff compatibility enabled!");
+            //if (SoftCompatibility("darmuh.TerminalStuff", ref Plugin.TerminalStuff))
+                //Plugin.X("darmuhsTerminalStuff compatibility enabled!");
 
             if (SoftCompatibility("Hexnet.lethalcompany.suitsaver", ref Plugin.SuitSaver))
                 Plugin.X("Suitsaver compatibility enabled!\nDefaultSuit will not be loaded");
@@ -121,12 +113,12 @@ namespace suitsTerminal.EventSub
 
         internal static void OnPlayerSpawn()
         {
-            AdvancedMenu.CaretOriginal = Plugin.Terminal.screenText.caretColor;
+            //AdvancedMenu.CaretOriginal = Plugin.Terminal.screenText.caretColor;
             if (!rackSituated)
             {
                 Plugin.X("player loaded & rackSituated is false, fixing suits rack");
                 PiPStuff();
-                AdvancedMenu.InitSettings();
+                AdvancedMenu.InitBetterMenu();
                 InitThisPlugin.InitSuitsTerm();
                 PictureInPicture.InitPiP();
                 hasLaunched = true;

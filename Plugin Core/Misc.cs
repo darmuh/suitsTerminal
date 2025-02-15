@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using static suitsTerminal.AdvancedMenu;
-using static suitsTerminal.AllSuits;
 
 namespace suitsTerminal
 {
@@ -23,30 +22,22 @@ namespace suitsTerminal
             return gameobj != null;
         }
 
-        internal static string HelpMenuDisplay(bool inHelpMenu)
+        internal static string HelpMenuDisplay()
         {
-            if (inHelpMenu)
-            {
-                Plugin.X("Help Menu Enabled, showing help information");
-                StringBuilder message = new();
+            Plugin.X("Help Menu Enabled, showing help information");
+            StringBuilder message = new();
 
-                message.Append($"========= AdvancedsuitsMenu Help Page  =========\r\n");
-                message.Append("\r\n\r\n");
+            message.Append($"========= AdvancedsuitsMenu Help Page  =========\r\n");
+            message.Append("\r\n\r\n");
 
-                message.Append($"Highlight Next Item: [{downString}]\r\nHighlight Last Item: [{upString}]\r\nFavorite Item: [{favItemKeyString}]\r\nToggle Favorites Menu: [{favMenuKeyString}]\r\n");
-                if (SConfig.EnablePiPCamera.Value)
-                {
-                    message.Append($"Toggle Camera Preview: [{togglePiPstring}]\r\nRotate Camera: [{pipRotateString}]\r\nChange Camera Height: [{pipHeightString}]\r\nChange Camera Zoom: [{pipZoomString}]\r\n");
-                }
-                message.Append($"Leave Suits Menu: [{leaveString}]\r\nSelect Suit: [{selectString}]\r\n");
-                message.Append($"\r\n>>>\tReturn to Suit Selection: [{helpMenuKeyString}]\t<<\r\n");
-                return message.ToString();
-            }
-            else
+            message.Append($"Highlight Next Item: [{suitsMenu.downMenu}]\r\nHighlight Last Item: [{suitsMenu.upMenu}]\r\nFavorite Item: [{favItemKeyString}]\r\n");
+            if (SConfig.EnablePiPCamera.Value)
             {
-                Plugin.X("Help Menu disabled, returning to menu selection...");
-                return StringStuff.AdvancedMenuDisplay(suitListing, activeSelection, 10, ref currentPage);
+                message.Append($"Toggle Camera Preview: [{togglePiPstring}]\r\nRotate Camera: [{pipRotateString}]\r\nChange Camera Height: [{pipHeightString}]\r\nChange Camera Zoom: [{pipZoomString}]\r\n");
             }
+            message.Append($"Leave Suits Menu: [{suitsMenu.leaveMenu}]\r\nSelect Suit: [{suitsMenu.selectMenu}]\r\n");
+            message.Append($"\r\n>>>\tReturn to Menu: [ANY KEY]\t<<\r\n");
+            return message.ToString();
         }
 
         internal static void SaveToConfig(List<string> stringList, out string configItem)

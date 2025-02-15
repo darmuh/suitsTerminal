@@ -1,4 +1,5 @@
-﻿using OpenLib.CoreMethods;
+﻿using HarmonyLib;
+using OpenLib.CoreMethods;
 using suitsTerminal.Suit_Stuff;
 using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.AllSuits;
@@ -31,18 +32,8 @@ namespace suitsTerminal
 
         internal static string AdvancedSuitsTerm()
         {
-            int page = 1;
-            AdvancedMenu.inFavsMenu = false;
-            PictureInPicture.rotateStep = 0;
-            PictureInPicture.heightStep = 0;
-            PictureInPicture.zoomStep = 1;
-            AdvancedMenu.currentPage = 1;
-            AdvancedMenu.activeSelection = 0;
-            AdvancedMenu.inHelpMenu = false;
-            AdvancedMenu.GetCurrentSuitID();
-            string displayText = AdvancedMenuDisplay(suitListing, 0, 10, ref page);
-            AdvancedMenu.MenuActive(true);
-            return displayText;
+            AdvancedMenu.suitsMenu.EnterMenu();
+            return "";
         }
 
         internal static void BetterSuitPick(SuitAttributes suit)
@@ -55,6 +46,9 @@ namespace suitsTerminal
 
             suit.Suit.SwitchSuitToThis(StartOfRound.Instance.localPlayerController);
             Plugin.Log.LogMessage($"Switched suit to {suit.Name}");
+            suitListing.SuitsList.Do(x => x.currentSuit = false);
+            suit.currentSuit = true;
+            Plugin.X("Updated currentSuit bool");
         }
 
         internal static string PickSuit()

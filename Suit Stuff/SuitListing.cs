@@ -11,16 +11,13 @@ namespace suitsTerminal.Suit_Stuff
     {
         internal List<SuitAttributes> SuitsList = [];
         internal List<UnlockableSuit> RawSuitsList = [];
-        internal int CurrentMenu = 0; //1 = favs
         internal List<string> NameList = [];
         internal List<string> FavList = [];
 
         internal void ClearAll()
         {
-            this.NameList.Clear();
-            this.FavList.Clear();
-            this.CurrentMenu = 0;
-            this.SuitsList.ForEach(x => x.Reset());
+            NameList.Clear();
+            SuitsList.ForEach(x => x.Reset());
         }
 
         internal bool Contains(int query, out SuitAttributes thisSuit)
@@ -54,34 +51,14 @@ namespace suitsTerminal.Suit_Stuff
             return false;
         }
 
-        internal void RefreshFavorites(bool checkList = false)
-        {
-            if (suitListing.SuitsList.Count == 0)
-                return;
-
-            if (checkList)
-            {
-                suitListing.FavList = []; //empty list
-
-                foreach (SuitAttributes fav in SuitsList)
-                {
-                    fav.FavIndex = -1;
-                    fav.IsFav = fav.IsFavorite();
-                    fav.SetIndex();
-                    Plugin.X($"SuitAttributes updated for {fav.Name}");
-                }
-            }
-            else
-            {
-                foreach (SuitAttributes fav in SuitsList)
-                    fav.RefreshFavIndex();
-            }
-        }
-
     }
 
     internal class SuitAttributes
     {
+        //BetterMenu Stuff
+        internal SuitMenuItem menuItem;
+        internal OpenLib.Events.Events.CustomEvent SelectSuit = new();
+        
         internal UnlockableSuit Suit;
         internal bool HideFromTerminal = false;
         internal bool IsOnRack = false;
@@ -90,18 +67,14 @@ namespace suitsTerminal.Suit_Stuff
 
         //extra stuff
         internal bool IsFav = false;
-        internal int MainMenuIndex = -1;
-        internal int FavIndex = -1;
         internal bool currentSuit = false;
 
         internal void Reset()
         {
-            this.HideFromTerminal = false;
-            this.IsOnRack = false;
-            this.currentSuit = false;
-            this.FavIndex = -1;
-            this.IsFav = false;
-            this.MainMenuIndex = -1;
+            HideFromTerminal = false;
+            IsOnRack = false;
+            currentSuit = false;
+            IsFav = false;
         }
 
         internal SuitAttributes(UnlockableSuit item, List<UnlockableItem> UnlockableItems, ref Dictionary<int, string> suitNameToID)
@@ -111,9 +84,29 @@ namespace suitsTerminal.Suit_Stuff
             UniqueID = item.syncedSuitID.Value;
             suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
+
+            menuItem = new(Name, SelectSuit);
+            menuItem.AddToBetterMenu();
             IsFav = IsFavorite();
-            SetIndex();
+
+            if (HideFromTerminal)
+                return;
+
+            menuItem.OnPageLoad = GetSuffix;
+            
+            menuItem.SetParentMenu(AdvancedMenu.SuitsList);
+            
+            if (IsFav)
+                menuItem.AddNestedItem(AdvancedMenu.FavoritesList);
+
+            SelectSuit.AddListener(WearSuit);
+
             Plugin.X($"SuitAttributes created for {Name}");
+        }
+
+        internal void WearSuit()
+        {
+            CommandHandler.BetterSuitPick(this);
         }
 
         internal void UpdateSuit(UnlockableSuit item, List<UnlockableItem> UnlockableItems, ref Dictionary<int, string> suitNameToID)
@@ -124,33 +117,31 @@ namespace suitsTerminal.Suit_Stuff
             suitListing.NameList.Add(Name);
             HideFromTerminal = ShouldHideTerm();
             IsFav = IsFavorite();
-            SetIndex();
+            menuItem.AddToBetterMenu();
+            menuItem.Name = Name;
+
+            if (!AdvancedMenu.SuitsList.NestedMenus.Contains(menuItem))
+            {
+                if (!HideFromTerminal)
+                {
+                    menuItem.SetParentMenu(AdvancedMenu.SuitsList);
+
+                    if (IsFav)
+                        menuItem.AddNestedItem(AdvancedMenu.FavoritesList);
+                }
+            }
+            else
+            {
+                if(HideFromTerminal)
+                {
+                    menuItem.Parent = null!;
+                    AdvancedMenu.SuitsList.NestedMenus.Remove(menuItem);
+
+                    if (AdvancedMenu.FavoritesList.NestedMenus.Contains(menuItem))
+                        AdvancedMenu.FavoritesList.NestedMenus.Remove(menuItem);
+                }
+            }
             Plugin.X($"SuitAttributes updated for {Name}");
-        }
-
-        internal void SetIndex()
-        {
-            if (this.HideFromTerminal)
-            {
-                this.MainMenuIndex = -1;
-                suitListing.NameList.Remove(this.Name);
-            }
-            this.MainMenuIndex = suitListing.NameList.IndexOf(this.Name);
-
-            if (this.IsFav && !suitListing.FavList.Contains(this.Name))
-            {
-                this.AddToFavs();
-            }
-
-        }
-
-        internal int GetIndex(List<string> listing)
-        {
-            if (listing.Contains(this.Name))
-            {
-                return listing.IndexOf(this.Name);
-            }
-            return -1;
         }
 
         internal bool IsFavorite()
@@ -158,61 +149,76 @@ namespace suitsTerminal.Suit_Stuff
             if (favsList.Count == 0)
                 return false;
 
-            if (favsList.Any(x => x.ToLower() == this.Name.ToLower()))
+            if (favsList.Any(x => x.ToLower() == Name.ToLower()))
             {
-                Plugin.X($"{this.Name} is detected in favorites list");
+                Plugin.X($"{Name} is detected in favorites list");
+                if(!suitListing.FavList.Contains(Name))
+                    suitListing.FavList.Add(Name);
                 return true;
             }
 
-            Plugin.X($"{this.Name} is *NOT* a favorite");
+            if(suitListing.FavList.Contains(Name))
+                suitListing.FavList.Remove(Name);
+            Plugin.X($"{Name} is *NOT* a favorite");
             return false;
         }
 
         internal void RemoveFromFavs()
         {
-            this.IsFav = false;
-            suitListing.FavList.Remove(this.Name);
-            this.FavIndex = -1;
+            IsFav = false;
+            if (!suitListing.FavList.Contains(Name))
+                return;
+            suitListing.FavList.Remove(Name);
+            AdvancedMenu.FavoritesList.NestedMenus.Remove(menuItem);
         }
 
         internal void AddToFavs()
         {
-            this.IsFav = true;
-
-            if (suitListing.FavList.Contains(this.Name))
+            if (SConfig.AdvancedTerminalMenu.Value && menuItem == null)
             {
-                this.FavIndex = suitListing.FavList.IndexOf(this.Name);
+                Plugin.WARNING($"menuItem is null for {Name}");
                 return;
             }
-            
-            suitListing.FavList.Add(this.Name);
-            this.FavIndex = suitListing.FavList.IndexOf(this.Name);
-        }
 
-        internal void RefreshFavIndex()
-        {
-            if (!suitListing.FavList.Contains(this.Name))
+            IsFav = true;
+
+            if (suitListing.FavList.Contains(Name))
                 return;
+            
+            suitListing.FavList.Add(Name);
+            if(!AdvancedMenu.FavoritesList.NestedMenus.Contains(menuItem))
+                AdvancedMenu.FavoritesList.NestedMenus.Add(menuItem);
 
-            this.FavIndex = suitListing.FavList.IndexOf(this.Name);
+            Plugin.X($"AddToFavs has added {Name}!");
         }
 
         internal bool ShouldHideTerm()
         {
             List<string> dontAddTerminal = GetListToLower(GetKeywordsPerConfigItem(SConfig.DontAddToTerminal.Value, ','));
 
-            if (dontAddTerminal.Any(x => x.ToLower() == this.Name.ToLower()))
+            if (dontAddTerminal.Any(x => x.ToLower() == Name.ToLower()))
                 return true;
 
             return false;
+        }
+
+        internal void GetSuffix()
+        {
+            menuItem.Suffix = string.Empty;
+
+            if (IsFav)
+                menuItem.Suffix += " (*)";
+
+            if (currentSuit)
+                menuItem.Suffix += " [EQUIPPED]";
         }
 
         internal static string GetName(UnlockableSuit item, List<UnlockableItem> UnlockableItems, ref Dictionary<int, string> suitNameToID)
         {
             string SuitName = UnlockableItems[item.syncedSuitID.Value].unlockableName;
 
-            if (suitListing.NameList.Contains(SuitName) && SConfig.AdvancedTerminalMenu.Value)
-                SuitName = SuitName + $"({item.suitID})"; //suit with same name exists, adding to name for advanced menu only
+            if (suitListing.NameList.Any(s => s.ToLower() == SuitName.ToLower()) && SConfig.AdvancedTerminalMenu.Value)
+                SuitName += $"({item.syncedSuitID.Value})"; //suit with same name exists, adding to name for advanced menu only
 
             if (!SConfig.AdvancedTerminalMenu.Value)
                 SuitName = TerminalFriendlyString(SuitName);

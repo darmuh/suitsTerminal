@@ -1,14 +1,13 @@
-﻿using Steamworks.Ugc;
-using suitsTerminal.Suit_Stuff;
+﻿using suitsTerminal.Suit_Stuff;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.Bools;
 using static suitsTerminal.Misc;
 using static suitsTerminal.ProcessRack;
-using static OpenLib.Common.CommonStringStuff;
-using System;
 
 namespace suitsTerminal
 {
@@ -75,8 +74,8 @@ namespace suitsTerminal
 
         }
 
-        internal static void InitFavoritesListing(bool checkList = false)
-        {       
+        internal static void InitFavoritesListing()
+        {
             if (SConfig.PersonalizedFavorites.Value)
             {
                 string favsFilePath = Path.Combine(@"%userprofile%\appdata\locallow\ZeekerssRBLX\Lethal Company", "suitsTerminal");
@@ -99,13 +98,12 @@ namespace suitsTerminal
             }
             else
                 favsList = GetKeywordsPerConfigItem(SConfig.FavoritesMenuList.Value, ',');
-
-            suitListing?.RefreshFavorites(checkList);
         }
 
         internal static void InitSuitsListing()
         {
             Plugin.X("InitSuitsListing");
+            InitFavoritesListing();
             FixRack();
             OldCommands.MakeRandomSuitCommand();
         }

@@ -63,7 +63,6 @@ namespace suitsTerminal
                 return;
 
             initKeySettings = true;
-            ExtraKeyActions = [];
             SetupExtraKeys();
             Plugin.X("Loading keybinds from config");
             if (menuDisplay == null)
@@ -121,6 +120,66 @@ namespace suitsTerminal
             SuitMenuItem.AddListToBetterMenu([HomePage, FavoritesList, SuitsList, HelpPage]);
         }
 
+        private static void ReplaceKey(ref Key current, Key newKey, ref int replacements)
+        {
+            current = newKey;
+            replacements++;
+        }
+
+        internal static void RefreshKeys()
+        {
+            if (suitsMenu.MenuNode == null)
+                return;
+
+            int replacements = 0;
+
+            if (IsValidReplacement(MenuUp.Value, suitsMenu.upMenu, out Key upKey))
+                ReplaceKey(ref suitsMenu.upMenu, upKey, ref replacements);
+            if (IsValidReplacement(MenuDown.Value, suitsMenu.downMenu, out Key downKey))
+                ReplaceKey(ref suitsMenu.downMenu, downKey, ref replacements);
+            if (IsValidReplacement(MenuLeft.Value, suitsMenu.leftMenu, out Key leftKey))
+                ReplaceKey(ref suitsMenu.leftMenu, leftKey, ref replacements);
+            if (IsValidReplacement(MenuRight.Value, suitsMenu.rightMenu, out Key rightKey))
+                ReplaceKey(ref suitsMenu.rightMenu, rightKey, ref replacements);
+            if (IsValidReplacement(LeaveMenu.Value, suitsMenu.leaveMenu, out Key leaveKey))
+                ReplaceKey(ref suitsMenu.leaveMenu, leaveKey, ref replacements);
+            if (IsValidReplacement(SelectMenu.Value, suitsMenu.selectMenu, out Key selectKey))
+                ReplaceKey(ref suitsMenu.selectMenu, selectKey, ref replacements);
+
+            if (replacements > 0)
+                suitsMenu.UpdateMainActions();
+
+            if (IsAnyExtraKeyDifferent())
+            {
+                SetupExtraKeys();
+                suitsMenu.OtherActions = ExtraKeyActions;
+            }
+
+        }
+
+        private static bool IsAnyExtraKeyDifferent()
+        {
+            if (favItemKeyString.ToLowerInvariant() != FavItemKey.Value.ToLowerInvariant())
+                return true;
+
+            if (!EnablePiPCamera.Value)
+                return false;
+
+            if (pipHeightString.ToLowerInvariant() != TogglePiPHeight.Value.ToLowerInvariant())
+                return true;
+
+            if (pipRotateString.ToLowerInvariant() != TogglePiPRotation.Value.ToLowerInvariant())
+                return true;
+
+            if (pipZoomString.ToLowerInvariant() != TogglePiPZoom.Value.ToLowerInvariant())
+                return true;
+
+            if (togglePiPstring.ToLowerInvariant() != SConfig.TogglePiP.Value.ToLowerInvariant())
+                return true;
+
+            return false;
+        }
+
         private static void GetCurrentSuitNum()
         {
             if (StartOfRound.Instance.localPlayerController.currentSuitID < 0)
@@ -145,33 +204,28 @@ namespace suitsTerminal
 
         private static void SetupExtraKeys()
         {
-
+            ExtraKeyActions = [];
             CheckKeys(FavItemKey.Value, out Key favItemKey, out favItemKeyString);
             BindKeys(FavItem, favItemKey, ref favItemKeyString, "F", Key.F);
-
             PiPKeys();
-
-            //CheckKeys(FavMenuKey.Value, out Key favMenuKey, out favMenuKeyString);
-            //BindKeys(ShowFavs, favMenuKey, ref favMenuKeyString, "F1", Key.F1);
-
-            //CheckKeys(HelpMenu.Value, out Key helpMenuKey, out helpMenuKeyString);
-            //BindKeys(ToggleHelp, helpMenuKey, ref helpMenuKeyString, "H", Key.H);
         }
 
         private static void UpdateMainKeys()
         {
-            CheckKeys(MenuUp.Value, out Key upKey);
-            suitsMenu.upMenu = upKey;
-            CheckKeys(MenuDown.Value, out Key downKey);
-            suitsMenu.downMenu = downKey;
-            CheckKeys(MenuLeft.Value, out Key leftKey);
-            suitsMenu.leftMenu = leftKey;
-            CheckKeys(MenuRight.Value, out Key rightKey);
-            suitsMenu.rightMenu = rightKey;
-            CheckKeys(LeaveMenu.Value, out Key leaveKey);
-            suitsMenu.leaveMenu = leaveKey;
-            CheckKeys(SelectMenu.Value, out Key selectKey);
-            suitsMenu.selectMenu = selectKey;
+            if (IsValidReplacement(MenuUp.Value, suitsMenu.upMenu, out Key upKey))
+                suitsMenu.upMenu = upKey;
+            if (IsValidReplacement(MenuDown.Value, suitsMenu.downMenu, out Key downKey))
+                suitsMenu.downMenu = downKey;
+            if (IsValidReplacement(MenuLeft.Value, suitsMenu.leftMenu, out Key leftKey))
+                suitsMenu.leftMenu = leftKey;
+            if (IsValidReplacement(MenuRight.Value, suitsMenu.rightMenu, out Key rightKey))
+                suitsMenu.rightMenu = rightKey;
+            if (IsValidReplacement(LeaveMenu.Value, suitsMenu.leaveMenu, out Key leaveKey))
+                suitsMenu.leaveMenu = leaveKey;
+            if (IsValidReplacement(SelectMenu.Value, suitsMenu.selectMenu, out Key selectKey))
+                suitsMenu.selectMenu = selectKey;
+
+            suitsMenu.UpdateMainActions();
         }
 
         internal static string GetFooter()
@@ -231,24 +285,12 @@ namespace suitsTerminal
             if (IsValidKey(configString, out Key validKey))
             {
                 usingKey = validKey;
-                keyString = configString;
+                keyString = validKey.ToString();
             }
             else
             {
                 usingKey = Key.None;
                 keyString = "FAIL";
-            }
-        }
-
-        private static void CheckKeys(string configString, out Key usingKey)
-        {
-            if (IsValidKey(configString, out Key validKey))
-            {
-                usingKey = validKey;
-            }
-            else
-            {
-                usingKey = Key.None;
             }
         }
 
@@ -269,6 +311,47 @@ namespace suitsTerminal
             CheckKeys(SConfig.TogglePiP.Value, out Key pipKey, out togglePiPstring);
             BindKeys(PipAction, pipKey, ref togglePiPstring, "F12", Key.F12);
 
+        }
+
+        private static bool IsValidReplacement(string key, Key original, out Key validKey)
+        {
+            List<Key> invalidKeys = [
+            Key.Tab
+            ];
+            if (Enum.TryParse(key, ignoreCase: true, out Key keyFromString))
+            {
+                if (original == keyFromString)
+                {
+                    validKey = original;
+                    return false;
+                }
+
+                if (invalidKeys.Contains(keyFromString))
+                {
+                    Plugin.WARNING("Tab Key detected, rejecting bind.");
+                    validKey = Key.None;
+                    return false;
+                }
+                else if (suitsMenu.MainActions.ContainsKey(keyFromString))
+                {
+                    Plugin.WARNING("Key was already bound to something, returning false");
+                    string allKeys = string.Join(", ", suitsMenu.MainActions.Keys);
+                    Plugin.WARNING($"Key list: {allKeys}");
+                    validKey = Key.None;
+                    return false;
+                }
+                else
+                {
+                    Plugin.X("Valid Key Detected and being assigned");
+                    validKey = keyFromString;
+                    return true;
+                }
+            }
+            else
+            {
+                validKey = Key.None;
+                return false;
+            }
         }
 
         private static bool IsValidKey(string key, out Key validKey)

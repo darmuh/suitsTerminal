@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.1]
+ - Fixed terminalstuff shortcuts compatibility
+	- shortcuts will now properly respect when the suits menu is active
+ - Fixed key rebinds not actually rebinding the controls
+	- requires OpenLib 0.3.1 update
+ - Added config event method for refreshing keybinds mid-game
+
 ## [1.6.0]
  - Moved menu system to OpenLib's BetterMenu system
 	- offloads a lot of the menu handling logic from this individual mod to OpenLib

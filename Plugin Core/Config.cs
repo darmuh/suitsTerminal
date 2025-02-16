@@ -1,4 +1,6 @@
 ﻿using BepInEx.Configuration;
+using System.Collections.Generic;
+using System.Linq;
 using static OpenLib.ConfigManager.ConfigSetup;
 
 namespace suitsTerminal
@@ -30,9 +32,9 @@ namespace suitsTerminal
         public static ConfigEntry<string> MenuRight { get; internal set; }
         public static ConfigEntry<string> LeaveMenu { get; internal set; }
         public static ConfigEntry<string> SelectMenu { get; internal set; }
-        public static ConfigEntry<string> HelpMenu { get; internal set; }
+        //public static ConfigEntry<string> HelpMenu { get; internal set; }
         public static ConfigEntry<string> FavItemKey { get; internal set; }
-        public static ConfigEntry<string> FavMenuKey { get; internal set; }
+        //public static ConfigEntry<string> FavMenuKey { get; internal set; }
         public static ConfigEntry<string> TogglePiP { get; internal set; }
         public static ConfigEntry<string> TogglePiPZoom { get; internal set; }
         public static ConfigEntry<string> TogglePiPRotation { get; internal set; }
@@ -48,6 +50,7 @@ namespace suitsTerminal
         public static ConfigEntry<float> MenuKeyPressDelay { get; internal set; }
         public static ConfigEntry<float> MenuPostSelectDelay { get; internal set; }
 
+        public static List<ConfigEntry<string>> KeyBinds = [];
 
         public static void Settings()
         {
@@ -83,13 +86,15 @@ namespace suitsTerminal
             MenuDown = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuDown", "DownArrow", "Set key to press to go to next item on page in advanced menu system");
             LeaveMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "LeaveMenu", "Backspace", "Set key to press to leave advanced menu system");
             SelectMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "SelectMenu", "Enter", "Set key to press to select an item in advanced menu system");
-            HelpMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "HelpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
+            //HelpMenu = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "HelpMenu", "H", "Set key to press to toggle help & controls page in advanced menu system");
             FavItemKey = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavItemKey", "F", "Set key to press to set an item as a favorite in advanced menu system");
-            FavMenuKey = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
+            //FavMenuKey = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavMenuKey", "F1", "Set key to press to show favorites menu in advanced menu system");
             TogglePiP = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiP", "F12", "Set key to press to toggle PiP (mirror cam) on/off in advanced menu system");
             TogglePiPZoom = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPZoom", "Minus", "Set key to press to toggle PiP (mirror cam) zoom in advanced menu system");
             TogglePiPRotation = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPRotation", "Equals", "Set key to press to toggle PiP (mirror cam) rotation in advanced menu system");
             TogglePiPHeight = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "TogglePiPHeight", "Backslash", "Set key to press to toggle PiP (mirror cam) height in advanced menu system");
+
+            KeyBinds.AddRange([MenuLeft, MenuRight, MenuUp, MenuDown, LeaveMenu, SelectMenu, FavItemKey, TogglePiP, TogglePiPZoom, TogglePiPRotation, TogglePiPHeight]);
 
             //Hints
             ChatHints = MakeBool(Plugin.instance.Config, "Hints", "ChatHints", false, "Determines whether chat hints are displayed at load in.");
@@ -117,6 +122,10 @@ namespace suitsTerminal
             
             if(settingChangedArg.ChangedSetting == PersonalizedFavorites)
                 AllSuits.InitFavoritesListing();
+
+            if (KeyBinds.Any(k => k == settingChangedArg.ChangedSetting))
+                AdvancedMenu.RefreshKeys();
+
         }
     }
 }

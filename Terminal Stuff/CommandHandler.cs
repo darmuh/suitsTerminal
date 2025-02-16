@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using OpenLib.CoreMethods;
+using OpenLib.InteractiveMenus;
 using suitsTerminal.Suit_Stuff;
 using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.AllSuits;
@@ -32,7 +33,7 @@ namespace suitsTerminal
 
         internal static string AdvancedSuitsTerm()
         {
-            AdvancedMenu.suitsMenu.EnterMenu();
+            AdvancedMenu.suitsMenu.EnterAtPage(SuitMenuItem.GetStartMenu());
             return "";
         }
 

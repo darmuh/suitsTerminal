@@ -572,7 +572,7 @@ namespace suitsTerminal
             yield return new WaitForEndOfFrame();
             TogglePiP(true);
             yield return new WaitForEndOfFrame();
-            PiPSetParent();
+            //PiPSetParent();
             yield break;
         }
     }

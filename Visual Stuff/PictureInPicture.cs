@@ -53,7 +53,7 @@ namespace suitsTerminal
             pipRawImage = pipGameObject.GetComponent<RawImage>();
 
             // Set dimensions and position for radar image (rawImage1)
-            SetRawImageDimensionsAndPosition(pipRawImage.rectTransform, 0.45f, 0.33f, 90f, 0f);
+            SetRawImageDimensionsAndPosition(pipRawImage.rectTransform, 0.45f, 0.33f, 95f, -20f);
             pipRawImage.color = new Color(1, 1, 1, 0.9f); //90% opacity
             pipGameObject.SetActive(false);
             PiPCreated = true;

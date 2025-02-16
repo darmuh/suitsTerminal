@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.6.2]
+ - Fixed menu items duplicating on additional loads.
+ - Added config option ``MenuStartPage`` to set which page loads on start of the menu
+	- default is main menu, which shows all nested menu options
+	- requires openlib update (added some new stuff for handling different entry points)
+ - Slightly changed picture-in-picture camera position
+ - Made it so terminal text can cover the picture-in-picture camera again
+
 ## [1.6.1]
  - Fixed terminalstuff shortcuts compatibility
 	- shortcuts will now properly respect when the suits menu is active

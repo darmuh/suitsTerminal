@@ -32,13 +32,12 @@ namespace suitsTerminal
         public static ConfigEntry<string> MenuRight { get; internal set; }
         public static ConfigEntry<string> LeaveMenu { get; internal set; }
         public static ConfigEntry<string> SelectMenu { get; internal set; }
-        //public static ConfigEntry<string> HelpMenu { get; internal set; }
         public static ConfigEntry<string> FavItemKey { get; internal set; }
-        //public static ConfigEntry<string> FavMenuKey { get; internal set; }
         public static ConfigEntry<string> TogglePiP { get; internal set; }
         public static ConfigEntry<string> TogglePiPZoom { get; internal set; }
         public static ConfigEntry<string> TogglePiPRotation { get; internal set; }
         public static ConfigEntry<string> TogglePiPHeight { get; internal set; }
+        public static ConfigEntry<string> MenuStartPage { get; internal set; }
 
         public static ConfigEntry<string> SuitsOnRackOnly { get; internal set; }
         public static ConfigEntry<string> DontAddToRack { get; internal set; }
@@ -46,9 +45,6 @@ namespace suitsTerminal
         public static ConfigEntry<string> FavoritesMenuList { get; internal set; }
         public static ConfigEntry<bool> PersonalizedFavorites { get; internal set; }
         public static ConfigEntry<string> SuitsSortingStyle { get; internal set; }
-
-        public static ConfigEntry<float> MenuKeyPressDelay { get; internal set; }
-        public static ConfigEntry<float> MenuPostSelectDelay { get; internal set; }
 
         public static List<ConfigEntry<string>> KeyBinds = [];
 
@@ -77,6 +73,7 @@ namespace suitsTerminal
             SuitsSortingStyle = MakeClampedString(Plugin.instance.Config, "Rack Settings", "SuitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
 
             //Menu Binds
+            MenuStartPage = MakeClampedString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuStartPage", "main", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("main", "favs", "change", "help"));
             FavoritesMenuList = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
             PersonalizedFavorites = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "PersonalizedFavorites", false, "Enable this to ignore the FavoritesMenuList configuration item in favor of a personal file saving your favorites list.\nUse this if you dont want your favorites list to be shared with other players in modpacks/profile codes.");
             EnablePiPCamera = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");

@@ -43,12 +43,26 @@ namespace suitsTerminal
             if (suitsMenu.AllMenuItemsOfType == null)
                 return;
 
-            suitsMenu.AllMenuItemsOfType.Add(this);
+            if(!suitsMenu.AllMenuItemsOfType.Contains(this))
+                suitsMenu.AllMenuItemsOfType.Add(this);
         }
 
         public static void AddListToBetterMenu(List<SuitMenuItem> menuList)
         {
             suitsMenu.AllMenuItemsOfType.AddRange(menuList);
+        }
+
+        internal static MenuItem GetStartMenu()
+        {
+            //"main", "favs", "change", "help"
+            if (SConfig.MenuStartPage.Value == "favs")
+                return FavoritesList;
+            else if (SConfig.MenuStartPage.Value == "change")
+                return SuitsList;
+            else if (SConfig.MenuStartPage.Value == "help")
+                return HelpPage;
+            else
+                return HomePage;
         }
     }
 }

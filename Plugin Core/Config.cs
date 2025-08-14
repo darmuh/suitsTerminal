@@ -73,7 +73,7 @@ namespace suitsTerminal
             SuitsSortingStyle = MakeClampedString(Plugin.instance.Config, "Rack Settings", "SuitsSortingStyle", "alphabetical (UnlockableName)", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("alphabetical", "numerical", "none"));
 
             //Menu Binds
-            MenuStartPage = MakeClampedString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuStartPage", "main", "How suits will be sorted in menus & on the rack", new AcceptableValueList<string>("main", "favs", "change", "help"));
+            MenuStartPage = MakeClampedString(Plugin.instance.Config, "AdvancedTerminalMenu", "MenuStartPage", "main", "The menu that will open when first running the suits command.", new AcceptableValueList<string>("main", "favs", "change", "help"));
             FavoritesMenuList = MakeString(Plugin.instance.Config, "AdvancedTerminalMenu", "FavoritesMenuList", "", "Favorited suit names will be stored here and displayed in the AdvancedTerminalMenu.");
             PersonalizedFavorites = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "PersonalizedFavorites", false, "Enable this to ignore the FavoritesMenuList configuration item in favor of a personal file saving your favorites list.\nUse this if you dont want your favorites list to be shared with other players in modpacks/profile codes.");
             EnablePiPCamera = MakeBool(Plugin.instance.Config, "AdvancedTerminalMenu", "EnablePiPCamera", true, "Disable this to stop the PiP camera from being created");

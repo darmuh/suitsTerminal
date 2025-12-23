@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.7.3]
+ - Made going back in menus more consistent, if you enter a specific suit's menu item you will return to the menu item you selected it from (favorites or main suits listing)
+ - Also, looks like thunderstore didn't upload 1.7.2 properly. Hopefully fixing this issue.
+	 
 ## [1.7.2]
  - hotfix for a blank default suit entry causing the mod to detect every suit as a player's default.
  - Added some early returns for situations where suit preview would throw null errors

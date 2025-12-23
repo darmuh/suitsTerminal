@@ -23,16 +23,19 @@ internal class Menu
     internal static Dictionary<Key, Action> ExtraKeyActions = [];
     internal static bool InitOnce = false;
 
-    //BetterMenu Pages
+    //Main Pages
     internal static SuitMenuItem HomePage = null!;
     internal static SuitMenuItem FavoritesList = null!;
     internal static SuitMenuItem SuitsList = null!;
     internal static SuitMenuItem HelpPage = null!;
-    internal static SuitAttributes PotentialSelection = null!;
+    //MenuItem Pages
     internal static SuitMenuItem SelectSuit = null!;
     internal static SuitMenuItem FavoriteSuit = null!;
     internal static SuitMenuItem SetDefaultSuit = null!;
     internal static SuitMenuItem PurchaseSuitFromStore = null!;
+
+    //Tracking between pages
+    internal static SuitAttributes PotentialSelection = null!;
 
     //BetterMenu Page Events
     internal static Events.CustomEvent OpenFavs = new();
@@ -77,7 +80,6 @@ internal class Menu
         initKeySettings = false;
 
     }
-
     private static void InitOneTime()
     {
         if (InitOnce)
@@ -152,9 +154,9 @@ internal class Menu
             OnPageLoad = () =>
             {
                 if (PotentialSelection.IsFav)
-                    FavoriteSuit.Name = $"UnFavorite {PotentialSelection.Name}";
+                    FavoriteSuit.Name = $"Remove Favorite {PotentialSelection.Name}";
                 else
-                    FavoriteSuit.Name = $"Favorite {PotentialSelection.Name}";
+                    FavoriteSuit.Name = $"Add Favorite {PotentialSelection.Name}";
             }
         };
         favSuit.AddListener(() =>

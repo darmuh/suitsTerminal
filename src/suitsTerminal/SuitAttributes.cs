@@ -142,6 +142,7 @@ internal class SuitAttributes : MonoBehaviour
     //Used to display new suit without making the change permanent
     internal void Preview()
     {
+        Loggers.LogDebug("Preview");
         if (Menu.CurrentNest == null)
             return;
 
@@ -157,6 +158,7 @@ internal class SuitAttributes : MonoBehaviour
     internal void Selection()
     {
         Menu.PotentialSelection = this;
+        Menu.PotentialSelection.MenuItem.Parent = Menu.SuitsMenu.CurrentMenuItem; //for fluid exits without having to constantly adjust the menu item parent
     }
 
     internal void WearSuit()
@@ -261,7 +263,12 @@ internal class SuitAttributes : MonoBehaviour
 
     internal void OnPageLoad()
     {
-        Preview();
+        if (Menu.SuitsMenu.CurrentMenuItem == MenuItem)
+            return;
+
+        Loggers.LogDebug($"{Name} OnPageLoad, Current - [{Menu.SuitsMenu.CurrentMenuItem.Name}]");
+        if(Plugin.LocalPlayer.currentSuitID != ID)
+            Preview();
         bool locked = IsLocked();
         MenuItem.Suffix = string.Empty;
         DetermineChildren(locked);

@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.7.2]
+ - hotfix for a blank default suit entry causing the mod to detect every suit as a player's default.
+ - Added some early returns for situations where suit preview would throw null errors
+	- Will dig deeper into *why* these null refs were popping up later
+
 ## [1.7.1]
  - Fixed package not referencing Openlib requirement. (oops)
 

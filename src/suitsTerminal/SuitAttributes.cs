@@ -34,7 +34,7 @@ internal class SuitAttributes : MonoBehaviour
             return false;
 
         if (!UpdateDefault)
-            Name.Contains(_defaultSuit, StringComparison.InvariantCultureIgnoreCase);
+            return Name.Equals(_defaultSuit, StringComparison.InvariantCultureIgnoreCase);
 
 
         if (ModConfig.PersonalizedDefault.Value)
@@ -47,7 +47,7 @@ internal class SuitAttributes : MonoBehaviour
             _defaultSuit = File.ReadAllText(FilePath + @"\defaultSuit.txt");
             Loggers.LogDebug($"Default Suit from personal files - {_defaultSuit}");
             UpdateDefault = false;
-            return Name.Contains(_defaultSuit, StringComparison.InvariantCultureIgnoreCase);
+            return Name.Equals(_defaultSuit, StringComparison.InvariantCultureIgnoreCase);
         }
         else
         {
@@ -142,6 +142,12 @@ internal class SuitAttributes : MonoBehaviour
     //Used to display new suit without making the change permanent
     internal void Preview()
     {
+        if (Menu.CurrentNest == null)
+            return;
+
+        if (Menu.SuitsMenu.ActiveSelection >= Menu.CurrentNest.Count)
+            return;
+
         if (Menu.CurrentNest[Menu.SuitsMenu.ActiveSelection] != MenuItem)
             return;
 

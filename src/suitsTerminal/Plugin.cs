@@ -58,6 +58,7 @@ public partial class Plugin : BaseUnityPlugin
         Log = Logger;
 
         Log.LogInfo($"Plugin {Name} is loaded with version {Version}!");
+        Log.LogInfo($"Built on v73 of Lethal Company ;)");
         ModConfig.Init(Config);
         EventManagement.Subscribe();
         Menu.CreateBetterCommand();

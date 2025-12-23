@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.7.1]
+ - Fixed package not referencing Openlib requirement. (oops)
+
 ## [1.7.0] *v73 rework*
  - Completely reworked project and updated mod for v73 of the game.
 	- This includes many changes that may not have been documented.

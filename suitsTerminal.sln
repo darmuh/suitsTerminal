@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "suitsTerminal", "src\suitsTerminal\suitsTerminal.csproj", "{C40FCD4B-662F-448D-8192-A1B31044B08F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C40FCD4B-662F-448D-8192-A1B31044B08F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C40FCD4B-662F-448D-8192-A1B31044B08F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C40FCD4B-662F-448D-8192-A1B31044B08F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C40FCD4B-662F-448D-8192-A1B31044B08F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C684CBFE-CB3B-4AA7-BCBB-2A55A0A18E8C}
+	EndGlobalSection
+EndGlobal

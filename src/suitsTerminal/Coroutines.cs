@@ -33,12 +33,18 @@ internal class Coroutines
             yield break;
 
         yield return new WaitForSeconds(5);
-        Loggers.LogDebug("hint in chat.");
+        if (HUDManager.Instance == null)
+        {
+            Loggers.WARNING("Unable to hint on chat! HUDManager instance is null!");
+            yield break;
+        }
 
-        HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]: Access more suits by typing 'suits' in the terminal.");
+        Loggers.LogMessage("displaying hint in chat.");
+
+        HUDManager.Instance.AddChatMessage($"[suitsTerminal]: Access more suits by typing 'suits' in the terminal.");
 
         if (ModConfig.ChatCommands.Value)
-            HUDManager.Instance.AddTextToChatOnServer($"[suitsTerminal]: Access more suits by typing '!suits' in chat.");
+            HUDManager.Instance.AddChatMessage($"[suitsTerminal]: Access more suits by typing '!suits' in chat.");
     }
 
     internal static IEnumerator HudHints()

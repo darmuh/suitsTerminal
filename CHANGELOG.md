@@ -1,4 +1,14 @@
-# Change Log
+# suitsTerminal Change Log
+
+## [1.7.4]
+ - Changed chat messages to be client sided to avoid spam from multiple clients using the commands.
+ - General fixes for chat commands, didn't realize I shipped them in such a poor state and I apologize for that.
+	- Should now check the message you just submitted for a chat command. It had been checking the previous message before that instead (regardless of who typed it).
+	- Should no longer detect other player's messages as a command you have submitted
+	- Will no longer check if the message being tested for a command is the same as the last message. Feel free to continually run the same command over and over
+	- Also trims leading/trailing spaces from the message being tested for commands.
+ - Fixed situation where default suits would spawn after getting fired and not be handled by suitsTerminal's rack manager. (Thanks Lunxara for the report)
+ - Fixed default suit not applying correctly after firing or when connecting to a new lobby if you had already been wearing it previously. (Thanks Lunxara/pacoito)
 
 ## [1.7.3]
  - Made going back in menus more consistent, if you enter a specific suit's menu item you will return to the menu item you selected it from (favorites or main suits listing)

@@ -24,6 +24,7 @@ internal class SuitAttributes : MonoBehaviour
 
     internal void Reset()
     {
+        Loggers.LogDebug($"{Name} is being reset!");
         HideFromTerminal = false;
         IsOnRack = false;
     }
@@ -35,7 +36,6 @@ internal class SuitAttributes : MonoBehaviour
 
         if (!UpdateDefault)
             return Name.Equals(_defaultSuit, StringComparison.InvariantCultureIgnoreCase);
-
 
         if (ModConfig.PersonalizedDefault.Value)
         {
@@ -108,13 +108,19 @@ internal class SuitAttributes : MonoBehaviour
         Name = GetName(item);
         HideFromTerminal = ShouldHideTerm();
 
-        MenuItem = (SuitMenuItem)Menu.SuitsMenu.AllMenuItemsOfType.FirstOrDefault(x => x.Name == Name);
-        MenuItem ??= new(Name, new())
+        var menuItem = Menu.SuitsMenu.AllMenuItemsOfType.FirstOrDefault(x => x.Name == Name);
+        if (menuItem != null)
+            MenuItem = (SuitMenuItem)menuItem;
+        else
+        {
+            MenuItem = new(Name, new())
             {
                 Header = () => $"========[( {Name} )]========\r\n",
                 Footer = Menu.GetFooter,
                 OnPageLoad = OnPageLoad
             };
+        }
+        
         MenuItem.SuitProps = this; //always associate with latest suitprop
         IsFav = IsFavorite();
 

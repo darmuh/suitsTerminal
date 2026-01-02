@@ -37,7 +37,10 @@ public partial class Plugin : BaseUnityPlugin
     {
         get
         {
-            return OpenLib.Plugin.instance.Terminal;
+            Terminal terminal = OpenLib.Plugin.instance.Terminal;
+            if (terminal == null)
+                Loggers.ERROR("Trying to get null Terminal Reference!");
+            return terminal!;
         }
     }
 
@@ -45,7 +48,10 @@ public partial class Plugin : BaseUnityPlugin
     {
         get
         {
-            return StartOfRound.Instance.localPlayerController;
+            if (StartOfRound.Instance.localPlayerController == null)
+                Loggers.ERROR("Trying to get null localplayer!!");
+
+            return StartOfRound.Instance.localPlayerController!;
         }
     }
 
@@ -56,13 +62,13 @@ public partial class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Log = Logger;
-
-        Log.LogInfo($"Plugin {Name} is loaded with version {Version}!");
-        Log.LogInfo($"Built on v73 of Lethal Company ;)");
-        ModConfig.Init(Config);
+        Log.LogMessage($"Plugin {Name} is loaded with version {Version}!");
+        ModConfig.Init(Config); 
         EventManagement.Subscribe();
         Menu.CreateBetterCommand();
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        Log.LogInfo($"Built on v73 of Lethal Company ;)");
+        Log.LogMessage($"Current logging level is {ModConfig.LogLevel.Value}");
     }
 
     internal static void ShowHint()
@@ -150,7 +156,6 @@ public partial class Plugin : BaseUnityPlugin
         {
             int excessLength = stringBuilder.Length - 14;
             stringBuilder.Remove(14, excessLength);
-            //Plugin.X($"terminalFriendlystring: {stringBuilder}");
         }
 
 

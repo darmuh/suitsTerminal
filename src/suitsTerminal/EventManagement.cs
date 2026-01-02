@@ -51,6 +51,7 @@ internal class EventManagement
     internal static void ResetSuitPlacementVars()
     {
         RackManager.RackSetupComplete = false;
+        RackManager.RealCurrentID = 0;
         if (RackManager.AllSuits.Count == 0)
             return;
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using OpenLib.Common;
 using OpenLib.CoreMethods;
-using OpenLib.Events;
 using OpenLib.InteractiveMenus;
 using UnityEngine;
 using static suitsTerminal.ModConfig;
@@ -32,15 +31,11 @@ internal class Menu
     internal static SuitMenuItem SelectSuit = null!;
     internal static SuitMenuItem FavoriteSuit = null!;
     internal static SuitMenuItem SetDefaultSuit = null!;
-    internal static SuitMenuItem PurchaseSuitFromStore = null!;
+    internal static SuitMenuItem PurchaseSuitFromStore = null!; //this will probably never be used since suits dont exist till they are bought
+    internal static SuitMenuItem SetRandomSuit = null!;
 
     //Tracking between pages
     internal static SuitAttributes PotentialSelection = null!;
-
-    //BetterMenu Page Events
-    internal static Events.CustomEvent OpenFavs = new();
-    internal static Events.CustomEvent ShowAllSuits = new();
-    internal static Events.CustomEvent ShowHelp = new();
 
     //BetterMenu Misc
     internal static CommandManager Command = null!;
@@ -111,45 +106,44 @@ internal class Menu
         };
         SuitsMenu.MainMenu = HomePage;
         SuitsMenu.OnExit.AddListener(RemovePreview);
-        FavoritesList = new("Favorites", OpenFavs)
+        FavoritesList = new("Favorites")
         {
             ShowIfEmptyNest = false,
             Header = () => $"============= Favorite Suits  =============\r\n",
             Footer = GetFooter
         };
-        OpenFavs.AddListener(ShowFavs);
+        FavoritesList.SelectionEvent.AddListener(ShowFavs);
         FavoritesList.SetParentMenu(HomePage);
-        SuitsList = new("Change Suits", ShowAllSuits)
+        SuitsList = new("Change Suits")
         {
             Header = () => $"============= Select a Suit!  =============\r\n",
             Footer = GetFooter
         };
 
-        ShowAllSuits.AddListener(ShowNormal);
+        SuitsList.SelectionEvent.AddListener(ShowNormal);
         SuitsList.SetParentMenu(HomePage);
-        HelpPage = new("Help Page", ShowHelp);
-        ShowHelp.AddListener(ShowHelpPage);
+
+        SetRandomSuit = new("Random Suit");
+        SetRandomSuit.SelectionEvent.AddListener(RandomSuitPage);
+        SetRandomSuit.SetParentMenu(HomePage);
+
+        HelpPage = new("Help Page");
+        HelpPage.SelectionEvent.AddListener(ShowHelpPage);
         HelpPage.SetParentMenu(HomePage);
 
         SuitsList.AdjustNestedMenuList.AddListener(SortSuits);
         FavoritesList.AdjustNestedMenuList.AddListener(SortSuits);
 
-        Events.CustomEvent newSuit = new();
-
-        SelectSuit = new("Select Suit", newSuit)
+        SelectSuit = new("Select Suit")
         {
             OnPageLoad = () =>
             {
                 SelectSuit.Name = $"Wear {PotentialSelection.Name}";
-            }
+            },
         };
-        newSuit.AddListener(() => 
-        {
-            PotentialSelection.WearSuit();
-        });
+        SelectSuit.SelectionEvent.AddListener(() => PotentialSelection.WearSuit());
 
-        Events.CustomEvent favSuit = new();
-        FavoriteSuit = new("Favorite Suit", favSuit)
+        FavoriteSuit = new("Favorite Suit")
         {
             OnPageLoad = () =>
             {
@@ -159,13 +153,9 @@ internal class Menu
                     FavoriteSuit.Name = $"Add Favorite {PotentialSelection.Name}";
             }
         };
-        favSuit.AddListener(() =>
-        {
-            PotentialSelection.ToggleFav();
-        });
+        FavoriteSuit.SelectionEvent.AddListener(() => PotentialSelection.ToggleFav());
 
-        Events.CustomEvent newDefault = new();
-        SetDefaultSuit = new("Set Default", newDefault)
+        SetDefaultSuit = new("Set Default")
         {
             OnPageLoad = () =>
             {
@@ -176,13 +166,9 @@ internal class Menu
                     SetDefaultSuit.Name = $"Make {PotentialSelection.Name} the default suit";
             }
         };
-        newDefault.AddListener(() =>
-        {
-            PotentialSelection.ToggleDefault();
-        });
+        SetDefaultSuit.SelectionEvent.AddListener(() => PotentialSelection.ToggleDefault());
 
-        Events.CustomEvent purchaseSuit = new();
-        PurchaseSuitFromStore = new("Purchase from store", purchaseSuit)
+        PurchaseSuitFromStore = new("Purchase from store")
         {
             OnPageLoad = () =>
             {
@@ -190,7 +176,9 @@ internal class Menu
                 PurchaseSuitFromStore.Name = $"Purchase {PotentialSelection.Name} from store {UnlockableItems[PotentialSelection.MenuItem.SuitProps.Suit.syncedSuitID.Value].shopSelectionNode.itemCost}";
             }
         };
-        purchaseSuit.AddListener(() =>
+
+        //probably will never be used but cool to keep for potential future updates
+        PurchaseSuitFromStore.SelectionEvent.AddListener(() =>
         {
             var UnlockableItems = StartOfRound.Instance.unlockablesList.unlockables;
             SuitsMenu.ExitAction = () => CommonTerminal.LoadNewNode(UnlockableItems[PotentialSelection.MenuItem.SuitProps.Suit.syncedSuitID.Value].shopSelectionNode);
@@ -523,6 +511,14 @@ internal class Menu
         Loggers.LogDebug($"Changing PiP zoom to zoomStep: [{ZoomStep}]");
     }
 
+    private static void RandomSuitPage()
+    {
+        SuitsMenu.MenuNode.displayText = CommandHandler.RandomSuit();
+        SuitsMenu.AcceptAnything = true;
+        SuitsMenu.Load();
+        Plugin.Terminal.StartCoroutine(SuitsMenuShowPicture(isCentered: true));
+    }
+
     private static void ShowHelpPage()
     {
         //inHelpMenu = true;
@@ -541,12 +537,12 @@ internal class Menu
             return;
         }
 
-        Plugin.Terminal.StartCoroutine(SuitsMenuStart());
+        Plugin.Terminal.StartCoroutine(SuitsMenuShowPicture());
     }
 
     private static void ShowNormal()
     {
-        Plugin.Terminal.StartCoroutine(SuitsMenuStart());
+        Plugin.Terminal.StartCoroutine(SuitsMenuShowPicture());
     }
 
     private static void OnExitStuff()
@@ -559,14 +555,13 @@ internal class Menu
         RotateStep = 0;
         HeightStep = 0;
         ZoomStep = 1;
+        SetRandomSuit.ShowIfEmptyNest = RandomSuitMenu.Value;
     }
 
-    internal static IEnumerator SuitsMenuStart()
+    internal static IEnumerator SuitsMenuShowPicture(bool isCentered = false)
     {
         yield return new WaitForEndOfFrame();
-        TogglePicture(true);
-        yield return new WaitForEndOfFrame();
-        //PiPSetParent();
+        TogglePicture(true, isCentered);
         yield break;
     }
 

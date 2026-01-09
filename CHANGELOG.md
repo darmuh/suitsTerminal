@@ -1,5 +1,18 @@
 # suitsTerminal Change Log
 
+## [1.8.0] (NEW DEPENDENCY)
+ - Mod has had a slight rework to use [MonkeyInjectionLibrary](https://thunderstore.io/c/lethal-company/p/mattymatty/MonkeyInjectionLibrary/)
+	- This new dependency has made this mod a lot simpler to maintain as I'm now injecting properties directly into the base game's ``UnlockableSuit`` class.
+ - Fixed bug caused by getting ejected from the ship for real this time. (Last version only fixed this for the host and not clients)
+ - Removed unused ``Random Suit Command`` configuration item and replaced it with ``Random Suit Menu Item``
+	- New Random Suit Selection page, check it out by enabling the setting! (opt-in)
+ - Added ``!random`` chat command that will be enabled whenever chat commands are enabled
+ - Fixed chat commands sometimes not working sometimes due to running as a postfix (now runs as a prefix when chat commands are submitted)
+ - Slightly adjusted suit positioning logic (when rack is enabled) so that the first suit is placed at the very end of the rack like vanilla
+ - Fixed paid suits not being removed from the suits terminal menu after being fired
+ - Also some general code cleanup
+
+
 ## [1.7.4]
  - Changed chat messages to be client sided to avoid spam from multiple clients using the commands.
  - General fixes for chat commands, didn't realize I shipped them in such a poor state and I apologize for that.

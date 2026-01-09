@@ -58,12 +58,13 @@ public partial class Plugin : BaseUnityPlugin
     internal static bool HintOnce = false;
     internal static bool EquipDefault = true;
     private static string _personalFiles = string.Empty;
+    internal static System.Random Rand = new();
 
     private void Awake()
     {
         Log = Logger;
         Log.LogMessage($"Plugin {Name} is loaded with version {Version}!");
-        ModConfig.Init(Config); 
+        ModConfig.Init(Config);
         EventManagement.Subscribe();
         Menu.CreateBetterCommand();
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());

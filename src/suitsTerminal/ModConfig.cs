@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
-using static OpenLib.Loggers;
 using static OpenLib.ConfigManager.ConfigSetup;
+using static OpenLib.Loggers;
 
 namespace suitsTerminal;
 internal class ModConfig
@@ -45,7 +45,7 @@ internal class ModConfig
     }
 
     public static ConfigEntry<LoggingLevel> LogLevel { get; internal set; } = null!;
-    public static ConfigEntry<bool> RandomSuitCommand { get; internal set; } = null!;
+    public static ConfigEntry<bool> RandomSuitMenu { get; internal set; } = null!;
     public static ConfigEntry<bool> ChatCommands { get; internal set; } = null!;
     public static ConfigEntry<int> SuitsOnRack { get; internal set; } = null!;
     public static ConfigEntry<float> RackOffset { get; internal set; } = null!;
@@ -54,7 +54,7 @@ internal class ModConfig
     public static ConfigEntry<Hint> HintStyle { get; internal set; } = null!;
     public static ConfigEntry<PiP> CamStyle { get; internal set; } = null!;
     public static ConfigEntry<string> ObcResolution { get; internal set; } = null!;
-            
+
     public static ConfigEntry<string> MenuUp { get; internal set; } = null!;
     public static ConfigEntry<string> MenuDown { get; internal set; } = null!;
     public static ConfigEntry<string> MenuLeft { get; internal set; } = null!;
@@ -66,20 +66,19 @@ internal class ModConfig
     public static ConfigEntry<string> TogglePiPRotation { get; internal set; } = null!;
     public static ConfigEntry<string> TogglePiPHeight { get; internal set; } = null!;
     public static ConfigEntry<Page> MenuStartPage { get; internal set; } = null!;
-            
+
     public static ConfigEntry<string> SuitsOnRackOnly { get; internal set; } = null!;
     public static ConfigEntry<string> DontAddToRack { get; internal set; } = null!;
     public static ConfigEntry<string> DontAddToTerminal { get; internal set; } = null!;
     public static ConfigEntry<string> FavoritesMenuList { get; internal set; } = null!;
     public static ConfigEntry<string> DefaultSuit { get; internal set; } = null!;
     public static ConfigEntry<bool> PersonalizedFavorites { get; internal set; } = null!;
-    public static ConfigEntry<bool> PersonalizedDefault {  get; internal set; } = null!;
+    public static ConfigEntry<bool> PersonalizedDefault { get; internal set; } = null!;
     public static ConfigEntry<Sort> SuitsSortingStyle { get; internal set; } = null!;
 
     public static void Init(ConfigFile config)
     {
         LogLevel = MakeGeneric(config, "Debug", "Logging Level", LoggingLevel.Info, "Set the mod's logging level to determine what messages populate the logs");
-        RandomSuitCommand = MakeGeneric(config, "General", "Random Suit Command", false, "Create a random suit command to pick a random suit from the terminal");
         ChatCommands = MakeGeneric(config, "General", "Chat Commands", false, "Create suit related chat commands (!suits/!wear) that can be run from chat");
         EnforcePaidSuits = MakeGeneric(config, "General", "Enforce Paid Suits", true, "Determines whether paid suits need to be unlocked before appearing in the listing.");
         HintStyle = MakeGeneric(config, "General", "Hint Style", Hint.AllHints, "Determines what style of Hints display on player load-in");
@@ -108,6 +107,7 @@ internal class ModConfig
         FavoritesMenuList = MakeGeneric(config, "Menu", "Profile Favorites List", "", "If PersonalizedFavorites is disabled, favorited suit names will be stored and loaded into the menu from here\n");
         CamStyle = MakeGeneric(config, "Menu", "Picture-In-Picture Style", PiP.OpenLib, "Determines what kind of camera is created, if at all");
         ObcResolution = MakeGeneric(config, "Menu", "OpenBodyCams Resolution", "1000; 700", "Set the resolution of the Menu Camera (if created with OpenBodyCams)");
+        RandomSuitMenu = MakeGeneric(config, "Menu", "Random Suit Menu Item", false, "Create a random suit menu item to pick a random suit from the terminal");
     }
 
     private static void InitControls(ConfigFile config)

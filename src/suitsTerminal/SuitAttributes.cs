@@ -7,7 +7,7 @@ using static OpenLib.Common.CommonStringStuff;
 using static suitsTerminal.RackManager;
 
 namespace suitsTerminal;
-internal class SuitAttributes : MonoBehaviour
+public class SuitAttributes : MonoBehaviour
 {
     private static string _defaultSuit = string.Empty;
     internal static bool UpdateDefault = true;
@@ -71,7 +71,7 @@ internal class SuitAttributes : MonoBehaviour
         }
         else
             Loggers.LogDebug("No default suit detected");
-        
+
     }
 
     internal bool IsLocked()
@@ -120,7 +120,7 @@ internal class SuitAttributes : MonoBehaviour
                 OnPageLoad = OnPageLoad
             };
         }
-        
+
         MenuItem.SuitProps = this; //always associate with latest suitprop
         IsFav = IsFavorite();
 
@@ -142,9 +142,10 @@ internal class SuitAttributes : MonoBehaviour
     private void OnDestroy()
     {
         Plugin.Log.LogDebug($"Destroying SuitAttribute! [{this.Name}]");
+        MenuItem.RemoveFromParent();
         AllSuits.Remove(this);
     }
-    
+
     //Used to display new suit without making the change permanent
     internal void Preview()
     {
@@ -169,7 +170,16 @@ internal class SuitAttributes : MonoBehaviour
 
     internal void WearSuit()
     {
-        CommandHandler.BetterSuitPick(this);
+        if (Suit == null)
+        {
+            Loggers.ERROR("suit is null!");
+            return;
+        }
+
+        Plugin.LocalPlayer.currentSuitID = RealCurrentID; //needed to sync new changes and play the sound
+        Suit.SwitchSuitToThis(Plugin.LocalPlayer);
+        Plugin.Log.LogMessage($"Switched suit to {Name}");
+        RealCurrentID = Suit.suitID;
     }
 
     internal bool IsFavorite()
@@ -264,7 +274,7 @@ internal class SuitAttributes : MonoBehaviour
 
         MenuItem.NestedMenus.Add(Menu.FavoriteSuit);
         MenuItem.NestedMenus.Add(Menu.SetDefaultSuit);
-        
+
     }
 
     internal void OnPageLoad()
@@ -273,7 +283,7 @@ internal class SuitAttributes : MonoBehaviour
             return;
 
         Loggers.LogDebug($"{Name} OnPageLoad, Current - [{Menu.SuitsMenu.CurrentMenuItem.Name}]");
-        if(Plugin.LocalPlayer.currentSuitID != ID)
+        if (Plugin.LocalPlayer.currentSuitID != ID)
             Preview();
         bool locked = IsLocked();
         MenuItem.Suffix = string.Empty;

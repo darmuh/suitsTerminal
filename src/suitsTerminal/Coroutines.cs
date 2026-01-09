@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using MonoMod.RuntimeDetour;
 using UnityEngine;
 
 namespace suitsTerminal;
@@ -8,7 +7,7 @@ internal class Coroutines
 {
     internal static IEnumerator DelayStartOnReset()
     {
-        EventManagement.ResetSuitPlacementVars();
+        RackManager.RealCurrentID = 0;
         Menu.specialMenusActive = false;
         Loggers.LogDebug("ShipResetStuff!");
         Plugin.EquipDefault = true;

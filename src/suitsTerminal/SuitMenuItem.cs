@@ -24,7 +24,11 @@ internal class SuitMenuItem(string name, CustomEvent select = null!) : MenuItem(
     private CustomEvent _selection = select;
     public override CustomEvent SelectionEvent
     {
-        get => _selection;
+        get
+        {
+            _selection ??= new();
+            return _selection;
+        }
         set => _selection = value;
     }
 

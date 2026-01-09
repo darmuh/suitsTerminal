@@ -36,12 +36,16 @@ internal class PictureInPicture
         Plugin.Terminal.terminalImage.color = new(1f, 1f, 1f, opacity);
     }
 
-    private static void SetTerminalImage(bool toDefault)
+    private static void SetTerminalImage(bool toDefault, bool centered)
     {
         if (!toDefault)
         {
             Plugin.Terminal.terminalImage.enabled = true; //force this enabled to avoid base-game messing with displayText
-            SetRectDimesionsAndPos(Plugin.Terminal.terminalImage.rectTransform, new(225f, 190f), new(75f, -2f));
+            if (centered)
+                SetRectDimesionsAndPos(Plugin.Terminal.terminalImage.rectTransform, new(225f, 190f), new(-10f, -4f));
+            else
+                SetRectDimesionsAndPos(Plugin.Terminal.terminalImage.rectTransform, new(225f, 190f), new(75f, -2f));
+
             SetTerminalImageOpacity(0.9f); //90%
         }
         else
@@ -122,7 +126,7 @@ internal class PictureInPicture
         cameraTransform.position = newPosition;
     }
 
-    internal static void TogglePicture(bool state)
+    internal static void TogglePicture(bool state, bool centered = false)
     {
         if (CamStyle.Value == PiP.Disabled)
             return;
@@ -135,7 +139,7 @@ internal class PictureInPicture
             Menu.SuitsMenu.MenuNode.displayTexture = null!;
         }
 
-        SetTerminalImage(!state);
+        SetTerminalImage(!state, centered);
 
         Loggers.LogDebug($"TogglePiP: {state}");
 
@@ -159,7 +163,7 @@ internal class PictureInPicture
                 PlayerCam = CamStuff.HomebrewCam(ref CamTexture, ref CamStuff.MyCameraHolder);
                 CamTexture.name = "suitsTerminal_CamText";
             }
-                
+
 
             CamStuff.CamInitMirror(CamStuff.MyCameraHolder, PlayerCam, 0.1f, false);
             CamStuff.HomebrewCameraState(state, PlayerCam);

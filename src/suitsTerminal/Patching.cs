@@ -1,57 +1,55 @@
-﻿using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine.InputSystem;
-using static suitsTerminal.CommandHandler;
 using static suitsTerminal.RackManager;
 
 namespace suitsTerminal;
 internal class Patching
 {
-    [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.PositionSuitsOnRack))]
-    public class PositionSuitsOnRackPatch
+    //method injected for this patch
+    [HarmonyPatch(typeof(UnlockableSuit), "Start")]
+    public class SuitStart
     {
-        static void Postfix()
+        static void Postfix(UnlockableSuit __instance)
         {
-            if (!RackSetupComplete)
-                return;
-
-            RackLaunch();
+            __instance.GetSuitAttributes();
+            SuitSpawn(__instance);
         }
     }
 
-    [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.UnlockShipObject))]
-    public class CatchSuitSpawnsOnReload
+    [HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.PositionSuitsOnRack))]
+    public class VoidSuitsPositioning
     {
-        static void Postfix(StartOfRound __instance, int unlockableID)
+        static bool Prefix()
         {
-            if (!Plugin.HintOnce) //dont rely on this patch on first launch of a lobby
-                return;
-
-            if (__instance.unlockablesList.unlockables.Count <= unlockableID)
-                return;
-
-            if (__instance.unlockablesList.unlockables[unlockableID].unlockableType != 0)
-                return;
-
-            string name = __instance.unlockablesList.unlockables[unlockableID].unlockableName;
-
-            if (AllSuits.Any(x => x.Name == name))
-                Loggers.LogInfo($"SuitAttributes for [{name}] already exists!");
-            else
+            if (ModConfig.RackSettings.Value == ModConfig.Removal.DontRemoveAnything)
             {
-                Loggers.LogInfo("New suit detected! Calling upon suitsTerminal rack manager to ensure it is placed by user's config!");
-                RackLaunch();
+                Loggers.WARNING("suitsTerminal is NOT touching the rack!!!");
+                return true;
             }
+
+            //reset rack suits number
+            var rackSuits = AllSuits.FindAll(x => x.IsOnRack);
+            foreach (var suit in rackSuits)
+                suit.IsOnRack = false;
+
+            foreach (var suit in AllSuits)
+            {
+                suit.Suit.ResetPosition();
+            }
+
+            return false;
         }
     }
 
     [HarmonyPatch(typeof(HUDManager), nameof(HUDManager.SubmitChat_performed))]
     public class Chat_Patch
     {
-        static void Postfix(HUDManager __instance, ref InputAction.CallbackContext context)
+        static void Prefix(HUDManager __instance, ref InputAction.CallbackContext context)
         {
             if (!ModConfig.ChatCommands.Value)
                 return;
+
+            //Loggers.LogDebug("submit chat performed");
 
             var localPlayer = Plugin.LocalPlayer;
             if (!context.performed || localPlayer == null || !localPlayer.isTypingChat || localPlayer.isPlayerDead)
@@ -109,7 +107,7 @@ internal class Patching
                         {
                             SuitAttributes suit = AllSuits[suitNumVal];
                             Loggers.LogDebug($"wear command");
-                            BetterSuitPick(suit);
+                            suit.WearSuit();
                             return;
                         }
                         else
@@ -131,6 +129,14 @@ internal class Patching
             {
                 _ = HUDManager.Instance.chatText.text[HUDManager.Instance.chatText.text.Length..];
                 HUDManager.Instance.ChatMessageHistory.Clear();
+            }
+            else if (command.StartsWith("!random")) //random suit command
+            {
+                int random = Plugin.Rand.Next(AllSuits.Count);
+                SuitAttributes suit = AllSuits[random];
+                suit.WearSuit();
+                HUDManager.Instance.AddChatMessage($"[suitsTerminal]:\t Rolled random number [ {random} ]");
+                HUDManager.Instance.AddChatMessage($"[suitsTerminal]:\t Changing suit to {suit.Name}!");
             }
         }
     }

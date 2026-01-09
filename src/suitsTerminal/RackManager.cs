@@ -11,7 +11,6 @@ internal class RackManager
 {
     internal static List<SuitAttributes> AllSuits = [];
     internal static List<string> FavsList = [];
-    internal static bool RackSetupComplete = false;
     internal static bool IsRackFull
     {
         get
@@ -37,7 +36,7 @@ internal class RackManager
     {
         get
         {
-            if(AllSuits.Count > 0)
+            if (AllSuits.Count > 0)
                 _current = AllSuits.FirstOrDefault(x => x.Suit.suitID == RealCurrentID);
 
             return _current!;
@@ -75,12 +74,20 @@ internal class RackManager
         }
     }
 
+    internal static int RackCount
+    {
+        get
+        {
+            return AllSuits.FindAll(x => x.IsOnRack).Count;
+        }
+    }
+
     private static GameObject _clothingRack = null!;
     internal static GameObject ClothingRack
     {
         get
         {
-            if(_clothingRack == null)
+            if (_clothingRack == null)
             {
                 if (Plugin.TryGetGameObject("Environment/HangarShip/NurbsPath.002", out _clothingRack))
                     return _clothingRack;
@@ -92,71 +99,48 @@ internal class RackManager
         }
     }
 
-    internal static void RackLaunch()
+    public static void SuitSpawn(UnlockableSuit unlockableSuit)
     {
-        List<UnlockableSuit> RawSuitsList = [.. UnityEngine.Object.FindObjectsByType<UnlockableSuit>(FindObjectsInactive.Include, FindObjectsSortMode.None)];
-        int rackCount = 0; //whenever we are doing this method we need to rest this value to 0 for proper placement
+        AutoParentToShip component = unlockableSuit.gameObject.GetComponent<AutoParentToShip>();
+        SuitAttributes suit = unlockableSuit.gameObject.GetComponent<SuitAttributes>();
 
-        bool RemoveBoots = ModConfig.RackSettings.Value == ModConfig.Removal.OnlyBootsAndExtraSuits || ModConfig.RackSettings.Value == ModConfig.Removal.Everything;
-        bool RemoveRack = ModConfig.RackSettings.Value == ModConfig.Removal.OnlyRackAndExtraSuits || ModConfig.RackSettings.Value == ModConfig.Removal.Everything;
+        if (Plugin.TooManySuits)
+            return;
 
-        if (!RackSetupComplete)
-            HideBootsAndRack(RemoveBoots, RemoveRack);
-
-        foreach (var item in RawSuitsList)
+        if (ModConfig.RackSettings.Value == ModConfig.Removal.DontRemoveAnything)
         {
-            AutoParentToShip component = item.gameObject.GetComponent<AutoParentToShip>();
-
-            SuitAttributes suit = item.gameObject.GetComponent<SuitAttributes>();
-            bool existing = suit != null;
-            if (suit == null)
-            {
-                suit = item.gameObject.AddComponent<SuitAttributes>();
-                Loggers.LogDebug($"Added suit attributes for {suit.Name} with ID {suit.Suit.syncedSuitID.Value}");
-            }
-            else
-                Loggers.LogDebug($"Suit attributes already exists for {suit.Name}");
-
-
-            if (Plugin.TooManySuits)
-                continue;
-
-            if (ModConfig.RackSettings.Value == ModConfig.Removal.DontRemoveAnything)
-            {
-                Loggers.WARNING("suitsTerminal is NOT touching the rack!!!");
-                continue;
-            }
-
-            if (RackDisabled)
-            {
-                ProcessHiddenSuit(component);
-                suit.IsOnRack = false;
-            }
-            else
-            {
-                if (ShouldShowSuit(suit, rackCount))
-                {
-                    suit.IsOnRack = true;
-                    ProcessVisibleSuit(component, rackCount);
-                    Loggers.LogDebug($"Showing suit - [ {suit.Name} ]");
-                    rackCount++;
-                }
-                else
-                {
-                    suit.IsOnRack = false;
-                    ProcessHiddenSuit(component);
-                    Loggers.LogDebug($"Hiding suit - [ {suit.Name} ]");
-                }
-            }
-
+            Loggers.WARNING("suitsTerminal is NOT touching the rack!!!");
+            return;
         }
 
-        RackSetupComplete = true;
-        Loggers.LogDebug($"Main list count: {AllSuits.Count}\nFav list count: {FavCount}");
+        if (RackDisabled)
+        {
+            ProcessHiddenSuit(component);
+            Loggers.LogDebug($"Hiding suit - [ {suit.Name} ]");
+            suit.IsOnRack = false;
+        }
+        else
+        {
+            if (ShouldShowSuit(suit, RackCount))
+            {
+                ProcessVisibleSuit(component, RackCount);
+                Loggers.LogDebug($"Showing suit - [ {suit.Name} ]");
+                suit.IsOnRack = true;
+            }
+            else
+            {
+                ProcessHiddenSuit(component);
+                Loggers.LogDebug($"Hiding suit - [ {suit.Name} ]");
+                suit.IsOnRack = false;
+            }
+        }
     }
 
-    private static void HideBootsAndRack(bool removeBoots, bool removeRack)
+    internal static void HideBootsAndRack()
     {
+        bool removeBoots = ModConfig.RackSettings.Value == ModConfig.Removal.OnlyBootsAndExtraSuits || ModConfig.RackSettings.Value == ModConfig.Removal.Everything;
+        bool removeRack = ModConfig.RackSettings.Value == ModConfig.Removal.OnlyRackAndExtraSuits || ModConfig.RackSettings.Value == ModConfig.Removal.Everything;
+
         if (removeBoots && Plugin.TryGetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004", out GameObject boots))
             GameObject.Destroy(boots);
 
@@ -166,7 +150,7 @@ internal class RackManager
 
     internal static void RemovePreview()
     {
-        if(CurrentSuit == null)
+        if (CurrentSuit == null)
         {
             Loggers.WARNING("Unable to re-equip the correct suit!");
             return;
@@ -211,7 +195,7 @@ internal class RackManager
 
         float offsetModifier = ModConfig.RackOffset.Value;
 
-        component.positionOffset = StartOfRound.Instance.rightmostSuitPosition.localPosition + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * suitNumber;
+        component.positionOffset = StartOfRound.Instance.rightmostSuitPosition.localPosition + StartOfRound.Instance.rightmostSuitPosition.forward * offsetModifier * (suitNumber - 1);
         component.rotationOffset = new Vector3(0f, 90f, 0f);
     }
 

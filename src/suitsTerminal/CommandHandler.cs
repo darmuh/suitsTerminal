@@ -1,7 +1,4 @@
-﻿using System;
-using HarmonyLib;
-using OpenLib.CoreMethods;
-using static suitsTerminal.RackManager;
+﻿using static suitsTerminal.RackManager;
 
 namespace suitsTerminal;
 
@@ -13,11 +10,10 @@ internal class CommandHandler
 
         string displayText;
 
-        Random rand = new();
-        int random = rand.Next(AllSuits.Count);
+        int random = Plugin.Rand.Next(AllSuits.Count);
         SuitAttributes suit = AllSuits[random];
-        suit.Suit.SwitchSuitToThis(Plugin.LocalPlayer);
-        displayText = $"Rolled random number [ {random} ]\n\n\nChanging suit to {suit.Name}!\r\n\r\n";
+        suit.WearSuit();
+        displayText = $"========== Rolled random number [ {random} ] ==========\n\n\n\n\n\n\n\n\n\n\n\n\n\tChanging suit to {suit.Name}!\n\tPress any key to continue...\n\n";
         return displayText;
     }
 
@@ -27,24 +23,5 @@ internal class CommandHandler
         RealCurrentID = Plugin.LocalPlayer.currentSuitID;
         Menu.SuitsMenu.EnterAtPage(SuitMenuItem.GetStartMenu());
         return "";
-    }
-
-    internal static void BetterSuitPick(SuitAttributes suit)
-    {
-        if (suit.Suit == null)
-        {
-            Loggers.ERROR("suit is null!");
-            return;
-        }
-
-        Plugin.LocalPlayer.currentSuitID = RealCurrentID; //needed to sync new changes and play the sound
-        suit.Suit.SwitchSuitToThis(Plugin.LocalPlayer);
-        Plugin.Log.LogMessage($"Switched suit to {suit.Name}");
-        RealCurrentID = suit.Suit.suitID;
-    }
-
-    internal static void AddBasicCommand(string nodeName, string keyWord, string displayText, string category = "", string description = "")
-    {
-        AddingThings.AddBasicCommand(nodeName, keyWord, displayText, false, true, category, description);
     }
 }

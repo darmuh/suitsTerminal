@@ -1,6 +1,9 @@
 ﻿using OpenLib.Events;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Suits;
+using suitsTerminal.Util;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Misc;
 
 internal class EventManagement
 {

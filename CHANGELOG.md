@@ -1,5 +1,16 @@
 # suitsTerminal Change Log
 
+## [1.8.1]
+ - Per matty's recommendation, made some adjustments to IUnlockableSuit interface
+	- Defined ``HandleErrors`` in case others try to inject the same Start method
+	- Renamed Attributes property to be a bit more unique, it's now called ``SuitsTerminalAttributes``
+- Added custom keyword handling for the suits menu! You can now configure keywords for the main menu, the suits listing page, and the favorites page.
+	- Note that adding a keyword to the favorites page or the suits listing page will have you exit immediately from that page, to access the full menu you must use the main menu keyword.
+	- You can always have the main menu keyword open to any page of your choosing, however this keyword will still exit to the main menu before fully exiting (unless you leave the terminal of course)
+	- leaving a configuration item blank will result in the keyword not being created, with exception to the main menu which will default to the ``suits`` keyword.
+- Re-added handling for changing controls mid-game. This has been missing since the rework :)
+- project folder has been reorganized a bit
+
 ## [1.8.0] (NEW DEPENDENCY)
  - Mod has had a slight rework to use [MonkeyInjectionLibrary](https://thunderstore.io/c/lethal-company/p/mattymatty/MonkeyInjectionLibrary/)
 	- This new dependency has made this mod a lot simpler to maintain as I'm now injecting properties directly into the base game's ``UnlockableSuit`` class.
@@ -7,7 +18,7 @@
  - Removed unused ``Random Suit Command`` configuration item and replaced it with ``Random Suit Menu Item``
 	- New Random Suit Selection page, check it out by enabling the setting! (opt-in)
  - Added ``!random`` chat command that will be enabled whenever chat commands are enabled
- - Fixed chat commands sometimes not working sometimes due to running as a postfix (now runs as a prefix when chat commands are submitted)
+ - Fixed chat commands not working sometimes due to running as a postfix (now runs as a prefix when chat commands are submitted)
  - Slightly adjusted suit positioning logic (when rack is enabled) so that the first suit is placed at the very end of the rack like vanilla
  - Fixed paid suits not being removed from the suits terminal menu after being fired
  - Also some general code cleanup

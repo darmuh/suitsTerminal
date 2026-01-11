@@ -1,9 +1,11 @@
 ﻿
 using System.Collections.Generic;
 using OpenLib.InteractiveMenus;
+using suitsTerminal.Misc;
+using suitsTerminal.OfTerminal;
 using static OpenLib.Events.Events;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Suits;
 
 internal class SuitMenuItem(string name, CustomEvent select = null!) : MenuItem(Menu.SuitsMenu)
 {
@@ -52,6 +54,5 @@ internal class SuitMenuItem(string name, CustomEvent select = null!) : MenuItem(
 
         return Menu.HomePage;
     }
-
 
 }

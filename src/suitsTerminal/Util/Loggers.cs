@@ -1,5 +1,6 @@
-﻿
-namespace suitsTerminal;
+﻿using suitsTerminal.Misc;
+
+namespace suitsTerminal.Util;
 public class Loggers
 {
     private static void Log(BepInEx.Logging.LogLevel bepLevel, object data)

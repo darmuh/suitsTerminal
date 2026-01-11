@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using suitsTerminal.Misc;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Util;
 using UnityEngine;
 using static OpenLib.Common.CommonStringStuff;
-using static suitsTerminal.RackManager;
+using static suitsTerminal.Suits.RackManager;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Suits;
 public class SuitAttributes : MonoBehaviour
 {
     private static string _defaultSuit = string.Empty;
@@ -141,7 +144,7 @@ public class SuitAttributes : MonoBehaviour
 
     private void OnDestroy()
     {
-        Plugin.Log.LogDebug($"Destroying SuitAttribute! [{this.Name}]");
+        Plugin.Log.LogDebug($"Destroying SuitAttribute! [{Name}]");
         MenuItem.RemoveFromParent();
         AllSuits.Remove(this);
     }

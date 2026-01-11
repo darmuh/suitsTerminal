@@ -6,14 +6,16 @@ using System.Text;
 using OpenLib.Common;
 using OpenLib.CoreMethods;
 using OpenLib.InteractiveMenus;
+using suitsTerminal.Suits;
+using suitsTerminal.Util;
 using UnityEngine;
-using static suitsTerminal.ModConfig;
-using static suitsTerminal.PictureInPicture;
-using static suitsTerminal.RackManager;
+using static suitsTerminal.Misc.ModConfig;
+using static suitsTerminal.Misc.PictureInPicture;
+using static suitsTerminal.Suits.RackManager;
 using Key = UnityEngine.InputSystem.Key;
 
 
-namespace suitsTerminal;
+namespace suitsTerminal.OfTerminal;
 
 internal class Menu
 {
@@ -27,6 +29,7 @@ internal class Menu
     internal static SuitMenuItem FavoritesList = null!;
     internal static SuitMenuItem SuitsList = null!;
     internal static SuitMenuItem HelpPage = null!;
+
     //MenuItem Pages
     internal static SuitMenuItem SelectSuit = null!;
     internal static SuitMenuItem FavoriteSuit = null!;
@@ -34,11 +37,13 @@ internal class Menu
     internal static SuitMenuItem PurchaseSuitFromStore = null!; //this will probably never be used since suits dont exist till they are bought
     internal static SuitMenuItem SetRandomSuit = null!;
 
+    //Commands
+    internal static CommandManager Main = null!;
+    internal static CommandManager FavListing = null!;
+    internal static CommandManager SuitListing = null!;
+
     //Tracking between pages
     internal static SuitAttributes PotentialSelection = null!;
-
-    //BetterMenu Misc
-    internal static CommandManager Command = null!;
 
     //Old stuff still used
     internal static string togglePiPstring = string.Empty;
@@ -47,8 +52,6 @@ internal class Menu
     internal static string pipZoomString = string.Empty;
 
     internal static List<MenuItem> CurrentNest = [];
-
-    private static TerminalNode menuDisplay = null!;
 
     internal static bool initKeySettings = false;
 
@@ -65,12 +68,8 @@ internal class Menu
         initKeySettings = true;
         SetupExtraKeys();
         Loggers.LogDebug("Loading keybinds from config");
-        if (menuDisplay == null)
-            menuDisplay = Command.terminalNode;
         InitOneTime();
         UpdateMainKeys();
-
-        SuitsMenu.MenuNode = menuDisplay!;
 
         initKeySettings = false;
 
@@ -235,7 +234,6 @@ internal class Menu
             SetupExtraKeys();
             SuitsMenu.OtherActions = ExtraKeyActions;
         }
-
     }
 
     private static bool IsAnyExtraKeyDifferent()
@@ -261,7 +259,9 @@ internal class Menu
 
     internal static void CreateBetterCommand()
     {
-        Command = new("suitsTerminal", ["suits", "suits menu"], CommandHandler.AdvancedSuitsTerm);
+        Main = new("suitsTerminal Main Menu", MainMenuKWs.GetKeywordValues(isMain: true), CommandHandler.MainSuitsMenu);
+        FavListing = new("suitsTerminal Favorites Listing", FavMenuKWs.GetKeywordValues(), CommandHandler.FavsSuitsMenu);
+        SuitListing = new("suitsTerminal Suits Listing", SuitsListingKWs.GetKeywordValues(), CommandHandler.SuitsListMenu);
     }
 
     internal static void AddHintToOther()
@@ -450,7 +450,7 @@ internal class Menu
 
     private static Camera GetCam()
     {
-        if (OpenLib.Plugin.instance.OpenBodyCamsMod && ModConfig.CamStyle.Value == ModConfig.PiP.OpenBodyCams)
+        if (OpenLib.Plugin.instance.OpenBodyCamsMod && CamStyle.Value == PiP.OpenBodyCams)
         {
             Loggers.LogDebug("Returning Cam from OpenLib OpenBodyCams Compat!");
             return OpenLib.Compat.OpenBodyCamFuncs.GetCam(OpenLib.Compat.OpenBodyCamFuncs.TerminalMirrorCam);

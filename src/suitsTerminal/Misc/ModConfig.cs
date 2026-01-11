@@ -1,8 +1,11 @@
-﻿using BepInEx.Configuration;
+﻿using System.Collections.Generic;
+using BepInEx.Configuration;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Util;
 using static OpenLib.ConfigManager.ConfigSetup;
 using static OpenLib.Loggers;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Misc;
 internal class ModConfig
 {
     public enum Removal
@@ -55,6 +58,12 @@ internal class ModConfig
     public static ConfigEntry<PiP> CamStyle { get; internal set; } = null!;
     public static ConfigEntry<string> ObcResolution { get; internal set; } = null!;
 
+    //Menu keywords
+    public static ConfigEntry<string> MainMenuKWs { get; internal set; } = null!;
+    public static ConfigEntry<string> SuitsListingKWs { get; internal set; } = null!;
+    public static ConfigEntry<string> FavMenuKWs { get; internal set; } = null!;
+
+
     public static ConfigEntry<string> MenuUp { get; internal set; } = null!;
     public static ConfigEntry<string> MenuDown { get; internal set; } = null!;
     public static ConfigEntry<string> MenuLeft { get; internal set; } = null!;
@@ -75,6 +84,8 @@ internal class ModConfig
     public static ConfigEntry<bool> PersonalizedFavorites { get; internal set; } = null!;
     public static ConfigEntry<bool> PersonalizedDefault { get; internal set; } = null!;
     public static ConfigEntry<Sort> SuitsSortingStyle { get; internal set; } = null!;
+
+    public static List<ConfigEntryBase> MenuControls { get; internal set; } = null!;
 
     public static void Init(ConfigFile config)
     {
@@ -108,6 +119,9 @@ internal class ModConfig
         CamStyle = MakeGeneric(config, "Menu", "Picture-In-Picture Style", PiP.OpenLib, "Determines what kind of camera is created, if at all");
         ObcResolution = MakeGeneric(config, "Menu", "OpenBodyCams Resolution", "1000; 700", "Set the resolution of the Menu Camera (if created with OpenBodyCams)");
         RandomSuitMenu = MakeGeneric(config, "Menu", "Random Suit Menu Item", false, "Create a random suit menu item to pick a random suit from the terminal");
+        MainMenuKWs = MakeGeneric(config, "Menu", "Main Keywords", "suits, suits menu, skin", "Comma separated list of keywords used to open the main menu of the suitsTerminal\nIf this item is blank, it will default to \"suits\"\nNOTE: Can only be changed between lobbies while in-game");
+        SuitsListingKWs = MakeGeneric(config, "Menu", "Listing Keywords", string.Empty, "Comma separated list of keywords used to open the suits listing menu of the suitsTerminal\nLeaving this item blank will result in the keyword not being created.\nNOTE: Can only be changed between lobbies while in-game");
+        FavMenuKWs = MakeGeneric(config, "Menu", "Favorites Keywords", string.Empty, "Comma separated list of keywords used to open the favorites menu of the suitsTerminal\nLeaving this item blank will result in the keyword not being created.\nNOTE: Can only be changed between lobbies while in-game");
     }
 
     private static void InitControls(ConfigFile config)
@@ -122,5 +136,21 @@ internal class ModConfig
         TogglePiPZoom = MakeGeneric(config, "Menu", "Camera Zoom", "Minus", "Set key to press to change the zoom level of the menu mirror camera");
         TogglePiPRotation = MakeGeneric(config, "Menu", "Camera Rotation", "Equals", "Set key to press to change the rotation step of the menu mirror camera");
         TogglePiPHeight = MakeGeneric(config, "Menu", "Camera Height", "Backslash", "Set key to press to change the height step of the menu mirror camera");
+
+        MenuControls = [MenuUp, MenuDown, MenuLeft, MenuRight, LeaveMenu, SelectMenu, TogglePiP, TogglePiPZoom, TogglePiPRotation, TogglePiPHeight];
+    }
+
+    internal static void HandleChangedSetting(object sender, SettingChangedEventArgs changed)
+    {
+        if (changed == null) return;
+
+        if (changed.ChangedSetting == SuitsListingKWs)
+            Menu.SuitListing.KeywordList = SuitsListingKWs.GetKeywordValues();
+
+        if (changed.ChangedSetting == FavMenuKWs)
+            Menu.FavListing.KeywordList = FavMenuKWs.GetKeywordValues();
+
+        if (MenuControls.Contains(changed.ChangedSetting))
+            Menu.RefreshKeys();
     }
 }

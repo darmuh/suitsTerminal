@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
+using suitsTerminal.Suits;
+using suitsTerminal.Util;
 using UnityEngine.InputSystem;
-using static suitsTerminal.RackManager;
+using static suitsTerminal.Suits.RackManager;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Misc;
 internal class Patching
 {
     //method injected for this patch

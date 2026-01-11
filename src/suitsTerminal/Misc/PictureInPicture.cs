@@ -1,9 +1,11 @@
 ﻿using OpenLib.Common;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Util;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static suitsTerminal.ModConfig;
+using static suitsTerminal.Misc.ModConfig;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Misc;
 
 internal class PictureInPicture
 {

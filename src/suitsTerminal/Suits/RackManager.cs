@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using suitsTerminal.Misc;
+using suitsTerminal.Util;
 using UnityEngine;
 using static OpenLib.Common.CommonStringStuff;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Suits;
 
 internal class RackManager
 {
@@ -142,10 +144,10 @@ internal class RackManager
         bool removeRack = ModConfig.RackSettings.Value == ModConfig.Removal.OnlyRackAndExtraSuits || ModConfig.RackSettings.Value == ModConfig.Removal.Everything;
 
         if (removeBoots && Plugin.TryGetGameObject("Environment/HangarShip/ScavengerModelSuitParts/Circle.004", out GameObject boots))
-            GameObject.Destroy(boots);
+            UnityEngine.Object.Destroy(boots);
 
         if (removeRack && Plugin.TryGetGameObject("Environment/HangarShip/NurbsPath.002", out GameObject clothingRack))
-            GameObject.Destroy(clothingRack);
+            UnityEngine.Object.Destroy(clothingRack);
     }
 
     internal static void RemovePreview()

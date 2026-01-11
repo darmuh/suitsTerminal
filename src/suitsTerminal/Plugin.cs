@@ -8,6 +8,10 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using GameNetcodeStuff;
 using HarmonyLib;
+using suitsTerminal.Misc;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Suits;
+using suitsTerminal.Util;
 using UnityEngine;
 
 namespace suitsTerminal;
@@ -70,7 +74,9 @@ public partial class Plugin : BaseUnityPlugin
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
         Log.LogInfo($"Built on v73 of Lethal Company ;)");
         Log.LogMessage($"Current logging level is {ModConfig.LogLevel.Value}");
+        Config.SettingChanged += ModConfig.HandleChangedSetting;
     }
+
 
     internal static void ShowHint()
     {

@@ -1,7 +1,10 @@
 ﻿using System.Collections;
+using suitsTerminal.OfTerminal;
+using suitsTerminal.Suits;
+using suitsTerminal.Util;
 using UnityEngine;
 
-namespace suitsTerminal;
+namespace suitsTerminal.Misc;
 
 internal class Coroutines
 {
